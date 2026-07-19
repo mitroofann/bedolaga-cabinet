@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import DOMPurify from 'dompurify';
 import { UseMutationResult } from '@tanstack/react-query';
+import { SanitizedHtml } from '../common/SanitizedHtml';
 import type { TrialInfo } from '../../types';
 import { useCurrency } from '../../hooks/useCurrency';
 import { useTheme } from '../../hooks/useTheme';
@@ -128,13 +128,10 @@ export default function TrialOfferCard({
       <h2 className="mb-1.5 text-[22px] font-bold tracking-tight text-dark-50">
         {isFree ? t('dashboard.trialOffer.freeTitle') : t('dashboard.trialOffer.paidTitle')}
       </h2>
-      <p
+      <SanitizedHtml
+        as="p"
         className="mb-5 text-sm text-dark-50/40"
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(
-            isFree ? t('dashboard.trialOffer.freeDesc') : t('dashboard.trialOffer.paidDesc'),
-          ),
-        }}
+        html={isFree ? t('dashboard.trialOffer.freeDesc') : t('dashboard.trialOffer.paidDesc')}
       />
 
       {/* Price tag for paid trial */}

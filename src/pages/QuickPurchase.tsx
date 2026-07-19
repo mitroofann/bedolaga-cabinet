@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { fireAnalyticsEvent, getYandexCid } from '../hooks/useAnalyticsCounters';
 import { motion, AnimatePresence } from 'framer-motion';
-import DOMPurify from 'dompurify';
 import { landingApi } from '../api/landings';
 import {
   brandingApi,
@@ -421,27 +420,6 @@ function PaymentMethodCard({
         </div>
       )}
     </div>
-  );
-}
-
-function SanitizedHtml({ html, className }: { html: string; className?: string }) {
-  const sanitized = useMemo(() => {
-    const clean = DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ['p', 'a', 'strong', 'em', 'b', 'i', 'br', 'span', 'ul', 'ol', 'li'],
-      ALLOWED_ATTR: ['href', 'target', 'rel'],
-    });
-    // Enforce rel="noopener noreferrer" and target="_blank" on all links
-    const container = document.createElement('div');
-    container.innerHTML = clean;
-    container.querySelectorAll('a').forEach((a) => {
-      a.setAttribute('rel', 'noopener noreferrer');
-      a.setAttribute('target', '_blank');
-    });
-    return container.innerHTML;
-  }, [html]);
-
-  return (
-    <div className={cn('break-words', className)} dangerouslySetInnerHTML={{ __html: sanitized }} />
   );
 }
 
