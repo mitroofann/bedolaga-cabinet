@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CheckIcon, CopyIcon } from '@/components/icons';
 import type { RemnawaveButtonClient, LocalizedText } from '@/types';
 import { copyToClipboard } from '@/utils/clipboard';
+import { extractSubscriptionUrl } from '@/utils/connectionLink';
 import { collapseDoubledCryptPrefix, hasTemplates, resolveTemplate } from '@/utils/templateEngine';
 import { blockButtonClass } from './buttonStyles';
 
@@ -101,8 +102,12 @@ export function BlockButtons({
 
         if (btn.type === 'copyButton') {
           if (hideLink) return null;
-          const url = btn.resolvedUrl || subscriptionUrl;
-          if (!url) return null;
+          const rawCopy = btn.resolvedUrl || subscriptionUrl;
+          if (!rawCopy) return null;
+          // The panel may put an app deep link (incy://import/https://…) in
+          // resolvedUrl; the user pastes this into the app, so copy the bare
+          // subscription URL instead of the prefixed deep link.
+          const url = extractSubscriptionUrl(rawCopy) || rawCopy;
           return (
             <button
               key={idx}
