@@ -17,6 +17,7 @@ import type {
 } from '../api/gift';
 
 import { cn } from '../lib/utils';
+import { SanitizedHtml } from '../components/common/SanitizedHtml';
 import { copyToClipboard } from '../utils/clipboard';
 import { getApiErrorMessage } from '../utils/api-error';
 import { formatPrice } from '../utils/format';
@@ -563,7 +564,7 @@ function BuyTabContent({
       {/* Selected tariff description */}
       {selectedTariff?.description && (
         <div className="rounded-xl border border-dark-800/30 bg-dark-800/20 px-4 py-3">
-          <p className="text-sm text-dark-300">{selectedTariff.description}</p>
+          <SanitizedHtml as="p" html={selectedTariff.description} className="text-sm text-dark-300" />
         </div>
       )}
 

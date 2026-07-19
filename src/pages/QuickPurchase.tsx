@@ -27,6 +27,7 @@ import {
 } from '../components/backgrounds/BackgroundRenderer';
 import { CheckCircleIcon, CheckIcon, DevicesIcon, DownloadIcon } from '@/components/icons';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { SanitizedHtml } from '../components/common/SanitizedHtml';
 import { cn } from '../lib/utils';
 import { getApiErrorMessage } from '../utils/api-error';
 import { formatPrice } from '../utils/format';
@@ -288,7 +289,7 @@ function TariffCard({
         <div>
           <h3 className="text-base font-semibold text-dark-50">{tariff.name}</h3>
           {tariff.description && (
-            <p className="mt-0.5 text-xs text-dark-400">{tariff.description}</p>
+            <SanitizedHtml as="p" html={tariff.description} className="mt-0.5 text-xs text-dark-400" />
           )}
         </div>
         <div

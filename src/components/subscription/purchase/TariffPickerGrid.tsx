@@ -5,6 +5,7 @@ import { useCurrency } from '../../../hooks/useCurrency';
 import { usePromoDiscount } from '../../../hooks/usePromoDiscount';
 import { getGlassColors } from '../../../utils/glassTheme';
 import { ArrowDownIcon, DevicesIcon, RestartIcon } from '@/components/icons';
+import { SanitizedHtml } from '../../common/SanitizedHtml';
 import type { Tariff, Subscription, PurchaseOptions } from '../../../types';
 
 // ──────────────────────────────────────────────────────────────────
@@ -167,9 +168,10 @@ export function TariffPickerGrid({
                   <div>
                     <div className="text-lg font-semibold text-dark-100">{tariff.name}</div>
                     {tariff.description && (
-                      <div className="mt-1 whitespace-pre-line text-sm text-dark-400">
-                        {tariff.description}
-                      </div>
+                      <SanitizedHtml
+                        html={tariff.description}
+                        className="mt-1 whitespace-pre-line text-sm text-dark-400"
+                      />
                     )}
                   </div>
                   {isCurrentTariff && (
