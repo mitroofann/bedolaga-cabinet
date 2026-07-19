@@ -176,9 +176,10 @@
 
             // Copy fallback: in-app browsers (Telegram WebView etc.) often can't
             // launch custom schemes at all — even from a user tap (Telegram bug
-            // #654272). Offer the raw subscription URL for manual import: extract
-            // the embedded http(s) link from deep links like
-            // happ://add/https://sub.example.com/abc or incy://import/https%3A%2F%2F...
+            // #654272). Offer a manual-import value: the plain http(s) subscription
+            // URL embedded in deep links like happ://add/https://sub.example.com/abc,
+            // or the deep link itself when nothing is embedded (e.g. happ://crypt4/...
+            // — Happ accepts its own crypt links pasted as-is).
             function extractSubscriptionUrl(deepLink) {
                 var m = String(deepLink).match(/https?:\/\/.+$/i) ||
                     String(deepLink).match(/https?%3A%2F%2F.+$/i);
@@ -190,37 +191,32 @@
                 return link;
             }
 
-            var copyValue = extractSubscriptionUrl(url);
+            var copyValue = extractSubscriptionUrl(url) || url;
             var copyBtn = document.getElementById('copyBtn');
             var copyHint = document.getElementById('copyHint');
-            if (copyValue) {
-                copyHint.textContent = t.copyHint;
-                copyBtn.textContent = t.copyBtn;
-                copyBtn.addEventListener('click', function() {
-                    function done() {
-                        copyBtn.textContent = t.copied;
-                        setTimeout(function() { copyBtn.textContent = t.copyBtn; }, 2000);
-                    }
-                    function legacyCopy() {
-                        var ta = document.createElement('textarea');
-                        ta.value = copyValue;
-                        ta.style.position = 'fixed';
-                        ta.style.opacity = '0';
-                        document.body.appendChild(ta);
-                        ta.select();
-                        try { document.execCommand('copy'); done(); } catch (e) {}
-                        document.body.removeChild(ta);
-                    }
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(copyValue).then(done, legacyCopy);
-                    } else {
-                        legacyCopy();
-                    }
-                });
-            } else {
-                copyHint.style.display = 'none';
-                copyBtn.style.display = 'none';
-            }
+            copyHint.textContent = t.copyHint;
+            copyBtn.textContent = t.copyBtn;
+            copyBtn.addEventListener('click', function() {
+                function done() {
+                    copyBtn.textContent = t.copied;
+                    setTimeout(function() { copyBtn.textContent = t.copyBtn; }, 2000);
+                }
+                function legacyCopy() {
+                    var ta = document.createElement('textarea');
+                    ta.value = copyValue;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand('copy'); done(); } catch (e) {}
+                    document.body.removeChild(ta);
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(copyValue).then(done, legacyCopy);
+                } else {
+                    legacyCopy();
+                }
+            });
 
             // Attempt to launch the app WITHOUT a top-level navigation. A direct
             // `location.href = scheme` paints a full-page net::ERR_UNKNOWN_URL_SCHEME
