@@ -27,7 +27,12 @@ export function SanitizedHtml({ html, className, as: Tag = 'div' }: SanitizedHtm
 
   return (
     <Tag
-      className={cn('break-words', className)}
+      className={cn(
+        // Tailwind's preflight strips default list/paragraph styling — restore it
+        // so admin-authored markup actually looks formatted.
+        'break-words [&_a]:underline [&_li]:mt-1 [&_ol]:mt-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:text-left [&_p]:mt-1.5 [&_ul]:mt-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-left',
+        className,
+      )}
       dangerouslySetInnerHTML={{ __html: sanitized }}
     />
   );
