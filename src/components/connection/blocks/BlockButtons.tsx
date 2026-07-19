@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { CheckIcon, CopyIcon } from '@/components/icons';
 import type { RemnawaveButtonClient, LocalizedText } from '@/types';
 import { copyToClipboard } from '@/utils/clipboard';
-import { logger } from '@/utils/logger';
 import { collapseDoubledCryptPrefix, hasTemplates, resolveTemplate } from '@/utils/templateEngine';
 import { blockButtonClass } from './buttonStyles';
 
@@ -87,15 +86,7 @@ export function BlockButtons({
               ? resolveTemplate(raw, { subscriptionUrl, username })
               : raw;
           const url = resolved ? collapseDoubledCryptPrefix(resolved) : resolved;
-          if (!url || hasTemplates(url) || !isValidDeepLink(url)) {
-            logger.warn('subscriptionLink button dropped: URL unresolved', {
-              raw,
-              resolved: url,
-              hasSubscriptionUrl: Boolean(subscriptionUrl),
-              hasUsername: Boolean(username),
-            });
-            return null;
-          }
+          if (!url || hasTemplates(url) || !isValidDeepLink(url)) return null;
           return (
             <button
               key={idx}
