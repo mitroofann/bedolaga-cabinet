@@ -86,19 +86,16 @@ export function BlockButtons({
             raw && subscriptionUrl && hasTemplates(raw)
               ? resolveTemplate(raw, { subscriptionUrl, username })
               : raw;
-          let url = resolved ? collapseDoubledCryptPrefix(resolved) : resolved;
+          const url = resolved ? collapseDoubledCryptPrefix(resolved) : resolved;
           if (!url || hasTemplates(url) || !isValidDeepLink(url)) {
-            // Never drop the button silently: fall back to the plain subscription
-            // URL (onOpenDeepLink re-wraps it into a crypt link when that mode is on).
-            logger.warn('subscriptionLink button URL unresolved, falling back', {
+            logger.warn('subscriptionLink button dropped: URL unresolved', {
               raw,
               resolved: url,
               hasSubscriptionUrl: Boolean(subscriptionUrl),
               hasUsername: Boolean(username),
             });
-            url = subscriptionUrl && isValidDeepLink(subscriptionUrl) ? subscriptionUrl : null;
+            return null;
           }
-          if (!url) return null;
           return (
             <button
               key={idx}
