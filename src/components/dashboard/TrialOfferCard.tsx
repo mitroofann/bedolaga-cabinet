@@ -161,27 +161,29 @@ export default function TrialOfferCard({
         </div>
       )}
 
-      {/* Trial stats */}
-      <div className="mb-7 flex justify-center gap-8">
-        {[
-          { value: String(trialInfo.duration_days), label: t('subscription.trial.days') },
-          {
-            value: trialInfo.traffic_limit_gb === 0 ? '∞' : String(trialInfo.traffic_limit_gb),
-            label: t('common.units.gb'),
-          },
-          {
-            value: trialInfo.device_limit === 0 ? '∞' : String(trialInfo.device_limit),
-            label: t('subscription.trial.devices'),
-          },
-        ].map((stat, i) => (
-          <div key={i} className="text-center">
-            <div className="text-4xl font-extrabold leading-none tracking-tight text-dark-50">
-              {stat.value}
+      {/* Trial stats — временно отключено */}
+      {false && (
+        <div className="mb-7 flex justify-center gap-8">
+          {[
+            { value: String(trialInfo.duration_days), label: t('subscription.trial.days') },
+            {
+              value: trialInfo.traffic_limit_gb === 0 ? '∞' : String(trialInfo.traffic_limit_gb),
+              label: t('common.units.gb'),
+            },
+            {
+              value: trialInfo.device_limit === 0 ? '∞' : String(trialInfo.device_limit),
+              label: t('subscription.trial.devices'),
+            },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <div className="text-4xl font-extrabold leading-none tracking-tight text-dark-50">
+                {stat.value}
+              </div>
+              <div className="mt-1 text-xs font-medium text-dark-50/30">{stat.label}</div>
             </div>
-            <div className="mt-1 text-xs font-medium text-dark-50/30">{stat.label}</div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Balance info for paid trial */}
       {!isFree && trialInfo.price_rubles > 0 && (
