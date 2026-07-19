@@ -81,6 +81,24 @@
             border-radius: 8px;
             font-weight: 500;
         }
+        .btn-secondary {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            color: inherit;
+            border: 1px solid rgba(128,128,128,0.4);
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .copy-hint {
+            margin-top: 0.75rem;
+            font-size: 0.8125rem;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -91,6 +109,8 @@
         <div class="error" id="errorBlock">
             <p id="errorText">If the app didn't open, click the button below:</p>
             <a class="btn" id="manualBtn" href="#">Open App</a>
+            <p class="copy-hint" id="copyHint"></p>
+            <button class="btn-secondary" id="copyBtn" type="button"></button>
         </div>
     </div>
 
@@ -106,14 +126,20 @@
                     subtitle: 'Please wait',
                     error: "If the app didn't open, click the button below:",
                     btn: 'Open App',
-                    noUrl: 'No URL provided'
+                    noUrl: 'No URL provided',
+                    copyHint: "If the button doesn't work either, copy the link and add it in the app manually:",
+                    copyBtn: 'Copy link',
+                    copied: 'Copied!'
                 },
                 ru: {
                     title: 'Открываем приложение...',
                     subtitle: 'Пожалуйста, подождите',
                     error: 'Если приложение не открылось, нажмите кнопку:',
                     btn: 'Открыть приложение',
-                    noUrl: 'URL не указан'
+                    noUrl: 'URL не указан',
+                    copyHint: 'Если кнопка тоже не работает — скопируйте ссылку и вставьте её в приложение самостоятельно:',
+                    copyBtn: 'Скопировать ссылку',
+                    copied: 'Скопировано!'
                 }
             };
 
@@ -147,6 +173,54 @@
 
             const manualBtn = document.getElementById('manualBtn');
             manualBtn.href = url;
+
+            // Copy fallback: in-app browsers (Telegram WebView etc.) often can't
+            // launch custom schemes at all — even from a user tap (Telegram bug
+            // #654272). Offer the raw subscription URL for manual import: extract
+            // the embedded http(s) link from deep links like
+            // happ://add/https://sub.example.com/abc or incy://import/https%3A%2F%2F...
+            function extractSubscriptionUrl(deepLink) {
+                var m = String(deepLink).match(/https?:\/\/.+$/i) ||
+                    String(deepLink).match(/https?%3A%2F%2F.+$/i);
+                if (!m) return null;
+                var link = m[0];
+                if (/^https?%3A/i.test(link)) {
+                    try { link = decodeURIComponent(link); } catch (e) { return null; }
+                }
+                return link;
+            }
+
+            var copyValue = extractSubscriptionUrl(url);
+            var copyBtn = document.getElementById('copyBtn');
+            var copyHint = document.getElementById('copyHint');
+            if (copyValue) {
+                copyHint.textContent = t.copyHint;
+                copyBtn.textContent = t.copyBtn;
+                copyBtn.addEventListener('click', function() {
+                    function done() {
+                        copyBtn.textContent = t.copied;
+                        setTimeout(function() { copyBtn.textContent = t.copyBtn; }, 2000);
+                    }
+                    function legacyCopy() {
+                        var ta = document.createElement('textarea');
+                        ta.value = copyValue;
+                        ta.style.position = 'fixed';
+                        ta.style.opacity = '0';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        try { document.execCommand('copy'); done(); } catch (e) {}
+                        document.body.removeChild(ta);
+                    }
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(copyValue).then(done, legacyCopy);
+                    } else {
+                        legacyCopy();
+                    }
+                });
+            } else {
+                copyHint.style.display = 'none';
+                copyBtn.style.display = 'none';
+            }
 
             // Attempt to launch the app WITHOUT a top-level navigation. A direct
             // `location.href = scheme` paints a full-page net::ERR_UNKNOWN_URL_SCHEME
