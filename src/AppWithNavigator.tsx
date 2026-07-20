@@ -180,6 +180,9 @@ const START_PARAM_ROUTES: Array<{ re: RegExp; to: (match: RegExpExecArray) => st
   // «Продлить» links for expired subscriptions in the bot's rich main menu.
   { re: /^renew_(\d+)$/, to: (match) => `/subscriptions/${match[1]}/renew` },
   { re: /^subscriptions$/, to: () => '/subscriptions' },
+  // «Тариф» button in the bot's subscription menu (deep-link fallback when
+  // MINIAPP_CUSTOM_URL is not set) — opens the purchase/tariff-switch page.
+  { re: /^purchase$/, to: () => '/subscription/purchase' },
   // Paid-trial «Активировать триал» link in the bot's rich main menu — the
   // dashboard renders TrialOfferCard with the pay-and-activate flow.
   { re: /^trial$/, to: () => '/' },
