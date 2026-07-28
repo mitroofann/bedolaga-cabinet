@@ -1,3 +1,4 @@
+import { uiLocale } from '@/utils/uiLocale';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useSearchParams, Link } from 'react-router';
@@ -75,7 +76,7 @@ function isGiftActivated(gift: SentGift): boolean {
 function formatGiftDate(dateStr: string | null): string {
   if (!dateStr) return '';
   const date = new Date(dateStr);
-  return date.toLocaleDateString(navigator.language || 'ru-RU', {
+  return date.toLocaleDateString(uiLocale(), {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -564,7 +565,11 @@ function BuyTabContent({
       {/* Selected tariff description */}
       {selectedTariff?.description && (
         <div className="rounded-xl border border-dark-800/30 bg-dark-800/20 px-4 py-3">
-          <SanitizedHtml as="p" html={selectedTariff.description} className="text-sm text-dark-300" />
+          <SanitizedHtml
+            as="p"
+            html={selectedTariff.description}
+            className="text-sm text-dark-300"
+          />
         </div>
       )}
 
