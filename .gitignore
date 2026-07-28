@@ -42,7 +42,8 @@ coverage/
 # Temporary files
 tmp/
 temp/
-miniapp/
+# Anchored to repo root so it does not match the tracked public/miniapp/ dir
+/miniapp/
 
 # AI & Agents context
 .ai/
