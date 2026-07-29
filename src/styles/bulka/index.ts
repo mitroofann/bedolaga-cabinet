@@ -1,44 +1,68 @@
 /*
  * Bulka theme activation — self-contained, toggleable feature.
  *
- * Adds the `theme-bulka` class to <html> so theme.css takes effect. The class
- * coexists with the developer's `.dark`/`.light` toggle (useTheme only adds/
- * removes those two), so both Bulka variants follow the normal light/dark switch.
+ * Adds the `theme-bulka` class to <html> so theme.css (font + color overrides)
+ * takes effect. The class coexists with the developer's `.dark`/`.light` toggle.
  *
- * Toggle (checked in order):
- *   1. localStorage['cabinet-bulka-theme'] === 'on' | 'off'  (runtime, no rebuild)
- *   2. VITE_BULKA_THEME === 'true'                            (build-time default)
+ * The theme is GLOBAL: the admin toggle (BulkaThemeToggle) writes the Bulka
+ * palette to the server via the existing branding-colors API, so every user's
+ * ThemeColorsProvider applies darkBackground=#1C1C1C. We detect that here (the
+ * `--color-dark-bg` var) and switch the class on for everyone — no backend
+ * changes needed. A manual localStorage flag / VITE_BULKA_THEME env can also
+ * force it on for local testing or a build default.
  *
- * Flip live from the browser console with:  toggleBulkaTheme(true|false)
+ * Force on locally from the browser console:  toggleBulkaTheme(true|false)
  */
 import './theme.css';
+import { BULKA_DARK_BG } from './constants';
 
 const STORAGE_KEY = 'cabinet-bulka-theme';
 const CLASS = 'theme-bulka';
+const root = document.documentElement;
 
-function isEnabled(): boolean {
+/** The server palette (applied inline by applyThemeColors) is the Bulka one. */
+function paletteIsBulka(): boolean {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'on') return true;
-    if (stored === 'off') return false;
+    const bg = getComputedStyle(root).getPropertyValue('--color-dark-bg').trim().toLowerCase();
+    return bg === BULKA_DARK_BG;
   } catch {
-    /* private mode / quota — fall through to env */
+    return false;
+  }
+}
+
+function manualForceOn(): boolean {
+  try {
+    if (localStorage.getItem(STORAGE_KEY) === 'on') return true;
+  } catch {
+    /* private mode */
   }
   return import.meta.env.VITE_BULKA_THEME === 'true';
 }
 
-function apply(enabled: boolean): void {
-  document.documentElement.classList.toggle(CLASS, enabled);
+function shouldEnable(): boolean {
+  return paletteIsBulka() || manualForceOn();
 }
 
-apply(isEnabled());
+function sync(): void {
+  root.classList.toggle(CLASS, shouldEnable());
+}
 
-// Console helper for evaluating the theme without a rebuild.
+sync();
+
+// Re-sync whenever applyThemeColors mutates the inline CSS vars (palette change)
+// or useTheme flips the dark/light class. toggle(force) is idempotent, so
+// re-adding our class on those mutations never loops.
+new MutationObserver(sync).observe(root, {
+  attributes: true,
+  attributeFilter: ['style', 'class'],
+});
+
+// Console helper for local evaluation without a rebuild (force-on only).
 (window as unknown as Record<string, unknown>).toggleBulkaTheme = (on = true): void => {
   try {
     localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off');
   } catch {
     /* ignore */
   }
-  apply(on);
+  sync();
 };

@@ -2,13 +2,14 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { themeColorsApi } from '../../api/themeColors';
-import { DEFAULT_THEME_COLORS, ThemeColors } from '../../types/theme';
+import { DEFAULT_THEME_COLORS, type ThemeColors } from '../../types/theme';
 import { ColorPicker } from '../ColorPicker';
 import { applyThemeColors } from '../../hooks/useThemeColors';
 import { updateEnabledThemesCache } from '../../hooks/useTheme';
 import { MoonIcon, SunIcon, ChevronDownIcon } from './icons';
 import { Toggle } from './Toggle';
 import { THEME_PRESETS } from './constants';
+import { BulkaThemeToggle } from '../../styles/bulka/BulkaThemeToggle';
 
 function colorsEqual(a: ThemeColors, b: ThemeColors): boolean {
   return (
@@ -250,6 +251,11 @@ export function ThemeTab() {
               disabled={updateEnabledThemesMutation.isPending}
             />
           </div>
+        </div>
+
+        {/* Bulka theme (custom, toggleable feature) */}
+        <div className="mt-3 sm:mt-4">
+          <BulkaThemeToggle />
         </div>
       </div>
 
