@@ -67,10 +67,10 @@ html.theme-bulka:not(.light) {
   --color-dark-50: 255, 255, 255 !important;
   --color-dark-100: 244, 244, 244 !important; /* primary text */
   --color-dark-200: 224, 224, 224 !important;
-  --color-dark-300: 200, 200, 200 !important;
-  --color-dark-400: 170, 170, 170 !important; /* secondary text — readable on lighter cards */
-  --color-dark-500: 138, 138, 138 !important;
-  --color-dark-600: 108, 108, 108 !important;
+  --color-dark-300: 205, 205, 205 !important;
+  --color-dark-400: 190, 190, 190 !important; /* secondary text — bumped for legibility */
+  --color-dark-500: 168, 168, 168 !important; /* was sub-AA on cards; raised */
+  --color-dark-600: 140, 140, 140 !important;
   --color-dark-700: 92, 92, 92 !important; /* borders */
   --color-dark-800: 74, 74, 74 !important; /* #4a4a4a — raised elements / hover */
   --color-dark-850: 68, 68, 68 !important; /* #444444 */
@@ -98,4 +98,24 @@ html.theme-bulka.light {
   --color-champagne-950: 28, 26, 22 !important; /* near-black warm text */
   --color-light-bg: #f5efe4 !important;
   --color-light-surface: #ffffff !important;
+}
+
+/* ── Legibility: raise low-opacity muted text ──────────────────────────────
+ * Many captions/hints use white-at-low-alpha (text-dark-50/20..40). On dark
+ * cards that lands ~2.5:1 contrast — hard to read. Bump the alpha (scoped to
+ * Bulka only) so muted text stays a hierarchy step below body text but legible. */
+html.theme-bulka .text-dark-50\/20 {
+  color: rgb(var(--color-dark-50) / 0.45) !important;
+}
+html.theme-bulka .text-dark-50\/25 {
+  color: rgb(var(--color-dark-50) / 0.48) !important;
+}
+html.theme-bulka .text-dark-50\/30 {
+  color: rgb(var(--color-dark-50) / 0.52) !important;
+}
+html.theme-bulka .text-dark-50\/35 {
+  color: rgb(var(--color-dark-50) / 0.56) !important;
+}
+html.theme-bulka .text-dark-50\/40 {
+  color: rgb(var(--color-dark-50) / 0.62) !important;
 }

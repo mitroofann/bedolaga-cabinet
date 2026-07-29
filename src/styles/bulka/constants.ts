@@ -11,7 +11,7 @@ export const BULKA_COLORS: ThemeColors = {
   darkBackground: '#1C1C1C',
   darkSurface: '#3C3C3C',
   darkText: '#F4F4F4',
-  darkTextSecondary: '#AAAAAA',
+  darkTextSecondary: '#BEBEBE',
 
   lightBackground: '#F5EFE4',
   lightSurface: '#FFFFFF',
