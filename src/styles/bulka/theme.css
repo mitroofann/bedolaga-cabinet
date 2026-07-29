@@ -1,0 +1,101 @@
+/*
+ * Bulka VPN theme — a self-contained visual redesign preset ported from the
+ * marketing site (bulkavpn.net). Activated by adding the `theme-bulka` class to
+ * <html> (see ./index.ts). Fully additive: overrides only CSS custom properties
+ * with `!important`, mirroring how globals.css `.light` beats the inline vars set
+ * by applyThemeColors() — so the developer's branding/preset engine is untouched
+ * and future upstream merges stay clean.
+ *
+ * Tokens (from the site's index.html):
+ *   bg #1C1C1C · surface #242424 / #2a2a2a / #2d2d2d · text #fff
+ *   accent (amber) #E8A33D · font Noto Sans
+ */
+
+/* Noto Sans — local variable fonts copied from the site (cyrillic + latin). */
+@font-face {
+  font-family: "Bulka Noto Sans";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/noto-sans-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Bulka Noto Sans";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/noto-sans-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* ── Shared: font + amber accent (works in both dark and light) ─────────────
+ * `!important` on the custom properties beats the inline values that
+ * applyThemeColors() writes onto :root, so Bulka wins regardless of the
+ * server-side branding palette. Keep 'Twemoji Country Flags' first so flag
+ * glyphs still render (see globals.css). */
+html.theme-bulka body,
+html.theme-bulka {
+  font-family:
+    "Twemoji Country Flags", "Bulka Noto Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+}
+
+html.theme-bulka {
+  /* Amber accent ramp (base #E8A33D = 232,163,61) */
+  --color-accent-50: 253, 246, 236 !important;
+  --color-accent-100: 250, 233, 206 !important;
+  --color-accent-200: 245, 212, 157 !important;
+  --color-accent-300: 240, 192, 109 !important;
+  --color-accent-400: 236, 175, 78 !important;
+  --color-accent-500: 232, 163, 61 !important;
+  --color-accent-600: 206, 138, 42 !important;
+  --color-accent-700: 166, 108, 33 !important;
+  --color-accent-800: 125, 80, 25 !important;
+  --color-accent-900: 92, 59, 19 !important;
+  --color-accent-950: 51, 32, 10 !important;
+  --color-on-accent: 28, 28, 28 !important; /* dark text on amber buttons */
+}
+
+/* ── Dark variant — Bulka charcoal ─────────────────────────────────────────
+ * Higher rung = darker (bg-dark-950 is background, text-dark-100 is body text). */
+html.theme-bulka.dark,
+html.theme-bulka:not(.light) {
+  --color-dark-50: 255, 255, 255 !important;
+  --color-dark-100: 240, 240, 240 !important;
+  --color-dark-200: 220, 220, 220 !important;
+  --color-dark-300: 190, 190, 190 !important;
+  --color-dark-400: 150, 150, 150 !important;
+  --color-dark-500: 120, 120, 120 !important;
+  --color-dark-600: 85, 85, 85 !important;
+  --color-dark-700: 58, 58, 58 !important;
+  --color-dark-800: 45, 45, 45 !important; /* #2d2d2d — borders/hover cards */
+  --color-dark-850: 42, 42, 42 !important; /* #2a2a2a */
+  --color-dark-900: 36, 36, 36 !important; /* #242424 — card surface */
+  --color-dark-950: 28, 28, 28 !important; /* #1C1C1C — app background */
+  --color-dark-bg: #1c1c1c !important;
+  --color-dark-surface: #242424 !important;
+}
+
+/* ── Light variant — warm cream paper ──────────────────────────────────────
+ * globals.css `.light` remaps --color-dark-* → --color-champagne-*, so we only
+ * need to redefine the champagne ramp. champagne-200 is the body bg,
+ * champagne-50 is the raised surface, champagne-950 is the darkest text. */
+html.theme-bulka.light {
+  --color-champagne-50: 255, 255, 255 !important;
+  --color-champagne-100: 251, 247, 240 !important;
+  --color-champagne-200: 245, 239, 228 !important; /* warm cream background */
+  --color-champagne-300: 233, 224, 208 !important;
+  --color-champagne-400: 210, 198, 178 !important;
+  --color-champagne-500: 168, 154, 130 !important;
+  --color-champagne-600: 120, 108, 90 !important;
+  --color-champagne-700: 88, 78, 64 !important;
+  --color-champagne-800: 60, 53, 43 !important;
+  --color-champagne-900: 42, 38, 32 !important;
+  --color-champagne-950: 28, 26, 22 !important; /* near-black warm text */
+  --color-light-bg: #f5efe4 !important;
+  --color-light-surface: #ffffff !important;
+}

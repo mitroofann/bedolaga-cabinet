@@ -29,6 +29,9 @@ import { checkBackendOnStartup } from './api/health';
 import { getCachedFullscreenEnabled, isTelegramMobile } from './hooks/useTelegramSDK';
 import { applyTelegramLanguage } from './i18n';
 import './styles/globals.css';
+// Bulka theme (self-contained, toggleable) — must load after globals.css so its
+// !important var overrides win. Activation is gated inside the module.
+import './styles/bulka';
 
 // Harden the global encoders against lone UTF-16 surrogates (truncated emoji in
 // backend names/remarks) BEFORE anything renders or fetches — otherwise such a
@@ -42,8 +45,7 @@ installEncodingSurrogateGuard();
 // See: https://github.com/Telegram-Mini-Apps/tma.js/issues/683
 if (typeof (Object as { hasOwn?: unknown }).hasOwn !== 'function') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (Object as any).hasOwn = (obj: object, prop: PropertyKey): boolean =>
-    Object.prototype.hasOwnProperty.call(obj, prop);
+  (Object as any).hasOwn = (obj: object, prop: PropertyKey): boolean => Object.hasOwn(obj, prop);
 }
 
 // Only initialize Telegram SDK when running inside Telegram
