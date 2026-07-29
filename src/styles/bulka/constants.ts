@@ -9,7 +9,7 @@ export const BULKA_COLORS: ThemeColors = {
   accent: '#E8A33D',
 
   darkBackground: '#1C1C1C',
-  darkSurface: '#323232',
+  darkSurface: '#3C3C3C',
   darkText: '#F4F4F4',
   darkTextSecondary: '#AAAAAA',
 
