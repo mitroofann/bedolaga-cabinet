@@ -65,19 +65,19 @@ html.theme-bulka {
 html.theme-bulka.dark,
 html.theme-bulka:not(.light) {
   --color-dark-50: 255, 255, 255 !important;
-  --color-dark-100: 240, 240, 240 !important;
-  --color-dark-200: 220, 220, 220 !important;
-  --color-dark-300: 190, 190, 190 !important;
-  --color-dark-400: 150, 150, 150 !important;
-  --color-dark-500: 120, 120, 120 !important;
-  --color-dark-600: 85, 85, 85 !important;
-  --color-dark-700: 58, 58, 58 !important;
-  --color-dark-800: 45, 45, 45 !important; /* #2d2d2d — borders/hover cards */
-  --color-dark-850: 42, 42, 42 !important; /* #2a2a2a */
-  --color-dark-900: 36, 36, 36 !important; /* #242424 — card surface */
-  --color-dark-950: 28, 28, 28 !important; /* #1C1C1C — app background */
+  --color-dark-100: 244, 244, 244 !important; /* primary text */
+  --color-dark-200: 224, 224, 224 !important;
+  --color-dark-300: 200, 200, 200 !important;
+  --color-dark-400: 170, 170, 170 !important; /* secondary text — readable on lighter cards */
+  --color-dark-500: 138, 138, 138 !important;
+  --color-dark-600: 108, 108, 108 !important;
+  --color-dark-700: 82, 82, 82 !important; /* borders */
+  --color-dark-800: 64, 64, 64 !important; /* #404040 — raised elements / hover */
+  --color-dark-850: 58, 58, 58 !important; /* #3a3a3a */
+  --color-dark-900: 50, 50, 50 !important; /* #323232 — card surface (lighter, less eye strain) */
+  --color-dark-950: 28, 28, 28 !important; /* #1C1C1C — app background (kept dark) */
   --color-dark-bg: #1c1c1c !important;
-  --color-dark-surface: #242424 !important;
+  --color-dark-surface: #323232 !important;
 }
 
 /* ── Light variant — warm cream paper ──────────────────────────────────────
