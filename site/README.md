@@ -40,6 +40,14 @@ inside the cabinet build (`site/` is excluded via `.dockerignore` and Biome).
 
 ## Wiring to the cabinet
 
-All CTA buttons ("Войти в ЛК", "Купить VPN", "Попробовать за 10 ₽") link to
-`https://cabinet.bulkavpn.net/login`. If your cabinet lives on a different domain,
-update those hrefs in `index.html` accordingly.
+CTA links point to `https://cabinet.bulkavpn.net`:
+
+- **Purchase CTAs** ("Купить VPN", "Попробовать за 10 ₽", "Выбрать тариф", "Выбрать",
+  "Оформить подписку") → `/buy/main` — the public purchase funnel (no prior
+  registration needed; the account is created after payment).
+- **Login CTAs** ("Войти в ЛК", "Войти в аккаунт") → `/login`.
+
+> **Required:** create a landing with slug `main` in the cabinet (Админка →
+> Лендинги) and add tariffs + payment methods. Until it exists, `/buy/main`
+> returns "not found". To use a different slug, update the 7 `/buy/…` hrefs in
+> `index.html`.
