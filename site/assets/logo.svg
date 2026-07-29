@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 158 44" fill="none">
+  <defs>
+    <linearGradient id="hx" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8A33D"/>
+      <stop offset="1" stop-color="#C46A1E"/>
+    </linearGradient>
+  </defs>
+  <!-- пончик: простое кольцо (чисто читается в мелком размере) -->
+  <circle cx="21" cy="22" r="13" fill="none" stroke="#C46A1E" stroke-width="11"/>
+  <circle cx="21" cy="22" r="13" fill="none" stroke="url(#hx)" stroke-width="7.5"/>
+  <text x="47" y="30" font-family="'Noto Sans','Segoe UI',Arial,sans-serif" font-weight="800" font-size="22" letter-spacing="1.5" fill="#FFFFFF">BULKA</text>
+</svg>

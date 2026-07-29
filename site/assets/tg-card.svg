@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="none">
+<defs>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+  <linearGradient id="dough" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#F0AE4B"/><stop offset="1" stop-color="#C46A1E"/></linearGradient>
+  <linearGradient id="glaze" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#FBDDA0"/><stop offset="1" stop-color="#E7B063"/></linearGradient>
+</defs>
+<rect width="640" height="640" fill="#1C1C1C"/>
+<g fill="#E8A33D" fill-opacity=".06">
+  <circle cx="80" cy="90" r="34"/>
+  <circle cx="570" cy="120" r="26"/>
+  <circle cx="90" cy="470" r="24"/>
+</g>
+
+<!-- пончик (как в steps.svg) -->
+<g transform="translate(-16 -66) scale(1.2)">
+  <ellipse cx="286" cy="356" rx="150" ry="34" fill="#000000" opacity=".38" filter="url(#soft)"/>
+  <path fill-rule="evenodd" fill="#A85614" d="M132 272 a148 90 0 1 0 296 0 a148 90 0 1 0 -296 0 M224 270 a56 34 0 1 0 112 0 a56 34 0 1 0 -112 0"/>
+  <path fill-rule="evenodd" fill="url(#dough)" d="M132 246 a148 90 0 1 0 296 0 a148 90 0 1 0 -296 0 M224 244 a56 34 0 1 0 112 0 a56 34 0 1 0 -112 0"/>
+  <path fill-rule="evenodd" fill="url(#glaze)" d="M148 240 C150 210 200 178 280 178 C360 178 410 210 412 240 C416 262 404 268 402 254 C398 276 386 268 386 256 C382 280 366 272 366 258 C300 292 260 292 194 258 C194 272 178 280 174 256 C174 268 162 276 158 254 C156 268 144 262 148 240 Z M226 240 a54 30 0 1 0 108 0 a54 30 0 1 0 -108 0"/>
+  <path d="M196 214 C214 198 250 192 276 194" fill="none" stroke="#FFF6E4" stroke-width="7" stroke-linecap="round" opacity=".45"/>
+  <g stroke-width="6" stroke-linecap="round">
+    <g transform="translate(214 214) rotate(40)"><path d="M0 -8 V8" stroke="#74DF8B"/></g>
+    <g transform="translate(250 200) rotate(-25)"><path d="M0 -8 V8" stroke="#FFF6E4"/></g>
+    <g transform="translate(292 196) rotate(15)"><path d="M0 -8 V8" stroke="#C46A1E"/></g>
+    <g transform="translate(330 202) rotate(-40)"><path d="M0 -8 V8" stroke="#74DF8B"/></g>
+    <g transform="translate(362 218) rotate(60)"><path d="M0 -8 V8" stroke="#FFF6E4"/></g>
+    <g transform="translate(186 232) rotate(-15)"><path d="M0 -8 V8" stroke="#C46A1E"/></g>
+    <g transform="translate(226 248) rotate(70)"><path d="M0 -7 V7" stroke="#FFF6E4"/></g>
+    <g transform="translate(300 250) rotate(-55)"><path d="M0 -7 V7" stroke="#74DF8B"/></g>
+    <g transform="translate(348 246) rotate(30)"><path d="M0 -7 V7" stroke="#C46A1E"/></g>
+    <g transform="translate(384 236) rotate(-30)"><path d="M0 -8 V8" stroke="#74DF8B"/></g>
+  </g>
+  <g transform="translate(330 332) scale(2) translate(-330 -332)">
+    <path fill="#F6DBA6" stroke="#B0611B" stroke-width="2.5" stroke-linejoin="round" d="M300 322 q10 -16 22 -9 q6 -13 18 -7 q9 -11 19 -2 q10 8 6 20 q-3 16 -22 18 q-20 2 -33 -6 q-14 -9 -10 -22 z"/>
+    <path d="M312 330 q10 -10 22 -6 q10 2 12 14" fill="none" stroke="#E7B063" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+  </g>
+  <g fill="url(#dough)" stroke="#B0611B" stroke-width="1.5">
+    <circle cx="424" cy="344" r="6"/>
+    <circle cx="442" cy="368" r="4.5"/>
+    <circle cx="418" cy="378" r="3.5"/>
+  </g>
+</g>
+
+<!-- подписи -->
+<text x="320" y="500" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="64" font-weight="800" fill="#FFFFFF">BULKA <tspan fill="#E8A33D">VPN</tspan></text>
+<text x="320" y="548" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-size="25" fill="#B4B4B4">Надёжное соединение с любого устройства</text>
+</svg>

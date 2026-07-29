@@ -5,6 +5,9 @@ node_modules
 dist
 build
 
+# Marketing site — deployed separately to its own domain, not part of the cabinet image
+site
+
 # Development files
 .git
 .gitignore
