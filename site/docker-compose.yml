@@ -6,6 +6,11 @@
 #
 # Caddy serves the static files in this folder and obtains/renews TLS certs
 # from Let's Encrypt automatically. No other setup needed.
+#
+# ⚠️  ONLY use this when ports 80/443 are FREE on the host. If a proxy already
+#     serves the cabinet here, it owns 443 — starting this second Caddy fails
+#     with "address already in use". In that case use Caddyfile.snippet instead
+#     (add a site block to the existing proxy). See README.md → "Which option".
 
 services:
   site:

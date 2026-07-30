@@ -1,0 +1,30 @@
+# ── Add this block to your EXISTING Caddyfile (the one already serving the
+#    cabinet on port 443) — do NOT run site/docker-compose.yml in that case, or
+#    two processes fight over 443. One Caddy serves both domains by name.
+#
+# Put the site files where this Caddy can read them (e.g. /srv/site), or mount
+# them into the Caddy container. Adjust the path and domain below.
+
+bulkavpn.net {
+	encode gzip zstd
+
+	root * /srv/site
+	file_server
+	try_files {path} /index.html
+
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	@html path *.html /
+	header @html Cache-Control "no-cache, must-revalidate"
+
+	# Don't expose deploy/meta files if they sit in the same folder.
+	@hidden path /Caddyfile* /docker-compose.yml /.env* /README.md
+	respond @hidden 404
+}
+
+# The cabinet keeps its own separate block, unchanged, e.g.:
+# cabinet.bulkavpn.net {
+#     handle /api/* { uri strip_prefix /api; reverse_proxy remnawave_bot:8080 }
+#     handle { reverse_proxy cabinet_frontend:80 }
+# }

@@ -4,7 +4,22 @@ Static landing / homepage for Bulka VPN — plain HTML + CSS + fonts + SVG, **no
 step**. Maintained in this repo alongside the cabinet, deployed separately to its own
 domain.
 
-## Quick start (recommended — Docker + automatic HTTPS)
+## Which option to use
+
+> **Important:** only one process can listen on port 443. If a reverse proxy
+> (Caddy/nginx/Traefik) already serves the cabinet on this server, it already owns
+> 443 — do **not** also start `site/docker-compose.yml`, or the two fight over the
+> port. Domains don't conflict (one proxy routes `bulkavpn.net` and
+> `cabinet.bulkavpn.net` by name); only ports do.
+
+- **A proxy already runs on this server** (typical — the cabinet is behind Caddy) →
+  use **Option B** (add a block to that proxy). Skip the Docker command.
+- **Nothing serves 443 on this box** (e.g. a dedicated host for the site) →
+  use **Option A** below.
+
+## Option A — standalone Docker + automatic HTTPS
+
+Use only when ports 80/443 are free on the host.
 
 ```bash
 cd site
@@ -12,13 +27,20 @@ cp .env.example .env      # set SITE_DOMAIN to your domain
 docker compose up -d
 ```
 
-That's it. Caddy serves this folder and obtains/renews the Let's Encrypt TLS
-certificate automatically. Ports 80 and 443 must be free on the host, and the
-domain's DNS A/AAAA record must already point at the server's IP (Caddy needs to
-reach it to issue the certificate).
+Caddy serves this folder and obtains/renews the Let's Encrypt TLS certificate
+automatically. The domain's DNS A/AAAA record must already point at the server's IP
+(Caddy needs to reach it to issue the certificate).
 
-Update the site later by editing files here and running `docker compose restart`
-(or just re-running `up -d` after `git pull`).
+Update later by editing files here and re-running `docker compose up -d` after
+`git pull`.
+
+## Option B — add to the existing proxy (shared server)
+
+The cabinet's Caddy already holds 443. Add one site block to its Caddyfile instead
+of starting a second proxy — copy the block from **`Caddyfile.snippet`**, adjust the
+`root` path/domain, put the site files where that Caddy can read them (e.g.
+`/srv/site` or a mounted volume), and reload Caddy. The cabinet block stays
+untouched; both domains are served by the same process.
 
 ### Files
 
@@ -27,10 +49,9 @@ Update the site later by editing files here and running `docker compose restart`
 - `robots.txt`, `sitemap.xml`.
 - `Caddyfile`, `docker-compose.yml`, `.env.example` — deploy (not served to visitors).
 
-## Alternative — existing web server, no Docker
+### nginx variant (Option B on nginx)
 
-If you already run nginx/Caddy on the host, just point a vhost's web root at this
-folder. Example nginx:
+If the existing proxy is nginx, add a vhost pointing at this folder:
 
 ```nginx
 server {
