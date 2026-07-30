@@ -1237,6 +1237,8 @@
       "liquidGradientDesc": "Blurred mesh gradient blobs",
       "constellation": "Constellation",
       "constellationDesc": "Particles linked by lines",
+      "bulkaCookies": "Bulka cookies",
+      "bulkaCookiesDesc": "Floating cookies that scatter from the cursor",
       "geminiEffect": "Gemini Effect",
       "geminiEffectDesc": "SVG effect like Google Gemini",
       "speed": "Speed",

@@ -20,6 +20,7 @@ export type BackgroundType =
   | 'matrix-rain'
   | 'liquid-gradient'
   | 'constellation'
+  | 'bulka-cookies'
   | 'none';
 
 export interface AnimationConfig {

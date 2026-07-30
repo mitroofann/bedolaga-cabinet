@@ -24,6 +24,7 @@ const backgroundImports: Record<Exclude<BackgroundType, 'none'>, () => Promise<u
   'matrix-rain': () => import('./matrix-rain'),
   'liquid-gradient': () => import('./liquid-gradient'),
   constellation: () => import('./constellation'),
+  'bulka-cookies': () => import('./bulka-cookies'),
 };
 
 /** Prefetch the JS chunk for a background type (call early to avoid lazy-load delay) */
@@ -59,6 +60,7 @@ export const backgroundComponents: Record<
   'matrix-rain': lazy(() => import('./matrix-rain')),
   'liquid-gradient': lazy(() => import('./liquid-gradient')),
   constellation: lazy(() => import('./constellation')),
+  'bulka-cookies': lazy(() => import('./bulka-cookies')),
 };
 
 // Registry of all background definitions with settings for the editor
@@ -789,6 +791,48 @@ export const backgroundRegistry: BackgroundDefinition[] = [
         max: 300,
         step: 10,
         default: 120,
+      },
+    ],
+  },
+  {
+    type: 'bulka-cookies',
+    labelKey: 'admin.backgrounds.bulkaCookies',
+    descriptionKey: 'admin.backgrounds.bulkaCookiesDesc',
+    category: 'canvas',
+    settings: [
+      {
+        key: 'cookieColor',
+        label: 'admin.backgrounds.color1',
+        type: 'color',
+        default: '#E8A33D',
+      },
+      { key: 'chipColor', label: 'admin.backgrounds.color2', type: 'color', default: '#7A3F12' },
+      {
+        key: 'count',
+        label: 'admin.backgrounds.count',
+        type: 'number',
+        min: 20,
+        max: 200,
+        step: 10,
+        default: 90,
+      },
+      {
+        key: 'speed',
+        label: 'admin.backgrounds.speed',
+        type: 'number',
+        min: 0.3,
+        max: 3,
+        step: 0.1,
+        default: 1,
+      },
+      {
+        key: 'size',
+        label: 'admin.backgrounds.size',
+        type: 'number',
+        min: 0.5,
+        max: 2.5,
+        step: 0.1,
+        default: 1,
       },
     ],
   },

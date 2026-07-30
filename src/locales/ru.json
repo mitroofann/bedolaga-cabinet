@@ -1257,6 +1257,8 @@
       "liquidGradientDesc": "Жидкий mesh-градиент из размытых блобов",
       "constellation": "Constellation",
       "constellationDesc": "Частицы, связанные линиями",
+      "bulkaCookies": "Печеньки Bulka",
+      "bulkaCookiesDesc": "Летающие печеньки, разлетаются от курсора",
       "geminiEffect": "Gemini Effect",
       "geminiEffectDesc": "SVG-эффект как на Google Gemini",
       "speed": "Скорость",
