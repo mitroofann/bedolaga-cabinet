@@ -10,6 +10,9 @@
  * bot backend adds that field, getColors simply won't return it and everything
  * stays at 1× — the frontend is inert-safe.
  */
+// Scales the arbitrary-px font utilities (text-[10px] etc.) that Tailwind's
+// named-scale vars can't reach. Inert at 1× until an admin sets a scale.
+import './font-scale.css';
 
 export interface FontScales {
   small: number;

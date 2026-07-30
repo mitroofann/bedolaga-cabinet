@@ -39,7 +39,6 @@ import {
 
 import { MobileBottomNav } from './MobileBottomNav';
 import { AppHeader } from './AppHeader';
-import { useBackgroundConsumer } from '@/components/backgrounds/BackgroundHost';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -60,9 +59,10 @@ export function AppShell({ children }: AppShellProps) {
   const { appName, logoLetter, hasCustomLogo, logoUrl } = useBranding();
   const { referralEnabled, wheelEnabled, hasContests, hasPolls, giftEnabled } = useFeatureFlags();
   useScrollRestoration();
-  // Анимированный фон рендерит BackgroundHost в App (не перемонтируется при
-  // смене роута) — здесь только регистрируем, что на этом роуте он нужен.
-  useBackgroundConsumer();
+  // Animated background is intentionally OFF inside the cabinet (it distracts
+  // from the content). It stays on the login page, which renders its own
+  // BackgroundRenderer instance. To re-enable it here, call useBackgroundConsumer().
+  // useBackgroundConsumer();
 
   // Theme toggle visibility
   const { data: enabledThemes } = useQuery({
