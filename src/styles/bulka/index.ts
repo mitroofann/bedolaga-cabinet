@@ -20,10 +20,15 @@ const STORAGE_KEY = 'cabinet-bulka-theme';
 const CLASS = 'theme-bulka';
 const root = document.documentElement;
 
-/** The server palette (applied inline by applyThemeColors) is the Bulka one. */
+/** The server palette (applied inline by applyThemeColors) is the Bulka one.
+ *  Read the INLINE style, not getComputedStyle: theme.css overrides --color-dark-*
+ *  via the .theme-bulka class, so a computed read would flip once the class is on
+ *  and toggle it back off → infinite MutationObserver loop. The inline value is
+ *  written only by applyThemeColors (the server palette) and is unaffected by our
+ *  class, so it's a stable sentinel. */
 function paletteIsBulka(): boolean {
   try {
-    const bg = getComputedStyle(root).getPropertyValue('--color-dark-bg').trim().toLowerCase();
+    const bg = root.style.getPropertyValue('--color-dark-bg').trim().toLowerCase();
     return bg === BULKA_DARK_BG;
   } catch {
     return false;
@@ -44,14 +49,19 @@ function shouldEnable(): boolean {
 }
 
 function sync(): void {
-  root.classList.toggle(CLASS, shouldEnable());
+  const want = shouldEnable();
+  // Only touch the class when it actually changes — writing it unconditionally
+  // would retrigger our own MutationObserver (which watches 'class') every time,
+  // an easy way to spin. No-op when already in the desired state.
+  if (root.classList.contains(CLASS) === want) return;
+  root.classList.toggle(CLASS, want);
 }
 
 sync();
 
 // Re-sync whenever applyThemeColors mutates the inline CSS vars (palette change)
-// or useTheme flips the dark/light class. toggle(force) is idempotent, so
-// re-adding our class on those mutations never loops.
+// or useTheme flips the dark/light class. sync() is a no-op when state is
+// unchanged, so our own class writes don't re-loop.
 new MutationObserver(sync).observe(root, {
   attributes: true,
   attributeFilter: ['style', 'class'],
