@@ -47,6 +47,7 @@ export default function AdminTariffCreate() {
   const [tierLevel, setTierLevel] = useState<number | ''>(1);
   const [periodPrices, setPeriodPrices] = useState<PeriodPrice[]>([]);
   const [selectedSquads, setSelectedSquads] = useState<string[]>([]);
+  const [limitDisabledSquads, setLimitDisabledSquads] = useState<string[]>([]);
   const [selectedExternalSquad, setSelectedExternalSquad] = useState<string | null>(null);
   const [selectedPromoGroups, setSelectedPromoGroups] = useState<number[]>([]);
   const [dailyPriceKopeks, setDailyPriceKopeks] = useState<number | ''>(0);
@@ -118,6 +119,7 @@ export default function AdminTariffCreate() {
       setTierLevel(data.tier_level || 1);
       setPeriodPrices(data.period_prices?.length ? data.period_prices : []);
       setSelectedSquads(data.allowed_squads || []);
+      setLimitDisabledSquads(data.limit_disabled_squads || []);
       setSelectedExternalSquad(data.external_squad_uuid || null);
       setSelectedPromoGroups(
         data.promo_groups?.filter((pg) => pg.is_selected).map((pg) => pg.id) || [],
@@ -171,6 +173,8 @@ export default function AdminTariffCreate() {
       tier_level: toNumber(tierLevel, 1),
       period_prices: isDaily ? [] : periodPrices.filter((p) => p.price_kopeks >= 0),
       allowed_squads: selectedSquads,
+      // Держим подмножество: отправляем только те, что реально в allowed_squads
+      limit_disabled_squads: limitDisabledSquads.filter((uuid) => selectedSquads.includes(uuid)),
       external_squad_uuid: selectedExternalSquad || null,
       promo_group_ids: selectedPromoGroups,
       traffic_topup_enabled: trafficTopupEnabled,
@@ -191,7 +195,18 @@ export default function AdminTariffCreate() {
   };
 
   const toggleServer = (uuid: string) => {
-    setSelectedSquads((prev) =>
+    setSelectedSquads((prev) => {
+      if (prev.includes(uuid)) {
+        // Сервер убрали из тарифа — снимаем его и из списка "отключать при лимите"
+        setLimitDisabledSquads((disabled) => disabled.filter((s) => s !== uuid));
+        return prev.filter((s) => s !== uuid);
+      }
+      return [...prev, uuid];
+    });
+  };
+
+  const toggleLimitDisabledServer = (uuid: string) => {
+    setLimitDisabledSquads((prev) =>
       prev.includes(uuid) ? prev.filter((s) => s !== uuid) : [...prev, uuid],
     );
   };
@@ -783,6 +798,61 @@ export default function AdminTariffCreate() {
                     </button>
                   );
                 })}
+              </div>
+            )}
+          </div>
+
+          {/* Servers disabled on traffic limit (subset of allowed_squads) */}
+          <div className="card space-y-4">
+            <h4 className="text-sm font-medium text-dark-200">
+              {t('admin.tariffs.limitDisabledServersTitle')}
+            </h4>
+            <p className="text-sm text-dark-400">{t('admin.tariffs.limitDisabledServersHint')}</p>
+            {selectedSquads.length === 0 ? (
+              <p className="py-4 text-center text-dark-500">
+                {t('admin.tariffs.limitDisabledServersEmpty')}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {servers
+                  .filter((server: ServerInfo) => selectedSquads.includes(server.squad_uuid))
+                  .map((server: ServerInfo) => {
+                    const isSelected = limitDisabledSquads.includes(server.squad_uuid);
+                    return (
+                      <button
+                        key={server.id}
+                        type="button"
+                        onClick={() => toggleLimitDisabledServer(server.squad_uuid)}
+                        className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors ${
+                          isSelected
+                            ? isDaily
+                              ? 'bg-warning-500/20 text-warning-300'
+                              : 'bg-accent-500/20 text-accent-300'
+                            : 'bg-dark-800 text-dark-300 hover:bg-dark-700'
+                        }`}
+                      >
+                        <div
+                          className={`flex h-5 w-5 items-center justify-center rounded ${
+                            isSelected
+                              ? isDaily
+                                ? 'bg-warning-500 text-white'
+                                : 'bg-accent-500 text-on-accent'
+                              : 'bg-dark-600'
+                          }`}
+                        >
+                          {isSelected && <CheckIcon />}
+                        </div>
+                        <span className="flex-1 text-sm font-medium">
+                          <Twemoji options={{ className: 'twemoji', folder: 'svg', ext: '.svg' }}>
+                            {server.display_name}
+                          </Twemoji>
+                        </span>
+                        {server.country_code && (
+                          <span className="text-xs text-dark-500">{server.country_code}</span>
+                        )}
+                      </button>
+                    );
+                  })}
               </div>
             )}
           </div>
