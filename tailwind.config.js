@@ -153,7 +153,27 @@ export default {
         linear: '12px',
       },
       fontSize: {
-        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+        // Font sizes are grouped into 3 scalable categories via CSS vars
+        // (--font-scale-small/body/heading), each defaulting to 1 so there is
+        // ZERO change until an admin sets a scale. The var is applied by the
+        // font-scale feature (src/features/font-scale/). rem × scale keeps line
+        // heights proportional. Merge-safe: this only re-expresses the stock
+        // Tailwind scale as calc()s of the same rem values.
+        // small
+        '2xs': ['calc(0.625rem * var(--font-scale-small, 1))', { lineHeight: '0.875rem' }],
+        xs: ['calc(0.75rem * var(--font-scale-small, 1))', { lineHeight: '1rem' }],
+        sm: ['calc(0.875rem * var(--font-scale-small, 1))', { lineHeight: '1.25rem' }],
+        // body
+        base: ['calc(1rem * var(--font-scale-body, 1))', { lineHeight: '1.5rem' }],
+        lg: ['calc(1.125rem * var(--font-scale-body, 1))', { lineHeight: '1.75rem' }],
+        // heading
+        xl: ['calc(1.25rem * var(--font-scale-heading, 1))', { lineHeight: '1.75rem' }],
+        '2xl': ['calc(1.5rem * var(--font-scale-heading, 1))', { lineHeight: '2rem' }],
+        '3xl': ['calc(1.875rem * var(--font-scale-heading, 1))', { lineHeight: '2.25rem' }],
+        '4xl': ['calc(2.25rem * var(--font-scale-heading, 1))', { lineHeight: '2.5rem' }],
+        '5xl': ['calc(3rem * var(--font-scale-heading, 1))', { lineHeight: '1' }],
+        '6xl': ['calc(3.75rem * var(--font-scale-heading, 1))', { lineHeight: '1' }],
+        '7xl': ['calc(4.5rem * var(--font-scale-heading, 1))', { lineHeight: '1' }],
       },
       boxShadow: {
         glow: '0 0 20px rgba(var(--color-accent-500), 0.15)',

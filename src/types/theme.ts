@@ -24,6 +24,9 @@ export interface ThemeColors {
 export interface ThemeSettings extends ThemeColors {
   id?: number;
   updated_at?: string;
+  // Global font-scale multipliers per category (backend feature; optional so the
+  // frontend stays inert at 1× until the bot backend ships this field).
+  font_scales?: { small: number; body: number; heading: number };
 }
 
 // Enabled themes settings

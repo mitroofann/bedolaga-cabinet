@@ -2184,6 +2184,17 @@
       "autoFullscreen": "Auto fullscreen",
       "autoFullscreenDesc": "Auto expand in Telegram",
       "availableThemes": "Available themes",
+      "fontSizes": {
+        "title": "Font sizes",
+        "description": "Scale text size by category (applies to everyone).",
+        "heading": "Headings",
+        "body": "Body text",
+        "small": "Small text",
+        "smaller": "Smaller",
+        "normal": "Normal",
+        "larger": "Larger",
+        "largest": "Largest"
+      },
       "colors": {
         "background": "Background",
         "error": "Error",

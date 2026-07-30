@@ -1845,6 +1845,17 @@
       "autoFullscreen": "تمام صفحه خودکار",
       "autoFullscreenDesc": "باز شدن خودکار در تلگرام",
       "availableThemes": "پوسته‌های موجود",
+      "fontSizes": {
+        "title": "اندازه فونت",
+        "description": "اندازه متن را بر اساس دسته تنظیم کنید (برای همه اعمال می‌شود).",
+        "heading": "عنوان‌ها",
+        "body": "متن اصلی",
+        "small": "متن کوچک",
+        "smaller": "کوچک‌تر",
+        "normal": "معمولی",
+        "larger": "بزرگ‌تر",
+        "largest": "بزرگ‌ترین"
+      },
       "colors": {
         "background": "پس‌زمینه",
         "error": "خطا",

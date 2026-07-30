@@ -10,6 +10,7 @@ import { MoonIcon, SunIcon, ChevronDownIcon } from './icons';
 import { Toggle } from './Toggle';
 import { THEME_PRESETS } from './constants';
 import { BulkaThemeToggle } from '../../styles/bulka/BulkaThemeToggle';
+import { FontScaleControls } from '../../features/font-scale/FontScaleControls';
 
 function colorsEqual(a: ThemeColors, b: ThemeColors): boolean {
   return (
@@ -258,6 +259,9 @@ export function ThemeTab() {
           <BulkaThemeToggle />
         </div>
       </div>
+
+      {/* Font sizes (custom feature) */}
+      <FontScaleControls />
 
       {/* Quick Presets */}
       <div className="rounded-2xl border border-dark-700/50 bg-dark-800/50 p-6">

@@ -1912,6 +1912,17 @@
       "autoFullscreen": "自动全屏",
       "autoFullscreenDesc": "在Telegram中自动展开",
       "availableThemes": "可用主题",
+      "fontSizes": {
+        "title": "字体大小",
+        "description": "按类别缩放文字大小（对所有人生效）。",
+        "heading": "标题",
+        "body": "正文",
+        "small": "小号文字",
+        "smaller": "更小",
+        "normal": "正常",
+        "larger": "更大",
+        "largest": "最大"
+      },
       "colors": {
         "background": "背景",
         "error": "错误",
