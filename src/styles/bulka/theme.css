@@ -78,6 +78,21 @@ html.theme-bulka:not(.light) {
   --color-dark-950: 28, 28, 28 !important; /* #1C1C1C — app background (kept dark) */
   --color-dark-bg: #1c1c1c !important;
   --color-dark-surface: #3c3c3c !important;
+
+  /* Glass tokens (inline styles via getGlassColors). Opaque + a touch darker
+     than the class surface so cards regain depth instead of reading flat-grey,
+     and the cookie background can't bleed through. Borders warm amber so they
+     don't blend into the card. */
+  --glass-card-bg: #303030 !important; /* slightly darker than #3c3c3c surface */
+  --glass-card-border: rgba(232, 163, 61, 0.22) !important;
+  --glass-inner-bg: #282828 !important;
+  --glass-inner-border: rgba(232, 163, 61, 0.14) !important;
+  --glass-hover-bg: #383838 !important;
+  --glass-hover-border: rgba(232, 163, 61, 0.3) !important;
+  --glass-track-bg: #232323 !important;
+  --glass-track-border: rgba(232, 163, 61, 0.12) !important;
+  --glass-code-bg: #232323 !important;
+  --glass-code-border: rgba(232, 163, 61, 0.12) !important;
 }
 
 /* ── Light variant — warm cream paper ──────────────────────────────────────
@@ -98,6 +113,18 @@ html.theme-bulka.light {
   --color-champagne-950: 28, 26, 22 !important; /* near-black warm text */
   --color-light-bg: #f5efe4 !important;
   --color-light-surface: #ffffff !important;
+
+  /* Glass tokens — opaque cream cards + amber borders (light variant). */
+  --glass-card-bg: #ffffff !important;
+  --glass-card-border: rgba(200, 138, 42, 0.28) !important;
+  --glass-inner-bg: #f7f1e6 !important;
+  --glass-inner-border: rgba(200, 138, 42, 0.18) !important;
+  --glass-hover-bg: #f2ead9 !important;
+  --glass-hover-border: rgba(200, 138, 42, 0.34) !important;
+  --glass-track-bg: #ece3d3 !important;
+  --glass-track-border: rgba(200, 138, 42, 0.16) !important;
+  --glass-code-bg: #f2ead9 !important;
+  --glass-code-border: rgba(200, 138, 42, 0.16) !important;
 }
 
 /* ── Opaque cards so the animated background can't bleed through ────────────
@@ -138,6 +165,21 @@ html.theme-bulka .bg-dark-900\/80,
 html.theme-bulka .bg-dark-900\/90,
 html.theme-bulka .bg-dark-900\/95 {
   background-color: rgb(var(--color-dark-900)) !important;
+}
+
+/* ── Warm card borders so they don't blend into the surface ────────────────
+ * The dominant card borders (border-dark-700 and alpha variants, border-dark-800/50)
+ * are grey and vanish against the opaque cards. Retint to a faint amber. Base
+ * classes only — not hover:/focus: variants. */
+html.theme-bulka .border-dark-700,
+html.theme-bulka .border-dark-700\/30,
+html.theme-bulka .border-dark-700\/40,
+html.theme-bulka .border-dark-700\/50,
+html.theme-bulka .border-dark-700\/60,
+html.theme-bulka .border-dark-800,
+html.theme-bulka .border-dark-800\/30,
+html.theme-bulka .border-dark-800\/50 {
+  border-color: rgba(232, 163, 61, 0.2) !important;
 }
 
 /* ── Legibility: raise low-opacity muted text ──────────────────────────────
