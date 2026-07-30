@@ -19,7 +19,6 @@ import { getAndClearReturnUrl, tokenStorage } from '../utils/token';
 import { getApiErrorMessage } from '../utils/api-error';
 import { isInTelegramWebApp, getTelegramInitData, useTelegramSDK } from '../hooks/useTelegramSDK';
 import { closeMiniApp } from '@telegram-apps/sdk-react';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 import TelegramLoginButton from '../components/TelegramLoginButton';
 import OAuthProviderIcon from '../components/OAuthProviderIcon';
 import { saveOAuthState } from '../utils/oauth';
@@ -29,7 +28,12 @@ import LegalFooter from '../components/LegalFooter';
 import { BackgroundRenderer } from '../components/backgrounds/BackgroundRenderer';
 
 export default function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Login is Russian-only for now — no language picker on this page.
+  useEffect(() => {
+    if (i18n.language !== 'ru') i18n.changeLanguage('ru');
+  }, [i18n]);
   const navigate = useNavigate();
   const location = useLocation();
   const {
@@ -335,15 +339,7 @@ export default function Login() {
           The animation-config endpoint is public, so this works pre-auth. */}
       <BackgroundRenderer />
 
-      {/* Language switcher */}
-      <div
-        className="fixed right-3 z-50"
-        style={{
-          top: safeTop > 0 ? `${safeTop + 12}px` : 'calc(12px + env(safe-area-inset-top, 0px))',
-        }}
-      >
-        <LanguageSwitcher />
-      </div>
+      {/* Language switcher removed — login is Russian-only for now. */}
 
       <div className="relative w-full max-w-md space-y-5">
         {/* Logo & branding */}
