@@ -259,9 +259,12 @@ export default function BulkaCookiesBackground({ settings }: Props) {
       R.y += R.vy;
     }
 
-    // Draw.
+    // Draw — muted like the marketing site (there: canvas opacity 0.35 × sprite
+    // alpha 0.7 ≈ 0.25). The cabinet's cards are translucent, so opaque bright
+    // sprites would bleed through and distract; keep the cookies as a faint
+    // backdrop. Admins can still tune further via the background opacity slider.
     ctx.clearRect(0, 0, w, h);
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.22;
     const drawSize = SPRITE * size;
     const half = drawSize / 2;
     for (const R of cookies) {
