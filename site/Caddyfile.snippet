@@ -1,30 +1,28 @@
-# ── Add this block to your EXISTING Caddyfile (the one already serving the
-#    cabinet on port 443) — do NOT run site/docker-compose.yml in that case, or
-#    two processes fight over 443. One Caddy serves both domains by name.
+# ── Блок для маркетингового сайта. Добавьте его в СУЩЕСТВУЮЩИЙ Caddyfile
+#    (тот, что уже раздаёт кабинет на 443), рядом с блоком cabinet.*.
+#    НЕ запускайте site/docker-compose.yml на этом же сервере — иначе два
+#    процесса будут драться за порт 443. Один Caddy обслуживает оба домена
+#    по имени.
 #
-# Put the site files where this Caddy can read them (e.g. /srv/site), or mount
-# them into the Caddy container. Adjust the path and domain below.
+# Файлы сайта положите в /srv/site (как кабинет лежит в /srv/cabinet):
+#   sudo mkdir -p /srv/site && sudo cp -r site/* /srv/site/
+# затем перезагрузите Caddy:
+#   docker exec <caddy_container> caddy reload --config /etc/caddy/Caddyfile
+# (или `caddy reload`, если Caddy запущен на хосте).
 
-bulkavpn.net {
-	encode gzip zstd
+# Маркетинговый сайт (главная)
+https://bulkavpn.net {
+    encode gzip zstd
 
-	root * /srv/site
-	file_server
-	try_files {path} /index.html
+    handle {
+        root * /srv/site
+        try_files {path} /index.html
+        file_server
 
-	@assets path /assets/*
-	header @assets Cache-Control "public, max-age=31536000, immutable"
+        @static path *.js *.css *.woff *.woff2 *.ttf *.ico *.png *.jpg *.jpeg *.svg *.webp *.gif
+        header @static Cache-Control "public, max-age=31536000, immutable"
 
-	@html path *.html /
-	header @html Cache-Control "no-cache, must-revalidate"
-
-	# Don't expose deploy/meta files if they sit in the same folder.
-	@hidden path /Caddyfile* /docker-compose.yml /.env* /README.md
-	respond @hidden 404
+        @html path *.html /
+        header @html Cache-Control "no-cache, must-revalidate"
+    }
 }
-
-# The cabinet keeps its own separate block, unchanged, e.g.:
-# cabinet.bulkavpn.net {
-#     handle /api/* { uri strip_prefix /api; reverse_proxy remnawave_bot:8080 }
-#     handle { reverse_proxy cabinet_frontend:80 }
-# }

@@ -1,81 +1,78 @@
-# Marketing site (bulkavpn.net)
+# Маркетинговый сайт (главная страница)
 
-Static landing / homepage for Bulka VPN — plain HTML + CSS + fonts + SVG, **no build
-step**. Maintained in this repo alongside the cabinet, deployed separately to its own
-domain.
+Статический лендинг / главная Bulka VPN — обычный HTML + CSS + шрифты + SVG, **сборка
+не нужна**. Ведётся в этом репозитории вместе с кабинетом, деплоится отдельно на свой
+домен.
 
-## Which option to use
+## Какой вариант выбрать
 
-> **Important:** only one process can listen on port 443. If a reverse proxy
-> (Caddy/nginx/Traefik) already serves the cabinet on this server, it already owns
-> 443 — do **not** also start `site/docker-compose.yml`, or the two fight over the
-> port. Domains don't conflict (one proxy routes `bulkavpn.net` and
-> `cabinet.bulkavpn.net` by name); only ports do.
+> **Важно:** порт 443 может слушать только один процесс. У тебя кабинет уже стоит за
+> Caddy (`/opt/caddy/Caddyfile`), который держит 443 и раздаёт `cabinet.*` статикой из
+> `/srv/cabinet`. Поэтому **не запускай** `site/docker-compose.yml` на этом же сервере —
+> второй Caddy не сможет забиндить занятый 443. Домены при этом не конфликтуют: один
+> Caddy обслуживает и сайт, и кабинет, разводя их по имени.
 
-- **A proxy already runs on this server** (typical — the cabinet is behind Caddy) →
-  use **Option B** (add a block to that proxy). Skip the Docker command.
-- **Nothing serves 443 on this box** (e.g. a dedicated host for the site) →
-  use **Option A** below.
+- **Прокси уже есть на сервере** (твой случай) → **Вариант B** ниже. Docker-команду не
+  запускаешь.
+- **Отдельный сервер, где 80/443 свободны** → **Вариант A**.
 
-## Option A — standalone Docker + automatic HTTPS
+## Вариант B — добавить в существующий Caddy (твой случай)
 
-Use only when ports 80/443 are free on the host.
+Раздаём сайт статикой, ровно как кабинет из `/srv/cabinet`.
+
+1. Скопируй файлы сайта на сервер:
+   ```bash
+   sudo mkdir -p /srv/site
+   sudo cp -r site/* /srv/site/
+   ```
+2. Добавь блок из **`Caddyfile.snippet`** в `/opt/caddy/Caddyfile` (рядом с блоком
+   `cabinet.stable-vpn.net`).
+3. Перезагрузи Caddy:
+   ```bash
+   docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+   ```
+   (имя контейнера подставь своё; если Caddy на хосте — просто `caddy reload`).
+
+DNS домена сайта (`bulkavpn.net`) должен указывать на IP этого сервера — Caddy сам
+выпустит и будет продлевать TLS-сертификат.
+
+Обновление сайта потом: `git pull` → снова `sudo cp -r site/* /srv/site/` (reload не
+нужен, файлы статические).
+
+## Вариант A — отдельный Docker с авто-HTTPS
+
+Только если порты 80/443 на хосте свободны.
 
 ```bash
 cd site
-cp .env.example .env      # set SITE_DOMAIN to your domain
+cp .env.example .env      # укажи свой домен в SITE_DOMAIN
 docker compose up -d
 ```
 
-Caddy serves this folder and obtains/renews the Let's Encrypt TLS certificate
-automatically. The domain's DNS A/AAAA record must already point at the server's IP
-(Caddy needs to reach it to issue the certificate).
+Caddy раздаёт эту папку и сам получает/продлевает сертификат Let's Encrypt. DNS
+A/AAAA-запись домена должна уже указывать на IP сервера.
 
-Update later by editing files here and re-running `docker compose up -d` after
-`git pull`.
+## Файлы
 
-## Option B — add to the existing proxy (shared server)
-
-The cabinet's Caddy already holds 443. Add one site block to its Caddyfile instead
-of starting a second proxy — copy the block from **`Caddyfile.snippet`**, adjust the
-`root` path/domain, put the site files where that Caddy can read them (e.g.
-`/srv/site` or a mounted volume), and reload Caddy. The cabinet block stays
-untouched; both domains are served by the same process.
-
-### Files
-
-- `index.html` — the whole page (inline `<style>` + inline JS for reveal/FAQ/CTA).
-- `assets/` — compiled `tailwind.css`, local Noto Sans woff2, SVG icons, OG images.
+- `index.html` — вся страница (инлайн `<style>` + инлайн JS для reveal/FAQ/CTA).
+- `assets/` — собранный `tailwind.css`, локальные Noto Sans woff2, SVG-иконки, OG-картинки.
 - `robots.txt`, `sitemap.xml`.
-- `Caddyfile`, `docker-compose.yml`, `.env.example` — deploy (not served to visitors).
+- `Caddyfile.snippet` — блок для существующего Caddy (Вариант B).
+- `Caddyfile`, `docker-compose.yml`, `.env.example` — отдельный деплой (Вариант A).
 
-### nginx variant (Option B on nginx)
+## Связь кнопок с кабинетом
 
-If the existing proxy is nginx, add a vhost pointing at this folder:
+Кнопки ведут на `https://cabinet.bulkavpn.net`:
 
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name bulkavpn.net;
-    root /srv/site;                 # this folder
-    index index.html;
-    location / { try_files $uri $uri/ /index.html; }
-    location /assets/ { expires 1y; add_header Cache-Control "public, immutable"; }
-}
-```
+- **Кнопки покупки** («Купить VPN», «Попробовать за 10 ₽», «Выбрать тариф», «Выбрать»,
+  «Оформить подписку») → `/buy/main` — публичная воронка покупки (регистрация заранее
+  не нужна, аккаунт создаётся после оплаты).
+- **Кнопки входа** («Войти в ЛК», «Войти в аккаунт») → `/login`.
 
-The cabinet stays on its own (sub)domain — this site is independent and is not part
-of the cabinet Docker image (`site/` is excluded via `.dockerignore` and Biome).
-
-## CTA wiring to the cabinet
-
-CTA links point to `https://cabinet.bulkavpn.net`:
-
-- **Purchase CTAs** ("Купить VPN", "Попробовать за 10 ₽", "Выбрать тариф", "Выбрать",
-  "Оформить подписку") → `/buy/main` — the public purchase funnel (no prior
-  registration; the account is created after payment).
-- **Login CTAs** ("Войти в ЛК", "Войти в аккаунт") → `/login`.
-
-> **Required:** create a landing with slug `main` in the cabinet (Admin → Landings)
-> with tariffs + payment methods. Until it exists, `/buy/main` returns "not found".
-> To use a different slug, update the 7 `/buy/…` hrefs in `index.html`.
+> **Нужно:** создать в кабинете лендинг со slug `main` (Админка → Лендинги) с тарифами
+> и способами оплаты. Пока его нет, `/buy/main` отдаёт «не найдено». Для другого slug
+> — поправь 7 ссылок `/buy/…` в `index.html`.
+>
+> **Проверь домен:** сейчас в кнопках зашит `cabinet.bulkavpn.net`, а кабинет у тебя на
+> `cabinet.stable-vpn.net`. Либо направь DNS `cabinet.bulkavpn.net` на кабинет, либо
+> скажи — заменю домен в ссылках.
