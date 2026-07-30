@@ -26,6 +26,7 @@ import { saveOAuthState } from '../utils/oauth';
 import { getPendingReferralCode } from '../utils/referral';
 import { UsersIcon, EmailIcon, RefreshIcon, ChevronDownIcon } from '@/components/icons';
 import LegalFooter from '../components/LegalFooter';
+import { BackgroundRenderer } from '../components/backgrounds/BackgroundRenderer';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -328,10 +329,11 @@ export default function Login() {
           safeBottom > 0 ? `${safeBottom + 16}px` : 'calc(1rem + env(safe-area-inset-bottom, 0px))',
       }}
     >
-      {/* Flat background — the previous two layered gradients (linear
-          + accent radial halo) read as the airdrop / crypto aesthetic
-          PRODUCT.md explicitly anti-references. Body bg-dark-950 carries
-          the surface alone. */}
+      {/* Animated background — Login renders outside AppShell (which is the only
+          BackgroundHost consumer), so mount our own instance directly, like
+          QuickPurchase does. Renders via a portal at z-index -2, behind content.
+          The animation-config endpoint is public, so this works pre-auth. */}
+      <BackgroundRenderer />
 
       {/* Language switcher */}
       <div

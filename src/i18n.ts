@@ -36,7 +36,11 @@ i18n
     partialBundledLanguages: true,
 
     detection: {
-      order: ['localStorage', 'navigator'],
+      // 'navigator' dropped so a first-time visitor with no stored choice gets
+      // fallbackLng ('ru') by default instead of their browser language. An
+      // explicit choice (localStorage 'cabinet_language') and the Telegram
+      // language adoption still take precedence.
+      order: ['localStorage'],
       caches: ['localStorage'],
       lookupLocalStorage: 'cabinet_language',
     },
