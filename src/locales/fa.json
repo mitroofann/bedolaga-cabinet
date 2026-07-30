@@ -1,4 +1,22 @@
 {
+  "landingTrial": {
+    "badge": "آزمایشی",
+    "badgeFree": "آزمایشی رایگان",
+    "title": "قبل از خرید امتحان کنید",
+    "days": "روز",
+    "priceLabel": "قیمت",
+    "free": "رایگان",
+    "contactLabel": "اطلاعات تماس شما",
+    "contactPlaceholder": "email@example.com یا @telegram",
+    "contactHint": "ایمیل یا نام کاربری تلگرام @",
+    "ctaFree": "شروع دوره آزمایشی رایگان",
+    "ctaPaid": "دریافت آزمایشی با {{price}}",
+    "successTitle": "دوره آزمایشی شما آماده است",
+    "error": "مشکلی پیش آمد. لطفاً دوباره تلاش کنید.",
+    "alreadyUsed": "شما قبلاً از دوره آزمایشی استفاده کرده‌اید.",
+    "rateLimited": "تلاش‌های زیاد. لطفاً بعداً دوباره امتحان کنید.",
+    "disabled": "دوره آزمایشی در دسترس نیست."
+  },
   "common": {
     "loading": "در حال بارگذاری...",
     "all": "همه",
@@ -3843,6 +3861,7 @@
       "methodIcon": "URL آیکون",
       "gifts": "هدایا",
       "giftEnabled": "خرید هدیه",
+      "trialEnabled": "آزمایشی فعال",
       "customCss": "CSS",
       "seo": "SEO",
       "metaTitle": "عنوان متا",

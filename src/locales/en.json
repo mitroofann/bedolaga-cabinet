@@ -1,4 +1,22 @@
 {
+  "landingTrial": {
+    "badge": "Trial",
+    "badgeFree": "Free trial",
+    "title": "Try before you buy",
+    "days": "days",
+    "priceLabel": "Price",
+    "free": "Free",
+    "contactLabel": "Your contact",
+    "contactPlaceholder": "email@example.com or @telegram",
+    "contactHint": "Email or Telegram @username",
+    "ctaFree": "Start free trial",
+    "ctaPaid": "Get trial for {{price}}",
+    "successTitle": "Your trial is ready",
+    "error": "Something went wrong. Please try again.",
+    "alreadyUsed": "You have already used the trial.",
+    "rateLimited": "Too many attempts. Please try again later.",
+    "disabled": "The trial is not available."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error",
@@ -4220,6 +4238,7 @@
       "methodIcon": "Icon URL",
       "gifts": "Gifts",
       "giftEnabled": "Gift purchases",
+      "trialEnabled": "Trial enabled",
       "customCss": "CSS",
       "seo": "SEO",
       "metaTitle": "Meta Title",

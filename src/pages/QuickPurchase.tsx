@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { fireAnalyticsEvent, getYandexCid } from '../hooks/useAnalyticsCounters';
@@ -27,6 +27,7 @@ import {
 import { CheckCircleIcon, CheckIcon, DevicesIcon, DownloadIcon } from '@/components/icons';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { SanitizedHtml } from '../components/common/SanitizedHtml';
+import { TrialBlock } from '../features/landing-trial';
 import { cn } from '../lib/utils';
 import { getApiErrorMessage } from '../utils/api-error';
 import { formatPrice } from '../utils/format';
@@ -288,7 +289,11 @@ function TariffCard({
         <div>
           <h3 className="text-base font-semibold text-dark-50">{tariff.name}</h3>
           {tariff.description && (
-            <SanitizedHtml as="p" html={tariff.description} className="mt-0.5 text-xs text-dark-400" />
+            <SanitizedHtml
+              as="p"
+              html={tariff.description}
+              className="mt-0.5 text-xs text-dark-400"
+            />
           )}
         </div>
         <div
@@ -742,6 +747,8 @@ function DiscountBanner({
 
 export default function QuickPurchase() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const trialIntent = searchParams.get('intent') === 'trial';
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -1135,6 +1142,13 @@ export default function QuickPurchase() {
             <DiscountBanner discount={config.discount} onExpired={handleDiscountExpired} />
           )}
         </AnimatePresence>
+
+        {/* Trial offer (isolated feature) — shown only when the backend enables it */}
+        {config.trial?.enabled && (
+          <div className="mb-8">
+            <TrialBlock slug={slug!} config={config} trial={config.trial} autofocus={trialIntent} />
+          </div>
+        )}
 
         {/* Two-column layout */}
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">

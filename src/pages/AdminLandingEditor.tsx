@@ -12,7 +12,7 @@ import {
   type SupportedLocale,
   toLocaleDict,
 } from '../api/landings';
-import { tariffsApi, TariffListItem, PeriodPrice } from '../api/tariffs';
+import { tariffsApi, type TariffListItem, type PeriodPrice } from '../api/tariffs';
 import { formatPrice } from '../utils/format';
 import { useCurrency } from '../hooks/useCurrency';
 import { adminPaymentMethodsApi } from '../api/adminPaymentMethods';
@@ -126,6 +126,7 @@ export default function AdminLandingEditor() {
   const [allowedPeriods, setAllowedPeriods] = useState<Record<string, number[]>>({});
   const [paymentMethods, setPaymentMethods] = useState<MethodWithId[]>([]);
   const [giftEnabled, setGiftEnabled] = useState(false);
+  const [trialEnabled, setTrialEnabled] = useState(false);
   const [footerText, setFooterText] = useState<LocaleDict>({});
   const [customCss, setCustomCss] = useState('');
 
@@ -258,6 +259,7 @@ export default function AdminLandingEditor() {
       })),
     );
     setGiftEnabled(landingData.gift_enabled);
+    setTrialEnabled(landingData.trial_enabled ?? false);
     setFooterText(toLocaleDict(landingData.footer_text));
     setCustomCss(landingData.custom_css ?? '');
     if (landingData.background_config) {
@@ -371,6 +373,7 @@ export default function AdminLandingEditor() {
       allowed_periods: cleanPeriods,
       payment_methods: cleanMethods,
       gift_enabled: giftEnabled,
+      trial_enabled: trialEnabled,
       custom_css: customCss || undefined,
       meta_title: nonEmptyDict(metaTitle),
       meta_description: nonEmptyDict(metaDescription),
@@ -1082,6 +1085,12 @@ export default function AdminLandingEditor() {
           <div className="flex items-center justify-between">
             <label className="text-sm text-dark-400">{t('admin.landings.giftEnabled')}</label>
             <Toggle checked={giftEnabled} onChange={() => setGiftEnabled(!giftEnabled)} />
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <label className="text-sm text-dark-400">
+              {t('admin.landings.trialEnabled', 'Trial enabled')}
+            </label>
+            <Toggle checked={trialEnabled} onChange={() => setTrialEnabled(!trialEnabled)} />
           </div>
         </Section>
 

@@ -78,6 +78,17 @@ export interface LandingDiscountInfo {
   badge_text: string | null;
 }
 
+/** Public trial config on the landing (null when the landing has no trial). */
+export interface LandingTrialConfig {
+  enabled: boolean;
+  duration_days: number;
+  traffic_limit_gb: number;
+  device_limit: number;
+  requires_payment: boolean;
+  price_kopeks: number;
+  price_rubles: number;
+}
+
 export interface LandingConfig {
   slug: string;
   title: string;
@@ -97,6 +108,9 @@ export interface LandingConfig {
   analytics_click_enabled: boolean;
   analytics_click_goal: string;
   sticky_pay_button: boolean;
+  // Trial offer exposed on the public funnel (backend feature). null / enabled:false
+  // means no trial block is shown. See src/features/landing-trial/.
+  trial?: LandingTrialConfig | null;
 }
 
 export interface PurchaseRequest {
@@ -120,6 +134,44 @@ export interface PurchaseResponse {
   purchase_token: string;
   payment_url: string;
 }
+
+// ── Trial (public landing funnel) ─────────────────────────────────────────
+export interface TrialRequest {
+  contact_type: 'email' | 'telegram';
+  contact_value: string;
+  /** Required only for a paid trial (config.trial.requires_payment). */
+  payment_method?: string | null;
+  language?: string | null;
+  yandex_cid?: string | null;
+  yclid?: string | null;
+  referrer?: string | null;
+  subid?: string | null;
+}
+
+/** Free trial granted immediately (no payment). */
+export interface TrialFreeResponse {
+  mode: 'free';
+  status: 'delivered';
+  subscription_url: string | null;
+  subscription_crypto_link: string | null;
+  contact_type: 'email' | 'telegram';
+  // Present only for a freshly created email account.
+  cabinet_email: string | null;
+  cabinet_password: string | null;
+  auto_login_token: string | null;
+  // Telegram arm.
+  recipient_in_bot: boolean | null;
+  bot_link: string | null;
+}
+
+/** Paid trial — proceed through payment like a normal purchase. */
+export interface TrialPaidResponse {
+  mode: 'paid';
+  purchase_token: string;
+  payment_url: string;
+}
+
+export type TrialResponse = TrialFreeResponse | TrialPaidResponse;
 
 export interface PurchaseStatus {
   status: 'pending' | 'paid' | 'delivered' | 'pending_activation' | 'failed' | 'expired';
@@ -229,6 +281,7 @@ export interface LandingDetail {
   analytics_click_enabled: boolean;
   analytics_click_goal: string;
   sticky_pay_button: boolean;
+  trial_enabled: boolean;
 }
 
 export interface LandingCreateRequest {
@@ -242,6 +295,7 @@ export interface LandingCreateRequest {
   allowed_periods?: Record<string, number[]>;
   payment_methods?: AdminLandingPaymentMethod[];
   gift_enabled?: boolean;
+  trial_enabled?: boolean;
   custom_css?: string;
   meta_title?: LocaleDict;
   meta_description?: LocaleDict;
@@ -285,6 +339,13 @@ export const landingApi = {
 
   createPurchase: async (slug: string, data: PurchaseRequest): Promise<PurchaseResponse> => {
     const response = await apiClient.post(`/cabinet/landing/${slug}/purchase`, data);
+    return response.data;
+  },
+
+  // Public trial grant through the funnel (no auth). Returns a discriminated
+  // union on `mode`: 'free' (granted now) or 'paid' (redirect to payment).
+  createTrial: async (slug: string, data: TrialRequest): Promise<TrialResponse> => {
+    const response = await apiClient.post(`/cabinet/landing/${slug}/trial`, data);
     return response.data;
   },
 

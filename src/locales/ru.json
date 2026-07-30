@@ -1,4 +1,22 @@
 {
+  "landingTrial": {
+    "badge": "Пробный",
+    "badgeFree": "Бесплатный пробный",
+    "title": "Попробуйте перед покупкой",
+    "days": "дней",
+    "priceLabel": "Цена",
+    "free": "Бесплатно",
+    "contactLabel": "Ваш контакт",
+    "contactPlaceholder": "email@example.com или @telegram",
+    "contactHint": "Email или Telegram @username",
+    "ctaFree": "Активировать пробный",
+    "ctaPaid": "Пробный за {{price}}",
+    "successTitle": "Пробный доступ готов",
+    "error": "Что-то пошло не так. Попробуйте ещё раз.",
+    "alreadyUsed": "Вы уже использовали пробный период.",
+    "rateLimited": "Слишком много попыток. Попробуйте позже.",
+    "disabled": "Пробный период недоступен."
+  },
   "common": {
     "all": "Все",
     "loading": "Загрузка...",
@@ -4756,6 +4774,7 @@
       "methodIcon": "URL иконки",
       "gifts": "Подарки",
       "giftEnabled": "Покупка в подарок",
+      "trialEnabled": "Триал включён",
       "customCss": "CSS",
       "seo": "SEO",
       "metaTitle": "Meta Title",

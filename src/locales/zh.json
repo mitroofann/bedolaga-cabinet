@@ -1,4 +1,22 @@
 {
+  "landingTrial": {
+    "badge": "试用",
+    "badgeFree": "免费试用",
+    "title": "先试后买",
+    "days": "天",
+    "priceLabel": "价格",
+    "free": "免费",
+    "contactLabel": "您的联系方式",
+    "contactPlaceholder": "email@example.com 或 @telegram",
+    "contactHint": "邮箱或 Telegram @用户名",
+    "ctaFree": "开始免费试用",
+    "ctaPaid": "以 {{price}} 获取试用",
+    "successTitle": "您的试用已就绪",
+    "error": "出错了，请重试。",
+    "alreadyUsed": "您已使用过试用。",
+    "rateLimited": "尝试次数过多，请稍后再试。",
+    "disabled": "试用不可用。"
+  },
   "common": {
     "loading": "加载中...",
     "error": "错误",
@@ -3842,6 +3860,7 @@
       "methodIcon": "图标URL",
       "gifts": "礼物",
       "giftEnabled": "礼物购买",
+      "trialEnabled": "启用试用",
       "customCss": "CSS",
       "seo": "SEO",
       "metaTitle": "Meta标题",
