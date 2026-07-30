@@ -6,7 +6,7 @@ dist
 build
 
 # Marketing site — deployed separately to its own domain, not part of the cabinet image
-site
+mainpage
 
 # Development files
 .git

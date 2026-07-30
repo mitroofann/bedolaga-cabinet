@@ -4,8 +4,8 @@
 #    процесса будут драться за порт 443. Один Caddy обслуживает оба домена
 #    по имени.
 #
-# Файлы сайта положите в /srv/site (как кабинет лежит в /srv/cabinet):
-#   sudo mkdir -p /srv/site && sudo cp -r site/* /srv/site/
+# Файлы сайта положите в /srv/mainpage (как кабинет лежит в /srv/cabinet):
+#   sudo mkdir -p /srv/mainpage && sudo cp -r mainpage/* /srv/mainpage/
 # затем перезагрузите Caddy:
 #   docker exec <caddy_container> caddy reload --config /etc/caddy/Caddyfile
 # (или `caddy reload`, если Caddy запущен на хосте).
@@ -15,7 +15,7 @@ https://bulkavpn.net {
     encode gzip zstd
 
     handle {
-        root * /srv/site
+        root * /srv/mainpage
         try_files {path} /index.html
         file_server
 

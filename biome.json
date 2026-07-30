@@ -6,7 +6,7 @@
       "!dist",
       "!node_modules",
       "!public",
-      "!site",
+      "!mainpage",
       "!package-lock.json",
       "!**/*.min.js",
       "!**/*.min.css"
