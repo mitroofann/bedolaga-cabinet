@@ -1,0 +1,30 @@
+# Bulka VPN marketing site — Caddy config.
+# Caddy fetches and renews HTTPS certificates automatically (Let's Encrypt).
+#
+# The domain is taken from the SITE_DOMAIN env var (see docker-compose.yml),
+# defaulting to bulkavpn.net. To serve www as well, add it to the site address.
+
+{$SITE_DOMAIN:bulkavpn.net} {
+	encode gzip zstd
+
+	root * /srv
+
+	# Never serve deploy/meta files that live in this folder.
+	@hidden path /Caddyfile /docker-compose.yml /.env /.env.example /README.md
+	respond @hidden 404
+
+	file_server
+
+	# Static assets (fonts, images, compiled CSS) — cache hard.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# HTML / entrypoints — always revalidate so edits go live on next deploy.
+	@html {
+		path *.html /
+	}
+	header @html Cache-Control "no-cache, must-revalidate"
+
+	# Single static page: fall back to index.html for unknown paths.
+	try_files {path} /index.html
+}

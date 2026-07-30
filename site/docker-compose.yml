@@ -1,0 +1,29 @@
+# Bulka VPN marketing site — one-command deploy with automatic HTTPS.
+#
+#   1. cd site
+#   2. edit .env (set SITE_DOMAIN to your domain, pointed at this server's IP)
+#   3. docker compose up -d
+#
+# Caddy serves the static files in this folder and obtains/renews TLS certs
+# from Let's Encrypt automatically. No other setup needed.
+
+services:
+  site:
+    image: caddy:2-alpine
+    container_name: bulka_site
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - .:/srv:ro # this folder is the web root
+      - caddy_data:/data # persisted certificates (survive restarts)
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
