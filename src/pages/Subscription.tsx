@@ -587,7 +587,7 @@ export default function Subscription() {
               />
 
               <div
-                className="relative overflow-hidden rounded-3xl lg:backdrop-blur-xl"
+                className="relative overflow-hidden rounded-3xl p-5 lg:p-6 lg:backdrop-blur-xl"
                 style={{
                   background: g.cardBg,
                   border: subscription.is_trial
@@ -598,7 +598,6 @@ export default function Subscription() {
                   boxShadow: isDark
                     ? g.shadow
                     : `0 2px 16px ${zone.mainHex}12, 0 0 0 1px ${zone.mainHex}08`,
-                  padding: '28px 28px 24px',
                 }}
               >
                 {/* Decorative ambient radial + trial shimmer border were
@@ -745,16 +744,12 @@ export default function Subscription() {
                         subscriptionId ? `/connection?sub=${subscriptionId}` : '/connection',
                       );
                     }}
-                    className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-[16px] bg-accent-500 p-4 text-left ring-1 ring-inset ring-white/15 transition-colors duration-300 hover:bg-accent-600 ${displayedConnectionUrl && !shouldHideConnectionLink ? 'mb-2.5' : 'mb-5'}${isAtDeviceLimit ? ' cursor-not-allowed opacity-50' : ''}`}
+                    className={`group flex w-full items-center gap-4 rounded-[16px] bg-accent-500 p-4 text-left ring-1 ring-inset ring-white/15 transition-colors duration-300 hover:bg-accent-600 ${displayedConnectionUrl && !shouldHideConnectionLink ? 'mb-2.5' : 'mb-5'}${isAtDeviceLimit ? ' cursor-not-allowed opacity-50' : ''}`}
                   >
-                    <span
-                      className="subscription-cta-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
-                      aria-hidden="true"
-                    />
-                    <div className="relative z-10 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[12px] bg-white/20 text-on-accent">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[12px] bg-white/20 text-on-accent">
                       <DevicesIcon className="h-5 w-5" />
                     </div>
-                    <div className="relative z-10 min-w-0 flex-1">
+                    <div className="min-w-0 flex-1">
                       <div className="text-[15px] font-semibold tracking-tight text-on-accent">
                         {t('dashboard.connectDevice')}
                       </div>
@@ -774,13 +769,13 @@ export default function Subscription() {
                     </div>
                     {subscription.device_limit === 0 ? (
                       <div
-                        className="relative z-10 flex flex-shrink-0 items-center text-lg text-on-accent/70"
+                        className="flex flex-shrink-0 items-center text-lg text-on-accent/70"
                         aria-hidden="true"
                       >
                         ∞
                       </div>
                     ) : subscription.device_limit <= 10 ? (
-                      <div className="relative z-10 flex flex-shrink-0 gap-1.5" aria-hidden="true">
+                      <div className="flex flex-shrink-0 gap-1.5" aria-hidden="true">
                         {Array.from({ length: subscription.device_limit }, (_, i) => (
                           <div
                             key={i}
@@ -795,10 +790,7 @@ export default function Subscription() {
                         ))}
                       </div>
                     ) : (
-                      <div
-                        className="relative z-10 flex w-16 flex-shrink-0 items-center"
-                        aria-hidden="true"
-                      >
+                      <div className="flex w-16 flex-shrink-0 items-center" aria-hidden="true">
                         <div className="h-[6px] w-full overflow-hidden rounded-full bg-white/25">
                           {/* scaleX (compositor) instead of width (layout-thrash).
                             Track is 64px (w-16), so 0.0625 floor = 4px minimum,
@@ -1231,7 +1223,7 @@ export default function Subscription() {
         })()
       ) : (
         <div
-          className="relative overflow-hidden rounded-3xl py-12 text-center"
+          className="relative overflow-hidden rounded-3xl px-5 py-12 text-center lg:px-6"
           style={{
             background: g.cardBg,
             border: `1px solid ${g.cardBorder}`,
@@ -1251,12 +1243,11 @@ export default function Subscription() {
       {/* Daily Subscription Pause */}
       {subscription && subscription.is_daily && !subscription.is_trial && (
         <div
-          className="relative overflow-hidden rounded-3xl"
+          className="relative overflow-hidden rounded-3xl p-5 lg:p-6"
           style={{
             background: g.cardBg,
             border: `1px solid ${g.cardBorder}`,
             boxShadow: g.shadow,
-            padding: '24px 28px',
           }}
         >
           <div className="flex items-center justify-between">
@@ -1451,12 +1442,11 @@ export default function Subscription() {
         !subscription.is_trial &&
         subscription.device_limit !== 0 && (
           <div
-            className="relative overflow-hidden rounded-3xl"
+            className="relative overflow-hidden rounded-3xl p-5 lg:p-6"
             style={{
               background: g.cardBg,
               border: `1px solid ${g.cardBorder}`,
               boxShadow: g.shadow,
-              padding: '24px 28px',
             }}
           >
             <h2 className="mb-4 text-base font-bold tracking-tight text-dark-50">
@@ -1531,12 +1521,11 @@ export default function Subscription() {
         (subscription.is_active || subscription.is_limited) &&
         !subscription.is_trial && (
           <div
-            className="relative overflow-hidden rounded-3xl"
+            className="relative overflow-hidden rounded-3xl p-5 lg:p-6"
             style={{
               background: g.cardBg,
               border: `1px solid ${g.cardBorder}`,
               boxShadow: g.shadow,
-              padding: '16px 20px',
             }}
           >
             <button
@@ -1588,12 +1577,11 @@ export default function Subscription() {
       {/* My Devices Section */}
       {subscription && (
         <div
-          className="relative overflow-hidden rounded-3xl"
+          className="relative overflow-hidden rounded-3xl p-5 lg:p-6"
           style={{
             background: g.cardBg,
             border: `1px solid ${g.cardBorder}`,
             boxShadow: g.shadow,
-            padding: '24px 28px',
           }}
         >
           <div className="mb-4 flex items-center justify-between">

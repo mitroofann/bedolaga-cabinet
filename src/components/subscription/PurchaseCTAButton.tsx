@@ -49,18 +49,13 @@ export default function PurchaseCTAButton({
 
   return (
     <Link to={linkTo} className="block">
-      {/* Золотистая (accent) кнопка в едином стиле кабинета: обычный статичный
-        бордер (без «бегающей» рамки), сверху ненавязчивый диагональный
-        проблеск-shimmer, как на CTA главной. */}
+      {/* Золотистая (accent) кнопка в едином статичном стиле кабинета
+        (как «Подключить устройство» на главной): обычный бордер, без бликов. */}
       <button
         type="button"
-        className="group relative flex w-full items-center justify-between overflow-hidden rounded-2xl bg-accent-500 px-5 py-4 text-left ring-1 ring-inset ring-white/15 transition-colors duration-300 hover:bg-accent-600"
+        className="group flex w-full items-center justify-between rounded-2xl bg-accent-500 px-5 py-4 text-left ring-1 ring-inset ring-white/15 transition-colors duration-300 hover:bg-accent-600"
       >
-        <span
-          className="subscription-cta-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
-          aria-hidden="true"
-        />
-        <div className="relative z-10 flex items-center gap-3">
+        <div className="flex items-center gap-3">
           {/* Sparkle icon */}
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 text-on-accent">
             <SubscriptionIcon className="h-[18px] w-[18px]" />
@@ -72,7 +67,7 @@ export default function PurchaseCTAButton({
         </div>
 
         {/* Right: chevron */}
-        <ChevronRightIcon className="relative z-10 h-5 w-5 flex-shrink-0 text-on-accent/70 transition-transform duration-300 group-hover:translate-x-1" />
+        <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-on-accent/70 transition-transform duration-300 group-hover:translate-x-1" />
       </button>
     </Link>
   );
