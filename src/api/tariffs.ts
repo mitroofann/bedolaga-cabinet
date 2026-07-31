@@ -68,6 +68,9 @@ export interface TariffDetail {
   allowed_squads: string[];
   // Серверы (подмножество allowed_squads), отключаемые у пользователя при исчерпании трафика
   limit_disabled_squads: string[];
+  // Бесплатный доступ после истечения подписки: UUID сквадов + число дней
+  expire_free_squads: string[];
+  expire_free_days: number;
   server_traffic_limits: Record<string, ServerTrafficLimit>;
   servers: ServerInfo[];
   promo_groups: PromoGroupInfo[];
@@ -113,6 +116,9 @@ export interface TariffCreateRequest {
   allowed_squads?: string[];
   // Серверы (подмножество allowed_squads), отключаемые при исчерпании трафика
   limit_disabled_squads?: string[];
+  // Бесплатный доступ после истечения подписки: UUID сквадов + число дней
+  expire_free_squads?: string[];
+  expire_free_days?: number;
   server_traffic_limits?: Record<string, ServerTrafficLimit>;
   promo_group_ids?: number[];
   // Произвольное количество дней
@@ -161,6 +167,9 @@ export interface TariffUpdateRequest {
   allowed_squads?: string[];
   // Серверы (подмножество allowed_squads), отключаемые при исчерпании трафика
   limit_disabled_squads?: string[];
+  // Бесплатный доступ после истечения подписки: UUID сквадов + число дней
+  expire_free_squads?: string[];
+  expire_free_days?: number;
   server_traffic_limits?: Record<string, ServerTrafficLimit>;
   promo_group_ids?: number[];
   // Произвольное количество дней

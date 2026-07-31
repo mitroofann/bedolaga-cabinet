@@ -48,6 +48,8 @@ export default function AdminTariffCreate() {
   const [periodPrices, setPeriodPrices] = useState<PeriodPrice[]>([]);
   const [selectedSquads, setSelectedSquads] = useState<string[]>([]);
   const [limitDisabledSquads, setLimitDisabledSquads] = useState<string[]>([]);
+  const [expireFreeSquads, setExpireFreeSquads] = useState<string[]>([]);
+  const [expireFreeDays, setExpireFreeDays] = useState<number | ''>(0);
   const [selectedExternalSquad, setSelectedExternalSquad] = useState<string | null>(null);
   const [selectedPromoGroups, setSelectedPromoGroups] = useState<number[]>([]);
   const [dailyPriceKopeks, setDailyPriceKopeks] = useState<number | ''>(0);
@@ -120,6 +122,8 @@ export default function AdminTariffCreate() {
       setPeriodPrices(data.period_prices?.length ? data.period_prices : []);
       setSelectedSquads(data.allowed_squads || []);
       setLimitDisabledSquads(data.limit_disabled_squads || []);
+      setExpireFreeSquads(data.expire_free_squads || []);
+      setExpireFreeDays(data.expire_free_days || 0);
       setSelectedExternalSquad(data.external_squad_uuid || null);
       setSelectedPromoGroups(
         data.promo_groups?.filter((pg) => pg.is_selected).map((pg) => pg.id) || [],
@@ -175,6 +179,9 @@ export default function AdminTariffCreate() {
       allowed_squads: selectedSquads,
       // Держим подмножество: отправляем только те, что реально в allowed_squads
       limit_disabled_squads: limitDisabledSquads.filter((uuid) => selectedSquads.includes(uuid)),
+      // Бесплатный доступ после истечения (фича активна только при обоих заполненных полях)
+      expire_free_squads: expireFreeSquads,
+      expire_free_days: toNumber(expireFreeDays),
       external_squad_uuid: selectedExternalSquad || null,
       promo_group_ids: selectedPromoGroups,
       traffic_topup_enabled: trafficTopupEnabled,
@@ -207,6 +214,12 @@ export default function AdminTariffCreate() {
 
   const toggleLimitDisabledServer = (uuid: string) => {
     setLimitDisabledSquads((prev) =>
+      prev.includes(uuid) ? prev.filter((s) => s !== uuid) : [...prev, uuid],
+    );
+  };
+
+  const toggleExpireFreeServer = (uuid: string) => {
+    setExpireFreeSquads((prev) =>
       prev.includes(uuid) ? prev.filter((s) => s !== uuid) : [...prev, uuid],
     );
   };
@@ -853,6 +866,95 @@ export default function AdminTariffCreate() {
                       </button>
                     );
                   })}
+              </div>
+            )}
+          </div>
+
+          {/* Free access after subscription expiry (independent of allowed_squads) */}
+          <div className="card space-y-4">
+            <h4 className="text-sm font-medium text-dark-200">
+              {t('admin.tariffs.expireFreeTitle')}
+            </h4>
+            <p className="text-sm text-dark-400">{t('admin.tariffs.expireFreeHint')}</p>
+
+            {/* Free servers multiselect (full server list) */}
+            <div className="space-y-2">
+              <span className="text-sm font-medium text-dark-300">
+                {t('admin.tariffs.expireFreeServersLabel')}
+              </span>
+              {servers.length === 0 ? (
+                <p className="py-4 text-center text-dark-500">
+                  {t('admin.tariffs.noServersAvailable')}
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {servers.map((server: ServerInfo) => {
+                    const isSelected = expireFreeSquads.includes(server.squad_uuid);
+                    return (
+                      <button
+                        key={server.id}
+                        type="button"
+                        onClick={() => toggleExpireFreeServer(server.squad_uuid)}
+                        className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors ${
+                          isSelected
+                            ? isDaily
+                              ? 'bg-warning-500/20 text-warning-300'
+                              : 'bg-accent-500/20 text-accent-300'
+                            : 'bg-dark-800 text-dark-300 hover:bg-dark-700'
+                        }`}
+                      >
+                        <div
+                          className={`flex h-5 w-5 items-center justify-center rounded ${
+                            isSelected
+                              ? isDaily
+                                ? 'bg-warning-500 text-white'
+                                : 'bg-accent-500 text-on-accent'
+                              : 'bg-dark-600'
+                          }`}
+                        >
+                          {isSelected && <CheckIcon />}
+                        </div>
+                        <span className="flex-1 text-sm font-medium">
+                          <Twemoji options={{ className: 'twemoji', folder: 'svg', ext: '.svg' }}>
+                            {server.display_name}
+                          </Twemoji>
+                        </span>
+                        {server.country_code && (
+                          <span className="text-xs text-dark-500">{server.country_code}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Free days */}
+            <div>
+              <label
+                htmlFor="tariff-expire-free-days"
+                className="mb-2 block text-sm font-medium text-dark-300"
+              >
+                {t('admin.tariffs.expireFreeDaysLabel')}
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="tariff-expire-free-days"
+                  type="number"
+                  value={expireFreeDays}
+                  onChange={createNumberInputHandler(setExpireFreeDays, 0)}
+                  className="input w-32"
+                  min={0}
+                  placeholder="0"
+                />
+                <span className="text-dark-400">{t('admin.tariffs.daysShort')}</span>
+              </div>
+            </div>
+
+            {/* Warning: feature activates only when BOTH fields are filled */}
+            {expireFreeSquads.length > 0 !== toNumber(expireFreeDays) > 0 && (
+              <div className="rounded-lg border border-warning-500/30 bg-warning-500/10 p-3">
+                <p className="text-xs text-warning-300">{t('admin.tariffs.expireFreeWarning')}</p>
               </div>
             )}
           </div>
