@@ -354,6 +354,7 @@
     "locationsLabel": "مکان‌ها",
     "locations_other": "{{count}} مکان",
     "trafficReset": {
+      "label": "بازنشانی ترافیک",
       "DAY": "بازنشانی روزانه",
       "WEEK": "بازنشانی هفتگی",
       "MONTH": "بازنشانی ماهانه",

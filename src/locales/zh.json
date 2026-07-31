@@ -354,6 +354,7 @@
     "locationsLabel": "位置",
     "locations_other": "{{count}} 个位置",
     "trafficReset": {
+      "label": "流量重置",
       "DAY": "每日重置",
       "WEEK": "每周重置",
       "MONTH": "每月重置",

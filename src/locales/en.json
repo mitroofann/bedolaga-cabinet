@@ -382,6 +382,7 @@
     "locations_one": "{{count}} location",
     "locations_other": "{{count}} locations",
     "trafficReset": {
+      "label": "Traffic reset",
       "DAY": "Resets daily",
       "WEEK": "Resets weekly",
       "MONTH": "Resets monthly",

@@ -8,7 +8,6 @@ import { DEVICE_ALIAS_MAX_LENGTH } from '../constants/devices';
 import { WebBackButton } from '../components/WebBackButton';
 import { useDestructiveConfirm } from '../platform/hooks/useNativeDialog';
 import SubscriptionSummaryCard from '../components/dashboard/SubscriptionSummaryCard';
-import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
 import { useTrafficZone } from '../hooks/useTrafficZone';
 import { getGlassColors } from '../utils/glassTheme';
 import { copyToClipboard } from '../utils/clipboard';
@@ -579,10 +578,12 @@ export default function Subscription() {
                 isUnlimited={isUnlimited}
                 connectedDevices={connectedDevices}
                 title={t('subscription.title')}
-                showCountdown
                 onRefreshTraffic={() => refreshTrafficMutation.mutate()}
                 refreshing={refreshTrafficMutation.isPending}
                 refreshCooldown={trafficRefreshCooldown}
+                footer={
+                  <PurchaseCTAButton subscription={subscription} isMultiTariff={isMultiTariff} />
+                }
               />
 
               <div
@@ -726,22 +727,14 @@ export default function Subscription() {
                   </div>
                 )}
 
-                {/* ─── Traffic reset mode note (progress bar moved to summary card) ─── */}
-                {subscription.traffic_reset_mode &&
-                  subscription.traffic_reset_mode !== 'NO_RESET' && (
-                    <div className="mb-5 text-[11px] text-dark-50/30">
-                      {t(`subscription.trafficReset.${subscription.traffic_reset_mode}`)}
-                    </div>
-                  )}
-
                 {/* ─── Connect Device Button ───
-                   Главное действие блока: увеличенная геометрия и house-style
-                   HoverBorderGradient делают его заметнее прочих строк, а ссылка
-                   ниже примыкает к нему как часть одного «подключательного» узла. */}
+                   Главное действие блока: золотистая (accent) кнопка в едином
+                   стиле кабинета — обычный статичный бордер + диагональный
+                   проблеск-shimmer, как у CTA продления. Ссылка ниже примыкает
+                   к ней как часть одного «подключательного» узла. */}
                 {subscription.subscription_url && (
-                  <HoverBorderGradient
-                    as="button"
-                    accentColor={zone.mainHex}
+                  <button
+                    type="button"
                     disabled={isAtDeviceLimit}
                     onClick={() => {
                       if (isAtDeviceLimit) {
@@ -752,20 +745,20 @@ export default function Subscription() {
                         subscriptionId ? `/connection?sub=${subscriptionId}` : '/connection',
                       );
                     }}
-                    className={`${displayedConnectionUrl && !shouldHideConnectionLink ? 'mb-2.5' : 'mb-5'} flex w-full items-center gap-4 rounded-[16px] p-4 text-left transition-shadow duration-300${isAtDeviceLimit ? ' cursor-not-allowed opacity-50' : ''}`}
-                    style={{ fontFamily: 'inherit' }}
+                    className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-[16px] bg-accent-500 p-4 text-left ring-1 ring-inset ring-white/15 transition-colors duration-300 hover:bg-accent-600 ${displayedConnectionUrl && !shouldHideConnectionLink ? 'mb-2.5' : 'mb-5'}${isAtDeviceLimit ? ' cursor-not-allowed opacity-50' : ''}`}
                   >
-                    <div
-                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[12px] transition-colors duration-500"
-                      style={{ background: `${zone.mainHex}18`, color: zone.mainHex }}
-                    >
+                    <span
+                      className="subscription-cta-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+                      aria-hidden="true"
+                    />
+                    <div className="relative z-10 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[12px] bg-white/20 text-on-accent">
                       <DevicesIcon className="h-5 w-5" />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[15px] font-semibold tracking-tight text-dark-50">
+                    <div className="relative z-10 min-w-0 flex-1">
+                      <div className="text-[15px] font-semibold tracking-tight text-on-accent">
                         {t('dashboard.connectDevice')}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-dark-50/30">
+                      <div className="mt-0.5 text-[11px] text-on-accent/70">
                         {subscription.device_limit === 0
                           ? t('dashboard.devicesConnectedUnlimited', { used: connectedDevices })
                           : t('dashboard.devicesOfMax', {
@@ -774,59 +767,55 @@ export default function Subscription() {
                             })}
                       </div>
                       {isAtDeviceLimit && (
-                        <div
-                          className="mt-1 text-[10px] font-medium"
-                          style={{ color: 'rgb(var(--color-warning-400))' }}
-                        >
+                        <div className="mt-1 text-[10px] font-medium text-on-accent">
                           {t('dashboard.deviceLimitReached')}
                         </div>
                       )}
                     </div>
                     {subscription.device_limit === 0 ? (
                       <div
-                        className="flex flex-shrink-0 items-center text-lg text-dark-50/40"
+                        className="relative z-10 flex flex-shrink-0 items-center text-lg text-on-accent/70"
                         aria-hidden="true"
                       >
                         ∞
                       </div>
                     ) : subscription.device_limit <= 10 ? (
-                      <div className="flex flex-shrink-0 gap-1.5" aria-hidden="true">
+                      <div className="relative z-10 flex flex-shrink-0 gap-1.5" aria-hidden="true">
                         {Array.from({ length: subscription.device_limit }, (_, i) => (
                           <div
                             key={i}
-                            className="h-[7px] w-[7px] rounded-full transition-[background-color,box-shadow] duration-300"
+                            className="h-[7px] w-[7px] rounded-full transition-colors duration-300"
                             style={{
-                              background: i < connectedDevices ? zone.mainHex : g.textGhost,
-                              boxShadow:
-                                i < connectedDevices ? `0 0 6px ${zone.mainHex}50` : 'none',
+                              background:
+                                i < connectedDevices
+                                  ? 'rgb(var(--color-on-accent))'
+                                  : 'rgba(255,255,255,0.3)',
                             }}
                           />
                         ))}
                       </div>
                     ) : (
-                      <div className="flex w-16 flex-shrink-0 items-center" aria-hidden="true">
-                        <div
-                          className="h-[6px] w-full overflow-hidden rounded-full"
-                          style={{ background: g.textGhost }}
-                        >
+                      <div
+                        className="relative z-10 flex w-16 flex-shrink-0 items-center"
+                        aria-hidden="true"
+                      >
+                        <div className="h-[6px] w-full overflow-hidden rounded-full bg-white/25">
                           {/* scaleX (compositor) instead of width (layout-thrash).
                             Track is 64px (w-16), so 0.0625 floor = 4px minimum,
                             preserving the prior minWidth behaviour. */}
                           <div
-                            className="h-full w-full origin-left rounded-full transition-transform duration-500"
+                            className="h-full w-full origin-left rounded-full bg-white transition-transform duration-500"
                             style={{
                               transform: `scaleX(${(() => {
                                 const pct = connectedDevices / subscription.device_limit;
                                 return connectedDevices > 0 ? Math.max(pct, 0.0625) : 0;
                               })()})`,
-                              background: zone.mainHex,
-                              boxShadow: `0 0 8px ${zone.mainHex}40`,
                             }}
                           />
                         </div>
                       </div>
                     )}
-                  </HoverBorderGradient>
+                  </button>
                 )}
 
                 {/* ─── Subscription URL ───
@@ -835,25 +824,18 @@ export default function Subscription() {
                 {displayedConnectionUrl && !shouldHideConnectionLink && (
                   <div className="mb-5 flex gap-2">
                     <code
-                      className="block min-w-0 flex-1 truncate whitespace-nowrap rounded-[10px] px-3 py-2 font-mono text-[11px] text-dark-50/30"
-                      style={{
-                        background: g.codeBg,
-                        border: `1px solid ${g.codeBorder}`,
-                      }}
+                      className="block min-w-0 flex-1 truncate whitespace-nowrap rounded-xl bg-dark-800/30 px-3 py-2 font-mono text-[11px] text-dark-400"
                       title={displayedConnectionUrl}
                     >
                       {displayedConnectionUrl}
                     </code>
                     <button
                       onClick={copyUrl}
-                      className="flex h-auto items-center rounded-[10px] px-3 transition-colors duration-300"
-                      style={{
-                        background: copied ? 'rgba(var(--color-accent-400), 0.12)' : g.innerBorder,
-                        border: copied
-                          ? '1px solid rgba(var(--color-accent-400), 0.2)'
-                          : `1px solid ${g.trackBg}`,
-                        color: copied ? 'rgb(var(--color-accent-400))' : g.textMuted,
-                      }}
+                      className={`flex h-auto items-center rounded-xl px-3 transition-colors duration-300 ${
+                        copied
+                          ? 'bg-accent-500/15 text-accent-400'
+                          : 'bg-dark-800/30 text-dark-400 hover:bg-dark-800/50 hover:text-dark-200'
+                      }`}
                       aria-label={t('subscription.copyLink')}
                       title={t('subscription.copyLink')}
                     >
@@ -866,19 +848,15 @@ export default function Subscription() {
 
                 {/* ─── Locations ─── */}
                 {subscription.servers && subscription.servers.length > 0 && (
-                  <div className="mb-5">
-                    <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-dark-50/35">
+                  <div className="mb-5 rounded-xl bg-dark-800/30 p-3">
+                    <div className="mb-2 text-[10px] font-medium uppercase tracking-wider text-dark-500">
                       {t('subscription.locationsLabel')}
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {subscription.servers.map((server) => (
                         <span
                           key={server.uuid}
-                          className="inline-flex items-center gap-1.5 rounded-[8px] px-2.5 py-1 text-[11px] font-medium text-dark-50/50"
-                          style={{
-                            background: g.innerBorder,
-                            border: `1px solid ${g.trackBg}`,
-                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-dark-700/50 px-2.5 py-1 text-[11px] font-medium text-dark-200"
                         >
                           {server.country_code && (
                             <span className="text-xs">{getFlagEmoji(server.country_code)}</span>
@@ -967,20 +945,30 @@ export default function Subscription() {
                   </div>
                 )}
 
+                {/* ─── Traffic reset mode note ───
+                   Перенесено сюда, в «трафиковую» зону карточки, и снабжено
+                   явной подписью, чтобы «Сброс раз в 30 дней» читался именно
+                   как сброс трафика, а не абстрактный сброс. */}
+                {subscription.traffic_reset_mode &&
+                  subscription.traffic_reset_mode !== 'NO_RESET' && (
+                    <div className="mb-5 flex items-center justify-between rounded-xl bg-dark-800/30 px-3.5 py-2.5">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-dark-500">
+                        {t('subscription.trafficReset.label')}
+                      </span>
+                      <span className="text-[11px] font-medium text-dark-200">
+                        {t(`subscription.trafficReset.${subscription.traffic_reset_mode}`)}
+                      </span>
+                    </div>
+                  )}
+
                 {/* ─── Autopay Toggle ─── */}
                 {!subscription.is_trial && !subscription.is_daily && (
-                  <div
-                    className="flex items-center justify-between rounded-[14px] p-3.5"
-                    style={{
-                      background: g.innerBg,
-                      border: `1px solid ${g.innerBorder}`,
-                    }}
-                  >
+                  <div className="flex items-center justify-between rounded-xl bg-dark-800/30 p-3.5">
                     <div>
-                      <div className="text-sm font-semibold text-dark-50">
+                      <div className="text-sm font-semibold text-dark-100">
                         {t('subscription.autoRenewal')}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-dark-50/30">
+                      <div className="mt-0.5 text-[11px] text-dark-500">
                         {t('subscription.daysBeforeExpiry', {
                           count: subscription.autopay_days_before,
                         })}
@@ -992,10 +980,9 @@ export default function Subscription() {
                       role="switch"
                       aria-checked={subscription.autopay_enabled}
                       aria-label={t('subscription.autopay', 'Auto-payment')}
-                      className="relative h-7 w-[52px] rounded-full transition-colors duration-300"
-                      style={{
-                        background: subscription.autopay_enabled ? zone.mainHex : g.textGhost,
-                      }}
+                      className={`relative h-7 w-[52px] rounded-full transition-colors duration-300 ${
+                        subscription.autopay_enabled ? 'bg-accent-500' : 'bg-dark-700'
+                      }`}
                     >
                       {/* translateX (compositor) instead of left (layout-thrash).
                         Resting position pinned at left:3px; on toggles a 23px
@@ -1018,13 +1005,7 @@ export default function Subscription() {
                    is_trial + uiState — daily-tariff subscriptions must see
                    this block too (backend supports a day-interval charge). */}
                 {!subscription.is_trial && sbpUiStateValue !== 'hidden' && (
-                  <div
-                    className="mt-3 rounded-[14px] p-3.5"
-                    style={{
-                      background: g.innerBg,
-                      border: `1px solid ${g.innerBorder}`,
-                    }}
-                  >
+                  <div className="mt-3 rounded-xl bg-dark-800/30 p-3.5">
                     {/* Заголовок и статус слева, компактное действие справа —
                       зеркально соседнему тогглу «Автопродление». На мобиле
                       кнопка падает вниз на всю ширину (w-full sm:w-auto). */}
@@ -1134,13 +1115,7 @@ export default function Subscription() {
                    состояния. Период задан продуктом в кабинете Lava и приезжает
                    числом дней, поэтому подпись строится из charge_days. */}
                 {!subscription.is_trial && lavaUiStateValue !== 'hidden' && (
-                  <div
-                    className="mt-3 rounded-[14px] p-3.5"
-                    style={{
-                      background: g.innerBg,
-                      border: `1px solid ${g.innerBorder}`,
-                    }}
-                  >
+                  <div className="mt-3 rounded-xl bg-dark-800/30 p-3.5">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
                         <div className="text-sm font-semibold text-dark-50">
@@ -1443,8 +1418,11 @@ export default function Subscription() {
         </div>
       )}
 
-      {/* Purchase / Renewal CTA */}
-      <PurchaseCTAButton subscription={subscription} isMultiTariff={isMultiTariff} />
+      {/* Purchase / Renewal CTA — при наличии подписки живёт в подвале
+          обзорной карточки выше; здесь остаётся только для пустого случая. */}
+      {!subscription && (
+        <PurchaseCTAButton subscription={subscription} isMultiTariff={isMultiTariff} />
+      )}
 
       {/* Delete expired subscription */}
       {isMultiTariff &&

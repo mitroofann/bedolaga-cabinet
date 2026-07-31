@@ -388,6 +388,7 @@
     "locations_few": "{{count}} локации",
     "locations_many": "{{count}} локаций",
     "trafficReset": {
+      "label": "Сброс трафика",
       "DAY": "Сброс ежедневно",
       "WEEK": "Сброс еженедельно",
       "MONTH": "Сброс ежемесячно",
