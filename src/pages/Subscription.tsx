@@ -1,5 +1,5 @@
 import { uiLocale } from '@/utils/uiLocale';
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate, useParams } from 'react-router';
@@ -21,7 +21,6 @@ import {
   CopyIcon,
   CheckIcon,
   PauseIcon,
-  CalendarIcon,
   DevicesIcon,
   DownloadIcon,
   TrashIcon,
@@ -53,148 +52,6 @@ import { DeviceReductionSheet } from '../components/subscription/sheets/DeviceRe
 import { TrafficTopupSheet } from '../components/subscription/sheets/TrafficTopupSheet';
 import { ServerManagementSheet } from '../components/subscription/sheets/ServerManagementSheet';
 import { DeleteSubscriptionSheet } from '../components/subscription/sheets/DeleteSubscriptionSheet';
-
-/** Isolated countdown so 1s interval doesn't re-render the whole page */
-const CountdownTimer = memo(function CountdownTimer({
-  endDate,
-  isActive,
-  glassColors: g,
-}: {
-  endDate: string;
-  isActive: boolean;
-  glassColors: ReturnType<typeof getGlassColors>;
-}) {
-  const { t } = useTranslation();
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const endTime = new Date(endDate).getTime();
-    const tick = () => {
-      const diff = Math.max(0, endTime - Date.now());
-      setCountdown({
-        days: Math.floor(diff / 86_400_000),
-        hours: Math.floor((diff % 86_400_000) / 3_600_000),
-        minutes: Math.floor((diff % 3_600_000) / 60_000),
-        seconds: Math.floor((diff % 60_000) / 1_000),
-      });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [endDate]);
-
-  const isExpired = !isActive;
-  const isUrgent = countdown.days <= 3;
-
-  const formattedDate = new Date(endDate).toLocaleDateString(uiLocale(), {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-
-  return (
-    <div
-      className="min-w-0 overflow-hidden rounded-[14px] p-3.5"
-      style={{
-        background: isExpired
-          ? 'rgba(255,59,92,0.06)'
-          : isUrgent
-            ? 'rgba(255,184,0,0.06)'
-            : g.innerBg,
-        border: isExpired
-          ? '1px solid rgba(255,59,92,0.15)'
-          : isUrgent
-            ? '1px solid rgba(255,184,0,0.15)'
-            : `1px solid ${g.innerBorder}`,
-      }}
-    >
-      <div className="mb-2 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-dark-50/35">
-        <div
-          className="flex h-6 w-6 items-center justify-center rounded-[7px]"
-          style={{
-            background: isExpired
-              ? 'rgba(255,59,92,0.1)'
-              : isUrgent
-                ? 'rgba(255,184,0,0.1)'
-                : g.hoverBg,
-          }}
-        >
-          <span
-            style={{
-              color: isExpired
-                ? 'rgb(var(--color-critical-500))'
-                : isUrgent
-                  ? 'rgb(var(--color-urgent-400))'
-                  : g.textSecondary,
-            }}
-          >
-            <CalendarIcon className="h-[13px] w-[13px]" />
-          </span>
-        </div>
-        {t('dashboard.remaining')}
-      </div>
-      {isExpired ? (
-        <div
-          className="text-[18px] font-bold tracking-tight"
-          style={{ color: 'rgb(var(--color-critical-500))' }}
-        >
-          {t('subscription.expired')}
-        </div>
-      ) : (
-        <div className="flex items-baseline justify-between">
-          <div className="flex items-baseline gap-1 font-mono tabular-nums">
-            {countdown.days > 0 && (
-              <>
-                <span
-                  className="text-[20px] font-bold tracking-tight"
-                  style={{ color: isUrgent ? 'rgb(var(--color-urgent-400))' : g.text }}
-                >
-                  {countdown.days}
-                </span>
-                <span className="mr-1 text-[10px] font-medium text-dark-50/25">
-                  {t('subscription.daysShort')}
-                </span>
-              </>
-            )}
-            <span
-              className="text-[20px] font-bold tracking-tight"
-              style={{ color: isUrgent ? 'rgb(var(--color-urgent-400))' : g.text }}
-            >
-              {String(countdown.hours).padStart(2, '0')}
-            </span>
-            <span
-              className="mx-[-1px] text-[16px] font-bold opacity-30"
-              style={{ color: isUrgent ? 'rgb(var(--color-urgent-400))' : g.text }}
-            >
-              :
-            </span>
-            <span
-              className="text-[20px] font-bold tracking-tight"
-              style={{ color: isUrgent ? 'rgb(var(--color-urgent-400))' : g.text }}
-            >
-              {String(countdown.minutes).padStart(2, '0')}
-            </span>
-            <span
-              className="mx-[-1px] text-[16px] font-bold opacity-30"
-              style={{ color: isUrgent ? 'rgb(var(--color-urgent-400))' : g.text }}
-            >
-              :
-            </span>
-            <span
-              className="text-[20px] font-bold tracking-tight"
-              style={{ color: isUrgent ? 'rgb(var(--color-urgent-400))' : g.text }}
-            >
-              {String(countdown.seconds).padStart(2, '0')}
-            </span>
-          </div>
-          <div className="text-[10px] font-medium text-dark-50/25">
-            {t('subscription.expiresAt')}: {formattedDate}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-});
 
 export default function Subscription() {
   const { t } = useTranslation();
@@ -722,6 +579,7 @@ export default function Subscription() {
                 isUnlimited={isUnlimited}
                 connectedDevices={connectedDevices}
                 title={t('subscription.title')}
+                showCountdown
                 onRefreshTraffic={() => refreshTrafficMutation.mutate()}
                 refreshing={refreshTrafficMutation.isPending}
                 refreshCooldown={trafficRefreshCooldown}
@@ -837,20 +695,9 @@ export default function Subscription() {
                         <div className="mt-1 text-[12px] text-dark-50/40">
                           {t('subscription.trialInfo.description')}
                         </div>
+                        {/* Оставшееся время убрано — оно теперь живёт в
+                          обзорной карточке выше (плитка обратного отсчёта). */}
                         <div className="mt-3 flex flex-wrap gap-4">
-                          <div className="flex items-center gap-1.5">
-                            <span
-                              className="font-mono text-[12px] font-semibold"
-                              style={{ color: 'rgb(var(--color-accent-400))' }}
-                            >
-                              {subscription.days_left > 0
-                                ? t('subscription.days', { count: subscription.days_left })
-                                : `${subscription.hours_left}${t('subscription.hours')} ${subscription.minutes_left}${t('subscription.minutes')}`}
-                            </span>
-                            <span className="text-[11px] text-dark-50/30">
-                              {t('subscription.trialInfo.remaining')}
-                            </span>
-                          </div>
                           <div className="flex items-center gap-1.5">
                             <span
                               className="font-mono text-[12px] font-semibold"
@@ -887,7 +734,10 @@ export default function Subscription() {
                     </div>
                   )}
 
-                {/* ─── Connect Device Button ─── */}
+                {/* ─── Connect Device Button ───
+                   Главное действие блока: увеличенная геометрия и house-style
+                   HoverBorderGradient делают его заметнее прочих строк, а ссылка
+                   ниже примыкает к нему как часть одного «подключательного» узла. */}
                 {subscription.subscription_url && (
                   <HoverBorderGradient
                     as="button"
@@ -902,17 +752,17 @@ export default function Subscription() {
                         subscriptionId ? `/connection?sub=${subscriptionId}` : '/connection',
                       );
                     }}
-                    className={`mb-5 flex w-full items-center gap-3.5 rounded-[14px] p-3.5 text-left transition-shadow duration-300${isAtDeviceLimit ? 'cursor-not-allowed opacity-50' : ''}`}
+                    className={`${displayedConnectionUrl && !shouldHideConnectionLink ? 'mb-2.5' : 'mb-5'} flex w-full items-center gap-4 rounded-[16px] p-4 text-left transition-shadow duration-300${isAtDeviceLimit ? ' cursor-not-allowed opacity-50' : ''}`}
                     style={{ fontFamily: 'inherit' }}
                   >
                     <div
-                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] transition-colors duration-500"
-                      style={{ background: `${zone.mainHex}12`, color: zone.mainHex }}
+                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[12px] transition-colors duration-500"
+                      style={{ background: `${zone.mainHex}18`, color: zone.mainHex }}
                     >
-                      <DevicesIcon className="h-4 w-4" />
+                      <DevicesIcon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold tracking-tight text-dark-50">
+                      <div className="text-[15px] font-semibold tracking-tight text-dark-50">
                         {t('dashboard.connectDevice')}
                       </div>
                       <div className="mt-0.5 text-[11px] text-dark-50/30">
@@ -979,7 +829,9 @@ export default function Subscription() {
                   </HoverBorderGradient>
                 )}
 
-                {/* ─── Subscription URL ─── */}
+                {/* ─── Subscription URL ───
+                   Примыкает к кнопке подключения выше (mb-2.5 у кнопки),
+                   образуя единый узел «подключить + ссылка». */}
                 {displayedConnectionUrl && !shouldHideConnectionLink && (
                   <div className="mb-5 flex gap-2">
                     <code
@@ -1010,14 +862,7 @@ export default function Subscription() {
                   </div>
                 )}
 
-                {/* ─── Countdown ─── */}
-                <div className="mb-5">
-                  <CountdownTimer
-                    endDate={subscription.end_date}
-                    isActive={subscription.is_active || subscription.is_limited}
-                    glassColors={g}
-                  />
-                </div>
+                {/* Countdown moved into the bento summary card above. */}
 
                 {/* ─── Locations ─── */}
                 {subscription.servers && subscription.servers.length > 0 && (

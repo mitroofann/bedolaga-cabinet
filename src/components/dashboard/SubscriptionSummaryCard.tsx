@@ -1,3 +1,4 @@
+import { useEffect, useState, memo } from 'react';
 import { uiLocale } from '@/utils/uiLocale';
 import { useTranslation } from 'react-i18next';
 import { StatCard } from '@/components/stats';
@@ -21,6 +22,8 @@ interface SubscriptionSummaryCardProps {
   usedPercent: number;
   isUnlimited: boolean;
   connectedDevices: number;
+  /** Активировать плитку с живым отсчётом срока подписки. */
+  showCountdown?: boolean;
   /** Заголовок карточки. По умолчанию — название тарифа. */
   title?: string;
   /** Показать кнопку «Подключить устройство». */
@@ -46,12 +49,54 @@ function statusBadge(subscription: Subscription): { cls: string; key: string } {
   return { cls: 'badge-error', key: 'subscription.expired' };
 }
 
+/** Isolated so one-second updates never re-render the whole summary. */
+const RemainingTimeStat = memo(function RemainingTimeStat({
+  subscription,
+}: {
+  subscription: Subscription;
+}) {
+  const { t } = useTranslation();
+  const [secondsLeft, setSecondsLeft] = useState(0);
+
+  useEffect(() => {
+    const endTime = new Date(subscription.end_date).getTime();
+    const update = () => setSecondsLeft(Math.max(0, Math.floor((endTime - Date.now()) / 1000)));
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [subscription.end_date]);
+
+  const isExpired = !(subscription.is_active || subscription.is_limited) || secondsLeft <= 0;
+  const days = Math.floor(secondsLeft / 86_400);
+  const hours = Math.floor((secondsLeft % 86_400) / 3_600);
+  const minutes = Math.floor((secondsLeft % 3_600) / 60);
+  const isUrgent = days <= 3;
+  const formattedDate = new Date(subscription.end_date).toLocaleDateString(uiLocale());
+
+  return (
+    <StatCard
+      label={t('dashboard.remaining')}
+      value={
+        isExpired
+          ? t('subscription.expired')
+          : days > 0
+            ? t('subscription.days', { count: days })
+            : `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+      }
+      subValue={t('dashboard.validUntil', { date: formattedDate })}
+      icon={<CalendarIcon className="h-5 w-5" />}
+      tone={isExpired ? 'error' : isUrgent ? 'warning' : 'neutral'}
+    />
+  );
+});
+
 export default function SubscriptionSummaryCard({
   subscription,
   usedGb,
   usedPercent,
   isUnlimited,
   connectedDevices,
+  showCountdown = false,
   title,
   onConnect,
   onRefreshTraffic,
@@ -78,7 +123,9 @@ export default function SubscriptionSummaryCard({
       </div>
 
       {/* Key stats */}
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+      <div
+        className={`grid grid-cols-2 gap-2.5 ${showCountdown ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}
+      >
         <div className="col-span-2 sm:col-span-1">
           <StatCard
             label={t('subscription.traffic')}
@@ -92,13 +139,17 @@ export default function SubscriptionSummaryCard({
             tone="accent"
           />
         </div>
-        <StatCard
-          label={t('dashboard.remaining')}
-          value={daysLeft}
-          subValue={t('dashboard.validUntil', { date: formattedDate })}
-          icon={<CalendarIcon className="h-5 w-5" />}
-          tone={daysLeft <= 3 ? 'warning' : 'neutral'}
-        />
+        {showCountdown ? (
+          <RemainingTimeStat subscription={subscription} />
+        ) : (
+          <StatCard
+            label={t('dashboard.remaining')}
+            value={daysLeft}
+            subValue={t('dashboard.validUntil', { date: formattedDate })}
+            icon={<CalendarIcon className="h-5 w-5" />}
+            tone={daysLeft <= 3 ? 'warning' : 'neutral'}
+          />
+        )}
         <StatCard
           label={t('subscription.devices')}
           value={

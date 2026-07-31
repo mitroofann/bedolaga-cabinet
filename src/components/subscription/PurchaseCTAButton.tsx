@@ -58,15 +58,18 @@ export default function PurchaseCTAButton({
         className="group relative w-full cursor-pointer overflow-hidden rounded-2xl"
       >
         <div
-          className="relative flex items-center justify-between rounded-[14px] px-5 py-4 transition-colors duration-300"
+          className="relative flex items-center justify-between overflow-hidden rounded-[14px] px-5 py-4 transition-colors duration-300"
           style={{
             background: isExpired
               ? 'linear-gradient(135deg, rgba(255,59,92,0.08), rgba(255,107,53,0.06))'
               : 'linear-gradient(135deg, rgba(var(--color-accent-400), 0.08), rgba(var(--color-accent-400), 0.06))',
           }}
         >
-          {/* Left: icon + text */}
-          <div className="flex items-center gap-3">
+          <span
+            className="subscription-cta-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+            aria-hidden="true"
+          />
+          <div className="relative z-10 flex items-center gap-3">
             {/* Sparkle icon */}
             <div
               className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
@@ -86,7 +89,7 @@ export default function PurchaseCTAButton({
           </div>
 
           {/* Right: chevron */}
-          <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-dark-50/30 transition-transform duration-300 group-hover:translate-x-1" />
+          <ChevronRightIcon className="relative z-10 h-5 w-5 flex-shrink-0 text-dark-50/30 transition-transform duration-300 group-hover:translate-x-1" />
         </div>
       </HoverBorderGradient>
     </Link>

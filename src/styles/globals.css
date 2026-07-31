@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Subscription renewal CTA shimmer sweep. */
+.subscription-cta-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.34) 48%,
+    transparent 76%
+  );
+  transform: skewX(-18deg);
+  animation: subscription-cta-shimmer 4.8s ease-in-out infinite;
+}
+
+@keyframes subscription-cta-shimmer {
+  0%,
+  56% {
+    transform: translateX(-110%) skewX(-18deg);
+  }
+  78%,
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subscription-cta-shimmer {
+    animation: none;
+  }
+}
+
 /* Flag emoji polyfill — Windows has no glyphs for regional-indicator flags, so
    they fall back to country letters. This locally-bundled Twemoji flag font is
    scoped via unicode-range to ONLY flag codepoints, so adding it to the front
