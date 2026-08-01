@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -17,6 +17,9 @@ import { saveOAuthState } from '../utils/oauth';
 import { getPendingReferralCode } from '../utils/referral';
 import { EmailIcon, RefreshIcon, ChevronDownIcon } from './icons';
 import LegalFooter from './LegalFooter';
+import LegalConsent from './LegalConsent';
+import { infoApi } from '../api/info';
+import type { LegalConsentConfig } from '../types';
 
 export interface AuthPanelProps {
   returnTo?: string;
@@ -25,7 +28,12 @@ export interface AuthPanelProps {
 }
 
 export default function AuthPanel({ returnTo, initialMode, embedded = false }: AuthPanelProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Login is Russian-only for now — no language picker on this page.
+  useEffect(() => {
+    if (i18n.language !== 'ru') i18n.changeLanguage('ru');
+  }, [i18n]);
   const navigate = useNavigate();
   const location = useLocation();
   const {
@@ -70,6 +78,70 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
   const [forgotPasswordError, setForgotPasswordError] = useState('');
   const [showEmailForm, setShowEmailForm] = useState(true);
 
+  // Гейт согласия с офертой/политикой для НОВОГО пользователя. Конфиг публичный:
+  // нужен до авторизации, чтобы нарисовать чекбоксы ещё на экране входа.
+  const { data: legalConsent } = useQuery<LegalConsentConfig>({
+    queryKey: ['legal-consent-config', i18n.language],
+    queryFn: () => infoApi.getLegalConsentConfig(i18n.language),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const consentDocuments = useMemo(() => legalConsent?.documents ?? [], [legalConsent]);
+  const [acceptedDocuments, setAcceptedDocuments] = useState<Record<string, boolean>>({});
+  // Telegram-вход происходит сам собой, поэтому чекбоксы показываем только когда
+  // бэк ответил 428: пользователь новый и без согласия аккаунт не создастся.
+  // Замыкание помнит, какой именно вход повторить после простановки галочек.
+  const [pendingConsentRetry, setPendingConsentRetry] = useState<
+    ((accepted: string[]) => Promise<void>) | null
+  >(null);
+
+  useEffect(() => {
+    if (!legalConsent?.prechecked || consentDocuments.length === 0) return;
+    setAcceptedDocuments((prev) => {
+      const next = { ...prev };
+      for (const document of consentDocuments) {
+        if (next[document] === undefined) next[document] = true;
+      }
+      return next;
+    });
+  }, [legalConsent?.prechecked, consentDocuments]);
+
+  const acceptedDocumentKeys = useMemo(
+    () => consentDocuments.filter((document) => acceptedDocuments[document]),
+    [consentDocuments, acceptedDocuments],
+  );
+  const allDocumentsAccepted =
+    consentDocuments.length === 0 || acceptedDocumentKeys.length === consentDocuments.length;
+
+  const toggleDocument = useCallback((document: string, value: boolean) => {
+    setAcceptedDocuments((prev) => ({ ...prev, [document]: value }));
+  }, []);
+
+  // 428 = бэк требует согласие. Запоминаем, что повторить, и рисуем чекбоксы.
+  const captureConsentRequirement = useCallback(
+    (err: unknown, retry: (accepted: string[]) => Promise<void>): boolean => {
+      const error = err as { response?: { status?: number; data?: { detail?: unknown } } };
+      if (error.response?.status !== 428) return false;
+
+      const detail = error.response?.data?.detail as
+        | { documents?: string[]; prechecked?: boolean }
+        | undefined;
+      if (detail?.documents?.length) {
+        const documents = detail.documents;
+        setAcceptedDocuments((prev) => {
+          const next = { ...prev };
+          for (const document of documents) {
+            if (next[document] === undefined) next[document] = Boolean(detail.prechecked);
+          }
+          return next;
+        });
+      }
+      setPendingConsentRetry(() => retry);
+      return true;
+    },
+    [],
+  );
+
   const getReturnUrl = useCallback(() => {
     if (safeReturnTo) return safeReturnTo;
     const stateFrom = (location.state as { from?: string })?.from;
@@ -79,6 +151,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
     return '/';
   }, [location.state, safeReturnTo]);
 
+  // Check if email auth is enabled
   const { data: emailAuthConfig } = useQuery<EmailAuthEnabled>({
     queryKey: ['email-auth-enabled'],
     queryFn: brandingApi.getEmailAuthEnabled,
@@ -127,8 +200,6 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
     }
   };
 
-  const appName = import.meta.env.VITE_APP_NAME || 'VPN';
-
   useEffect(() => {
     if (isAuthenticated) {
       navigate(getReturnUrl(), { replace: true });
@@ -162,6 +233,16 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
           if (import.meta.env.DEV)
             console.warn(`Telegram auth attempt ${attempt + 1} failed:`, status, detail);
 
+          // Не ошибка входа, а недостающее согласие: показываем чекбоксы.
+          const needsConsent = captureConsentRequirement(err, async (accepted) => {
+            await loginWithTelegram(initData, accepted);
+            navigate(getReturnUrl(), { replace: true });
+          });
+          if (needsConsent) {
+            setIsLoading(false);
+            return;
+          }
+
           if (status === 401 && attempt < MAX_RETRIES) {
             await new Promise((r) => setTimeout(r, 1500));
             continue;
@@ -176,7 +257,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
     };
 
     tryTelegramAuth();
-  }, [isAuthInitializing, loginWithTelegram, navigate, t, getReturnUrl]);
+  }, [isAuthInitializing, loginWithTelegram, navigate, t, getReturnUrl, captureConsentRequirement]);
 
   const handleRetryTelegramAuth = () => {
     // Clear ALL cached auth state to prevent stale token/initData loops
@@ -229,6 +310,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
           password,
           firstName || undefined,
           referralCode || undefined,
+          acceptedDocumentKeys,
         );
         sessionStorage.setItem('email_verification_return_to', getReturnUrl());
         // Show "check your email" screen
@@ -238,6 +320,24 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
       const error = err as { response?: { status?: number } };
       const status = error.response?.status;
       const detail = getApiErrorMessage(err, '');
+
+      // Конфиг чекбоксов мог протухнуть (админ включил гейт между загрузкой страницы
+      // и отправкой формы) — показываем недостающие галочки вместо сырой ошибки.
+      const needsConsent = captureConsentRequirement(err, async (accepted) => {
+        const retried = await registerWithEmail(
+          email,
+          password,
+          firstName || undefined,
+          referralCode || undefined,
+          accepted,
+        );
+        setPendingConsentRetry(null);
+        setRegisteredEmail(retried.email);
+      });
+      if (needsConsent) {
+        setIsLoading(false);
+        return;
+      }
 
       if (status === 400 && detail.includes('already registered')) {
         setError(t('auth.emailAlreadyRegistered', 'This email is already registered'));
@@ -291,14 +391,55 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
       }
     >
       <div className={embedded ? 'w-full' : 'relative w-full max-w-md space-y-5'}>
-        {!embedded && (
-          <div className="mb-5 text-center">
-            <h1 className="text-2xl font-bold text-dark-50">{appName}</h1>
-          </div>
-        )}
+        {pendingConsentRetry ? (
+          <div className="card">
+            <h2 className="mb-2 text-lg font-bold text-dark-50">
+              {t('auth.legalConsentTitle', 'Ещё один шаг')}
+            </h2>
+            <p className="mb-4 text-sm text-dark-400">
+              {t(
+                'auth.legalConsentSubtitle',
+                'Чтобы создать аккаунт, подтвердите, что ознакомились с документами.',
+              )}
+            </p>
 
-        {/* Check Email Screen */}
-        {registeredEmail ? (
+            <LegalConsent
+              documents={consentDocuments}
+              accepted={acceptedDocuments}
+              onChange={toggleDocument}
+              disabled={isLoading}
+            />
+
+            {error && (
+              <p className="mt-4 text-sm text-error-400" role="alert">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="button"
+              className="btn-primary mt-5 w-full"
+              disabled={!allDocumentsAccepted || isLoading}
+              onClick={async () => {
+                setError('');
+                setIsLoading(true);
+                try {
+                  await pendingConsentRetry(acceptedDocumentKeys);
+                  setPendingConsentRetry(null);
+                } catch (err) {
+                  setError(getApiErrorMessage(err, t('common.error')));
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            >
+              {isLoading
+                ? t('common.loading', 'Загрузка...')
+                : t('auth.legalConsentContinue', 'Продолжить')}
+            </button>
+          </div>
+        ) : /* Check Email Screen */
+        registeredEmail ? (
           <div className="card text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-success-500/20">
               <EmailIcon className="h-7 w-7 text-success-400" />
@@ -620,9 +761,21 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
                               </div>
                             )}
 
+                            {authMode === 'register' && (
+                              <LegalConsent
+                                documents={consentDocuments}
+                                accepted={acceptedDocuments}
+                                onChange={toggleDocument}
+                                disabled={isLoading}
+                                className="pt-1"
+                              />
+                            )}
+
                             <button
                               type="submit"
-                              disabled={isLoading}
+                              disabled={
+                                isLoading || (authMode === 'register' && !allDocumentsAccepted)
+                              }
                               className="btn-primary w-full py-2.5"
                             >
                               {isLoading ? (

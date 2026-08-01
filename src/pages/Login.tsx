@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   brandingApi,
@@ -9,16 +10,20 @@ import {
   preloadLogo,
   setCachedBranding,
   type BrandingInfo,
+  type EmailAuthEnabled,
 } from '../api/branding';
 import AuthPanel from '../components/AuthPanel';
-import LanguageSwitcher from '../components/LanguageSwitcher';
-import { useTelegramSDK } from '../hooks/useTelegramSDK';
+import LegalFooter from '../components/LegalFooter';
+import { BackgroundRenderer } from '../components/backgrounds/BackgroundRenderer';
+import { getPendingReferralCode } from '../utils/referral';
+import { UsersIcon } from '@/components/icons';
 
 export default function Login() {
+  const { i18n, t } = useTranslation();
   const location = useLocation();
-  const { safeAreaInset, contentSafeAreaInset } = useTelegramSDK();
-  const safeTop = Math.max(safeAreaInset.top, contentSafeAreaInset.top);
-  const safeBottom = Math.max(safeAreaInset.bottom, contentSafeAreaInset.bottom);
+  useEffect(() => {
+    if (i18n.language !== 'ru') i18n.changeLanguage('ru');
+  }, [i18n]);
   const [logoLoaded, setLogoLoaded] = useState(() => isLogoPreloaded());
   const cachedBranding = useMemo(() => getCachedBranding(), []);
   const { data: branding } = useQuery<BrandingInfo>({
@@ -33,32 +38,28 @@ export default function Login() {
     initialData: cachedBranding ?? undefined,
     initialDataUpdatedAt: 0,
   });
+  const { data: emailAuthConfig } = useQuery<EmailAuthEnabled>({
+    queryKey: ['email-auth-enabled'],
+    queryFn: brandingApi.getEmailAuthEnabled,
+    staleTime: 60_000,
+  });
+  const { data: footerEnabled } = useQuery({
+    queryKey: ['footer-enabled'],
+    queryFn: brandingApi.getFooterEnabled,
+    staleTime: 60_000,
+  });
   const appName = branding?.name || import.meta.env.VITE_APP_NAME || 'VPN';
   const appLogo = branding?.logo_letter || import.meta.env.VITE_APP_LOGO || 'V';
   const logoUrl = branding?.has_custom_logo ? getLogoBlobUrl() : null;
+  const referralCode = getPendingReferralCode();
 
   useEffect(() => {
     document.title = appName;
   }, [appName]);
 
   return (
-    <div
-      className="flex min-h-[100dvh] items-center justify-center px-4 sm:px-6 lg:px-8"
-      style={{
-        paddingTop:
-          safeTop > 0 ? `${safeTop + 16}px` : 'calc(1rem + env(safe-area-inset-top, 0px))',
-        paddingBottom:
-          safeBottom > 0 ? `${safeBottom + 16}px` : 'calc(1rem + env(safe-area-inset-bottom, 0px))',
-      }}
-    >
-      <div
-        className="fixed right-3 z-50"
-        style={{
-          top: safeTop > 0 ? `${safeTop + 12}px` : 'calc(12px + env(safe-area-inset-top, 0px))',
-        }}
-      >
-        <LanguageSwitcher />
-      </div>
+    <div className="flex min-h-[100dvh] items-center justify-center px-4 sm:px-6 lg:px-8">
+      <BackgroundRenderer />
       <div className="relative w-full max-w-md space-y-5">
         <div className="text-center">
           <div className="relative mx-auto mb-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-dark-700/50 bg-dark-800/80 shadow-md">
@@ -77,6 +78,14 @@ export default function Login() {
             )}
           </div>
           <h1 className="text-2xl font-bold text-dark-50">{appName}</h1>
+          {referralCode && (emailAuthConfig?.enabled ?? true) && (
+            <div className="mt-3 rounded-xl border border-accent-500/30 bg-accent-500/10 p-2.5">
+              <div className="flex items-center justify-center gap-2 text-accent-400">
+                <UsersIcon className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs font-medium">{t('auth.referralInvite')}</span>
+              </div>
+            </div>
+          )}
         </div>
         <AuthPanel
           initialMode={
@@ -85,6 +94,7 @@ export default function Login() {
               : undefined
           }
         />
+        {footerEnabled && <LegalFooter className="pt-1" />}
       </div>
     </div>
   );
