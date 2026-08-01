@@ -11,16 +11,35 @@ import { getPendingCampaignSlug } from '../utils/campaign';
 import { copyToClipboard } from '../utils/clipboard';
 import { isEndpointMissingError } from '../utils/api-error';
 
+import { getAndClearReturnUrl, isValidRedirectUrl } from '../utils/token';
+
 interface TelegramLoginButtonProps {
   referralCode?: string;
+  returnTo?: string;
+  onSuccess?: (returnTo: string) => void;
 }
 
 const SCRIPT_LOAD_TIMEOUT_MS = 2000;
 const DEEPLINK_POLL_INTERVAL_MS = 2500;
 
-export default function TelegramLoginButton({ referralCode }: TelegramLoginButtonProps) {
+export default function TelegramLoginButton({
+  referralCode,
+  returnTo,
+  onSuccess,
+}: TelegramLoginButtonProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const resolvedReturnTo =
+    returnTo && isValidRedirectUrl(returnTo)
+      ? returnTo
+      : (() => {
+          const saved = getAndClearReturnUrl();
+          return saved && isValidRedirectUrl(saved) ? saved : '/';
+        })();
+  const completeLogin = useCallback(() => {
+    if (onSuccess) onSuccess(resolvedReturnTo);
+    else navigate(resolvedReturnTo, { replace: true });
+  }, [navigate, onSuccess, resolvedReturnTo]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [oidcLoading, setOidcLoading] = useState(false);
   const [oidcError, setOidcError] = useState('');
@@ -87,7 +106,7 @@ export default function TelegramLoginButton({ referralCode }: TelegramLoginButto
       setOidcLoading(true);
       setOidcError('');
       await loginWithTelegramOIDC(data.id_token);
-      if (mountedRef.current) navigate('/');
+      if (mountedRef.current) completeLogin();
     } catch (err: unknown) {
       if (!mountedRef.current) return;
       let message = t('common.error');
@@ -189,7 +208,7 @@ export default function TelegramLoginButton({ referralCode }: TelegramLoginButto
           auth_date: user.auth_date as number,
           hash: user.hash as string,
         });
-        navigate('/');
+        completeLogin();
       } catch {
         // Error handled by auth store
       }
@@ -278,7 +297,7 @@ export default function TelegramLoginButton({ referralCode }: TelegramLoginButto
           }
           if (mountedRef.current) {
             setDeepLinkPolling(false);
-            navigate('/');
+            completeLogin();
           }
         } catch (err: unknown) {
           if (!mountedRef.current) return;
@@ -376,7 +395,7 @@ export default function TelegramLoginButton({ referralCode }: TelegramLoginButto
             }
             if (mountedRef.current) {
               setDeepLinkPolling(false);
-              navigate('/');
+              completeLogin();
             }
           } catch (err: unknown) {
             if (!mountedRef.current) return;

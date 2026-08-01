@@ -5,7 +5,7 @@ import { authApi } from '../api/auth';
 import { useAuthStore } from '../store/auth';
 import { useShallow } from 'zustand/shallow';
 import { consumeCampaignSlug, getPendingCampaignSlug } from '../utils/campaign';
-import { tokenStorage } from '../utils/token';
+import { tokenStorage, isValidRedirectUrl } from '../utils/token';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function VerifyEmail() {
@@ -51,8 +51,10 @@ export default function VerifyEmail() {
         }
         checkAdminStatus();
         setStatus('success');
-        // Redirect to dashboard after short delay
-        redirectTimer = setTimeout(() => navigate('/', { replace: true }), 1500);
+        const savedReturnTo = sessionStorage.getItem('email_verification_return_to');
+        const returnTo = savedReturnTo && isValidRedirectUrl(savedReturnTo) ? savedReturnTo : '/';
+        sessionStorage.removeItem('email_verification_return_to');
+        redirectTimer = setTimeout(() => navigate(returnTo, { replace: true }), 1500);
       } catch (err: unknown) {
         setStatus('error');
         const error = err as { response?: { data?: { detail?: string } } };

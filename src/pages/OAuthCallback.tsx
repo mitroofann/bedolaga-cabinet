@@ -11,6 +11,7 @@ import {
   getErrorDetail,
 } from '../utils/oauth';
 import type { ServerCompleteResponse } from '../types';
+import { isValidRedirectUrl } from '../utils/token';
 import { CheckIcon, ExclamationIcon } from '@/components/icons';
 
 type CallbackMode = 'login' | 'link-browser' | 'link-server';
@@ -56,6 +57,7 @@ export default function OAuthCallback() {
     let mode: CallbackMode = 'link-server';
     let provider: string | undefined;
     let state: string | undefined;
+    let returnTo = '/';
 
     const linkSaved = peekLinkOAuthState();
     if (linkSaved && linkSaved.state === urlState) {
@@ -66,10 +68,13 @@ export default function OAuthCallback() {
     } else {
       const loginSaved = loadOAuthState();
       if (loginSaved && loginSaved.state === urlState) {
-        clearOAuthState();
         mode = 'login';
         provider = loginSaved.provider;
         state = loginSaved.state;
+        if (loginSaved.returnTo && isValidRedirectUrl(loginSaved.returnTo)) {
+          returnTo = loginSaved.returnTo;
+        }
+        clearOAuthState();
       }
     }
 
@@ -101,12 +106,12 @@ export default function OAuthCallback() {
       if (mode === 'login' && provider && state) {
         // Login flow
         if (isAuthenticated) {
-          navigate('/', { replace: true });
+          navigate(returnTo, { replace: true });
           return;
         }
         try {
           await loginWithOAuth(provider, code, state, deviceId);
-          navigate('/', { replace: true });
+          navigate(returnTo, { replace: true });
         } catch (err: unknown) {
           const detail = getErrorDetail(err);
           setError(detail || t('auth.oauthError', 'Authorization was denied or failed'));

@@ -4,21 +4,30 @@ export const LINK_OAUTH_PROVIDER_KEY = 'link_oauth_provider';
 const OAUTH_STATE_KEY = 'oauth_state';
 const OAUTH_PROVIDER_KEY = 'oauth_provider';
 
-export function saveOAuthState(state: string, provider: string): void {
+const OAUTH_RETURN_TO_KEY = 'oauth_return_to';
+
+export function saveOAuthState(state: string, provider: string, returnTo?: string): void {
   sessionStorage.setItem(OAUTH_STATE_KEY, state);
   sessionStorage.setItem(OAUTH_PROVIDER_KEY, provider);
+  if (returnTo) sessionStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
+  else sessionStorage.removeItem(OAUTH_RETURN_TO_KEY);
 }
 
-export function loadOAuthState(): { state: string; provider: string } | null {
+export function loadOAuthState(): {
+  state: string;
+  provider: string;
+  returnTo: string | null;
+} | null {
   const state = sessionStorage.getItem(OAUTH_STATE_KEY);
   const provider = sessionStorage.getItem(OAUTH_PROVIDER_KEY);
   if (!state || !provider) return null;
-  return { state, provider };
+  return { state, provider, returnTo: sessionStorage.getItem(OAUTH_RETURN_TO_KEY) };
 }
 
 export function clearOAuthState(): void {
   sessionStorage.removeItem(OAUTH_STATE_KEY);
   sessionStorage.removeItem(OAUTH_PROVIDER_KEY);
+  sessionStorage.removeItem(OAUTH_RETURN_TO_KEY);
 }
 
 export function peekLinkOAuthState(): { state: string; provider: string } | null {
