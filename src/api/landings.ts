@@ -1,6 +1,70 @@
 import apiClient from './client';
 import type { AnimationConfig } from '@/components/ui/backgrounds/types';
 
+export type LandingTemplate = 'classic' | 'bulka_sales_flow';
+
+export interface BulkaFlowTrial {
+  available: boolean;
+  unavailable_code: string | null;
+  unavailable_reason: string | null;
+  tariff_id: number | null;
+  tariff_name: string | null;
+  tariff_description_html: string | null;
+  duration_days: number | null;
+  traffic_limit_gb: number | null;
+  device_limit: number | null;
+  requires_external_payment: boolean;
+  price_kopeks: number | null;
+  currency: string | null;
+}
+
+export interface BulkaFlowTariffPeriod {
+  days: number;
+  price_kopeks: number;
+  original_price_kopeks: number | null;
+  discount_percent: number | null;
+}
+
+export interface BulkaFlowTariff {
+  id: number;
+  name: string;
+  description_html: string | null;
+  traffic_limit_gb: number;
+  device_limit: number;
+  is_daily: boolean;
+  periods: BulkaFlowTariffPeriod[];
+}
+
+export interface BulkaFlowPaymentMethod extends LandingPaymentMethod {}
+
+export interface BulkaFlowConfig {
+  landing_slug: string;
+  landing_template: 'bulka_sales_flow';
+  trial: BulkaFlowTrial;
+  tariffs: BulkaFlowTariff[];
+  payment_methods: BulkaFlowPaymentMethod[];
+}
+
+export interface BulkaFlowPurchaseRequest {
+  flow_kind: 'trial' | 'purchase';
+  tariff_id?: number | null;
+  period_days?: number | null;
+  payment_method: string;
+  payment_sub_option?: string | null;
+  language?: string | null;
+  yandex_cid?: string | null;
+  referrer?: string | null;
+  subid?: string | null;
+}
+
+export interface BulkaFlowPurchaseResponse {
+  purchase_token: string;
+  payment_url: string;
+  flow_kind: 'trial' | 'purchase';
+  landing_slug: string;
+  landing_template: 'bulka_sales_flow';
+}
+
 export interface LandingFeature {
   icon: string;
   title: string;
@@ -90,6 +154,8 @@ export interface LandingTrialConfig {
 }
 
 export interface LandingConfig {
+  /** Missing on older backend versions; render it as the unchanged classic experience. */
+  template?: LandingTemplate;
   slug: string;
   title: string;
   subtitle: string | null;
@@ -194,6 +260,12 @@ export interface PurchaseStatus {
   is_claimable: boolean;
   claim_url: string | null;
   bot_claim_link: string | null;
+  /** Additive metadata for the authenticated Bulka sales flow. */
+  landing_template?: LandingTemplate | null;
+  flow_kind?: 'trial' | 'purchase' | null;
+  flow_return_kind?: 'bulka_connect' | null;
+  activated_at?: string | null;
+  subscription_id?: number | null;
 }
 
 /** Result returned to the recipient after a successful web (email) gift claim. */
@@ -229,6 +301,8 @@ export interface AdminLandingFeature {
 
 export interface LandingListItem {
   id: number;
+  /** Missing on older backend versions; treat it as classic in the admin UI. */
+  template?: LandingTemplate;
   slug: string;
   title: LocaleDict;
   is_active: boolean;
@@ -254,6 +328,8 @@ export interface LandingListItem {
 
 export interface LandingDetail {
   id: number;
+  /** Missing on older backend versions; treat it as classic in the editor. */
+  template?: LandingTemplate;
   slug: string;
   title: LocaleDict;
   subtitle: LocaleDict | null;
@@ -286,6 +362,8 @@ export interface LandingDetail {
 
 export interface LandingCreateRequest {
   slug: string;
+  /** Optional while backend rollout is in progress; backend defaults to classic. */
+  template?: LandingTemplate;
   title: LocaleDict;
   subtitle?: LocaleDict;
   is_active?: boolean;
@@ -346,6 +424,22 @@ export const landingApi = {
   // union on `mode`: 'free' (granted now) or 'paid' (redirect to payment).
   createTrial: async (slug: string, data: TrialRequest): Promise<TrialResponse> => {
     const response = await apiClient.post(`/cabinet/landing/${slug}/trial`, data);
+    return response.data;
+  },
+
+  getBulkaFlowConfig: async (slug: string): Promise<BulkaFlowConfig> => {
+    const response = await apiClient.get(`/cabinet/landing/${slug}/bulka-flow`);
+    return response.data;
+  },
+
+  createBulkaFlowPurchase: async (
+    slug: string,
+    data: BulkaFlowPurchaseRequest,
+    idempotencyKey: string,
+  ): Promise<BulkaFlowPurchaseResponse> => {
+    const response = await apiClient.post(`/cabinet/landing/${slug}/bulka-flow/purchase`, data, {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
     return response.data;
   },
 

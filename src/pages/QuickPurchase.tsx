@@ -28,6 +28,7 @@ import { CheckCircleIcon, CheckIcon, DevicesIcon, DownloadIcon } from '@/compone
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { SanitizedHtml } from '../components/common/SanitizedHtml';
 import { TrialBlock } from '../features/landing-trial';
+import { BulkaSalesFlow } from '../components/landings/bulka/BulkaSalesFlow';
 import { cn } from '../lib/utils';
 import { getApiErrorMessage } from '../utils/api-error';
 import { formatPrice } from '../utils/format';
@@ -1100,6 +1101,17 @@ export default function QuickPurchase() {
   if (error || !config) {
     const errMsg = getApiErrorMessage(error, t('landing.notFound', 'Landing page not found'));
     return <ErrorState message={errMsg} />;
+  }
+
+  if (config.template === 'bulka_sales_flow') {
+    return (
+      <BulkaSalesFlow
+        slug={slug!}
+        intent={trialIntent ? 'trial' : 'purchase'}
+        config={config}
+        branding={branding}
+      />
+    );
   }
 
   const showTariffCards = visibleTariffs.length > 1;

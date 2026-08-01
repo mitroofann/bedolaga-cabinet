@@ -59,7 +59,9 @@ export default function Login() {
   const referralCode = getPendingReferralCode() || '';
 
   const [authMode, setAuthMode] = useState<'login' | 'register'>(() =>
-    referralCode ? 'register' : 'login',
+    referralCode || (location.state as { authMode?: string } | null)?.authMode === 'register'
+      ? 'register'
+      : 'login',
   );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

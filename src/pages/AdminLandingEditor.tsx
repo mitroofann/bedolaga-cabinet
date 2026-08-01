@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import {
   adminLandingsApi,
   type LandingCreateRequest,
+  type LandingTemplate,
   type AdminLandingFeature,
   type EditableMethodField,
   type LocaleDict,
@@ -116,6 +117,7 @@ export default function AdminLandingEditor() {
 
   // Form state — text fields are now LocaleDict
   const [slug, setSlug] = useState('');
+  const [template, setTemplate] = useState<LandingTemplate>('classic');
   const [title, setTitle] = useState<LocaleDict>({ ru: '' });
   const [subtitle, setSubtitle] = useState<LocaleDict>({});
   const [isActive, setIsActive] = useState(true);
@@ -232,6 +234,7 @@ export default function AdminLandingEditor() {
     if (!landingData || formPopulated.current) return;
     formPopulated.current = true;
     setSlug(landingData.slug);
+    setTemplate(landingData.template === 'bulka_sales_flow' ? 'bulka_sales_flow' : 'classic');
     setTitle(toLocaleDict(landingData.title, { ru: '' }));
     setSubtitle(toLocaleDict(landingData.subtitle));
     setIsActive(landingData.is_active);
@@ -364,6 +367,7 @@ export default function AdminLandingEditor() {
 
     const data: LandingCreateRequest = {
       slug,
+      template,
       title,
       subtitle: nonEmptyDict(subtitle),
       is_active: isActive,
@@ -625,6 +629,76 @@ export default function AdminLandingEditor() {
           onToggle={() => toggleSection('general')}
         >
           <div className="space-y-4">
+            <fieldset>
+              <legend className="mb-2 text-sm text-dark-400">
+                {t('admin.landings.template', 'Шаблон лендинга')}
+              </legend>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {(
+                  [
+                    {
+                      value: 'classic',
+                      title: t('admin.landings.templates.classic.title', 'Классический лендинг'),
+                      description: t(
+                        'admin.landings.templates.classic.description',
+                        'Текущий лендинг с самостоятельной формой покупки.',
+                      ),
+                    },
+                    {
+                      value: 'bulka_sales_flow',
+                      title: t(
+                        'admin.landings.templates.bulkaSalesFlow.title',
+                        'Bulka VPN — флоу продаж',
+                      ),
+                      description: t(
+                        'admin.landings.templates.bulkaSalesFlow.description',
+                        'Пошаговый путь: авторизация, оплата и подключение устройства.',
+                      ),
+                    },
+                  ] as const
+                ).map((option) => {
+                  const selected = template === option.value;
+                  return (
+                    <label
+                      key={option.value}
+                      className={`cursor-pointer rounded-xl border p-3 transition-colors ${
+                        selected
+                          ? 'border-accent-500 bg-accent-500/10'
+                          : 'border-dark-700 bg-dark-800/40 hover:border-dark-600'
+                      }`}
+                    >
+                      <span className="flex items-start gap-2">
+                        <input
+                          type="radio"
+                          name="landing-template"
+                          value={option.value}
+                          checked={selected}
+                          onChange={() => setTemplate(option.value)}
+                          className="mt-0.5 accent-accent-500"
+                        />
+                        <span>
+                          <span className="block text-sm font-medium text-dark-100">
+                            {option.title}
+                          </span>
+                          <span className="mt-1 block text-xs text-dark-400">
+                            {option.description}
+                          </span>
+                        </span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              {isEdit && template === 'bulka_sales_flow' && (
+                <p className="mt-2 text-xs text-dark-500">
+                  {t(
+                    'admin.landings.templates.bulkaSalesFlow.note',
+                    'Изменение шаблона влияет на будущие посещения. Уже созданные покупки завершатся в прежнем сценарии.',
+                  )}
+                </p>
+              )}
+            </fieldset>
+
             <div>
               <label htmlFor="landing-slug" className="mb-1 block text-sm text-dark-400">
                 {t('admin.landings.slug')}

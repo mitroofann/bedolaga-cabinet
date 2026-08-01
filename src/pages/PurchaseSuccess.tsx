@@ -660,6 +660,47 @@ function GiftLinkShareState({
   );
 }
 
+function BulkaFlowSuccessState({
+  tariffName,
+  periodDays,
+  subscriptionUrl,
+  cryptoLink,
+}: {
+  tariffName: string | null;
+  periodDays: number | null;
+  subscriptionUrl: string | null;
+  cryptoLink: string | null;
+}) {
+  const navigate = useNavigate();
+
+  return (
+    <div className="space-y-5 text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-success-500/15 text-success-400">
+        <CheckIcon className="h-7 w-7" />
+      </div>
+      <div>
+        <h1 className="text-xl font-bold text-dark-50">Подписка активирована</h1>
+        <p className="mt-2 text-sm text-dark-400">
+          {tariffName || 'Доступ'}
+          {periodDays ? ` · ${periodDays} дней` : ''}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => navigate('/connection')}
+        className="w-full rounded-xl bg-accent-500 px-5 py-3.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-600"
+      >
+        Подключить устройство
+      </button>
+      {(subscriptionUrl || cryptoLink) && (
+        <p className="text-xs text-dark-500">
+          Ссылка подключения доступна в разделе подключения устройств.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function PurchaseSuccess() {
   const { t } = useTranslation();
   const { token } = useParams<{ token: string }>();
@@ -699,7 +740,11 @@ export default function PurchaseSuccess() {
       // the recipient claims) — stop polling and show the share link instead of
       // spinning. A paid gift is always claimable, so don't gate on is_claimable.
       if (currentStatus === 'paid' && data?.is_gift) return false;
-      if (currentStatus === 'pending' || currentStatus === 'paid') {
+      if (
+        currentStatus === 'pending' ||
+        currentStatus === 'paid' ||
+        currentStatus === 'pending_activation'
+      ) {
         if (Date.now() - pollStart.current > MAX_POLL_MS) {
           setPollTimedOut(true);
           return false;
@@ -768,8 +813,8 @@ export default function PurchaseSuccess() {
   // forward (it stays PAID until the recipient claims it).
   const isBuyerGiftLink = purchaseStatus?.status === 'paid' && !!purchaseStatus?.is_gift;
 
-  // Gift pending activation → buyer sees "gift sent" message, not the activate button.
-  // Recipient arrives via email link with ?activate=1 and sees the activate button instead.
+  const isBulkaFlow = purchaseStatus?.landing_template === 'bulka_sales_flow';
+  const isBulkaPendingActivation = isBulkaFlow && isPendingActivation;
   const isGiftPendingActivation = isPendingActivation && purchaseStatus?.is_gift && !isActivateHint;
 
   // Email self-purchase delivered → show cabinet credentials
@@ -805,6 +850,13 @@ export default function PurchaseSuccess() {
             tariffName={purchaseStatus.tariff_name}
             periodDays={purchaseStatus.period_days}
           />
+        ) : isSuccess && isBulkaFlow ? (
+          <BulkaFlowSuccessState
+            tariffName={purchaseStatus.tariff_name}
+            periodDays={purchaseStatus.period_days}
+            subscriptionUrl={purchaseStatus.subscription_url}
+            cryptoLink={purchaseStatus.subscription_crypto_link}
+          />
         ) : isSuccess ? (
           <SuccessState
             subscriptionUrl={purchaseStatus.subscription_url}
@@ -829,6 +881,8 @@ export default function PurchaseSuccess() {
             botLink={purchaseStatus.bot_link}
             contactType={purchaseStatus.contact_type}
           />
+        ) : isBulkaPendingActivation ? (
+          <PendingState />
         ) : isPendingActivation ? (
           <div className="space-y-4">
             <PendingActivationState

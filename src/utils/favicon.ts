@@ -9,13 +9,17 @@
 /** Point the page favicon at `href`, creating the <link> if needed. */
 export function setFavicon(href: string): void {
   if (!href) return;
-  let link = document.querySelector<HTMLLinkElement>("link[rel*='icon']");
-  if (!link) {
-    link = document.createElement('link');
+  const iconLinks = Array.from(
+    document.querySelectorAll<HTMLLinkElement>("link[rel~='icon'], link[rel='shortcut icon']"),
+  );
+  const link = iconLinks.shift() ?? document.createElement('link');
+  if (!link.isConnected) {
     link.rel = 'icon';
     document.head.appendChild(link);
   }
   link.href = href;
+  // A stale second icon link can win browser favicon selection after navigation.
+  for (const duplicate of iconLinks) duplicate.remove();
 }
 
 /**

@@ -67,6 +67,7 @@ const GiftResult = lazyWithRetry(() => import('./pages/GiftResult'));
 const Connection = lazyWithRetry(() => import('./pages/Connection'));
 const ConnectionQR = lazyWithRetry(() => import('./pages/ConnectionQR'));
 const QuickPurchase = lazyWithRetry(() => import('./pages/QuickPurchase'));
+const BulkaLandingFlow = lazyWithRetry(() => import('./pages/BulkaLandingFlow'));
 const PurchaseSuccess = lazyWithRetry(() => import('./pages/PurchaseSuccess'));
 const GiftClaim = lazyWithRetry(() => import('./pages/GiftClaim'));
 const RenewSubscription = lazyWithRetry(() => import('./pages/RenewSubscription'));
@@ -307,6 +308,16 @@ function App() {
             <LazyPage>
               <CouponStatus />
             </LazyPage>
+          }
+        />
+        <Route
+          path="/buy/:slug/flow"
+          element={
+            <ProtectedRoute>
+              <LazyPage>
+                <BulkaLandingFlow />
+              </LazyPage>
+            </ProtectedRoute>
           }
         />
         <Route
