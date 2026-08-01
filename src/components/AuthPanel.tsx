@@ -163,6 +163,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
     queryKey: ['footer-enabled'],
     queryFn: brandingApi.getFooterEnabled,
     staleTime: 60000,
+    enabled: !embedded,
   });
 
   // Fetch enabled OAuth providers
@@ -392,7 +393,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
     >
       <div className={embedded ? 'w-full' : 'relative w-full max-w-md space-y-5'}>
         {pendingConsentRetry ? (
-          <div className="card">
+          <div className={embedded ? 'landing-auth-panel' : 'card'}>
             <h2 className="mb-2 text-lg font-bold text-dark-50">
               {t('auth.legalConsentTitle', 'Ещё один шаг')}
             </h2>
@@ -468,8 +469,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
             </button>
           </div>
         ) : (
-          /* Main auth card */
-          <div className="card">
+          <div className={embedded ? 'landing-auth-panel' : 'card'}>
             {error && (
               <div
                 role="alert"
@@ -820,7 +820,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
             )}
           </div>
         )}
-        {footerEnabled && <LegalFooter className="pt-1" />}
+        {!embedded && footerEnabled && <LegalFooter className="pt-1" />}
       </div>
     </div>
   );

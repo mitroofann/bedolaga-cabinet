@@ -103,12 +103,12 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
   };
 
   if (isLoading) {
-    return <div className="bento-card mt-6 h-64 animate-pulse" />;
+    return <div className="landing-surface-primary mt-6 h-64 animate-pulse" />;
   }
 
   if (error || !flow) {
     return (
-      <div className="bento-card mt-6 text-center text-sm text-error-400">
+      <div className="landing-surface-primary mt-6 text-center text-sm text-error-400">
         {getApiErrorMessage(error, 'Не удалось загрузить условия оформления')}
       </div>
     );
@@ -123,7 +123,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
   return (
     <div className="space-y-4">
       <LandingProgressSteps current={2} />
-      <div className="bento-card">
+      <div className="landing-surface-primary">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-dark-100">Выберите доступ</p>
@@ -132,7 +132,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
             </p>
           </div>
           <div
-            className="flex rounded-xl bg-dark-800/50 p-1 text-xs font-medium"
+            className="flex rounded-xl landing-surface-inset p-1 text-xs font-medium"
             role="tablist"
             aria-label="Вариант доступа"
           >
@@ -159,7 +159,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       </div>
 
       {isTrial ? (
-        <div className="bento-card">
+        <div className="landing-surface-primary">
           <h1 className="text-xl font-semibold text-dark-50">Пробный период</h1>
           {flow.trial.tariff_description_html && (
             <SanitizedHtml
@@ -169,19 +169,19 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           )}
           {flow.trial.available ? (
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-xl bg-dark-800/50 p-3">
+              <div className="rounded-xl landing-surface-inset p-3">
                 <div className="text-base font-semibold text-dark-100">
                   {flow.trial.duration_days}
                 </div>
                 <div className="text-[10px] text-dark-400">дней</div>
               </div>
-              <div className="rounded-xl bg-dark-800/50 p-3">
+              <div className="rounded-xl landing-surface-inset p-3">
                 <div className="text-base font-semibold text-dark-100">
                   {flow.trial.traffic_limit_gb}
                 </div>
                 <div className="text-[10px] text-dark-400">ГБ</div>
               </div>
-              <div className="rounded-xl bg-dark-800/50 p-3">
+              <div className="rounded-xl landing-surface-inset p-3">
                 <div className="text-base font-semibold text-dark-100">
                   {flow.trial.device_limit}
                 </div>
@@ -189,13 +189,13 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
               </div>
             </div>
           ) : (
-            <p className="mt-4 rounded-xl bg-dark-800/50 p-3 text-sm text-dark-400">
+            <p className="mt-4 rounded-xl landing-surface-inset p-3 text-sm text-dark-400">
               {flow.trial.unavailable_reason || 'Пробный период недоступен для этого аккаунта.'}
             </p>
           )}
         </div>
       ) : (
-        <div className="bento-card space-y-5">
+        <div className="landing-surface-primary space-y-5">
           <div>
             <h1 className="text-xl font-semibold text-dark-50">Выберите тариф</h1>
             <div className="mt-3 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Тариф">
@@ -212,7 +212,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                       setSelectedPeriodDays(item.periods[0]?.days ?? null);
                       setSubmitError(null);
                     }}
-                    className={`rounded-xl border p-3 text-left ${selected ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 bg-dark-800/50 hover:border-dark-600'}`}
+                    className={`rounded-xl border p-3 text-left ${selected ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
                   >
                     <span className="block text-sm font-semibold text-dark-100">{item.name}</span>
                     {item.description_html && (
@@ -235,7 +235,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                     key={item.days}
                     type="button"
                     onClick={() => setSelectedPeriodDays(item.days)}
-                    className={`rounded-xl border px-3 py-2 text-sm ${period?.days === item.days ? 'border-accent-500 bg-accent-500/10 text-dark-100' : 'border-dark-700 bg-dark-800/50 text-dark-400 hover:border-dark-600'}`}
+                    className={`rounded-xl border px-3 py-2 text-sm ${period?.days === item.days ? 'border-accent-500 bg-accent-500/10 text-dark-100' : 'border-dark-700 landing-surface-inset text-dark-400 hover:border-dark-600'}`}
                   >
                     {item.days} дней
                   </button>
@@ -246,7 +246,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
         </div>
       )}
 
-      <div className="bento-card">
+      <div className="landing-surface-primary">
         <p className="mb-3 text-sm font-semibold text-dark-100">Способ оплаты</p>
         <div className="space-y-2" role="radiogroup" aria-label="Способ оплаты">
           {flow.payment_methods.map((item) => (
@@ -257,7 +257,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                   role="radio"
                   aria-checked={method?.method_id === item.method_id}
                   onClick={() => selectMethod(item.method_id)}
-                  className={`flex w-full items-center justify-between rounded-xl border p-3 text-left ${method?.method_id === item.method_id ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 bg-dark-800/50 hover:border-dark-600'}`}
+                  className={`flex w-full items-center justify-between rounded-xl border p-3 text-left ${method?.method_id === item.method_id ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
                 >
                   <span>
                     <span className="block text-sm font-medium text-dark-100">
@@ -279,7 +279,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                         key={option.id}
                         type="button"
                         onClick={() => setSelectedSubOption(option.id)}
-                        className={`rounded-lg px-2.5 py-1.5 text-xs ${selectedSubOption === option.id ? 'bg-accent-500 text-on-accent' : 'bg-dark-800/50 text-dark-400'}`}
+                        className={`rounded-lg px-2.5 py-1.5 text-xs ${selectedSubOption === option.id ? 'bg-accent-500 text-on-accent' : 'landing-surface-inset text-dark-400'}`}
                       >
                         {option.name}
                       </button>

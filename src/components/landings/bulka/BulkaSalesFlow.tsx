@@ -39,12 +39,12 @@ export function BulkaSalesFlow({ slug, intent, config, branding }: BulkaSalesFlo
         <LandingPublicHeader branding={branding} mode={authMode} onModeChange={setAuthMode} />
         <main className="flex-1 py-8 sm:py-10">
           <LandingProgressSteps current={1} />
-          <section className="mx-auto mt-6 max-w-xl bento-card sm:mt-8">
+          <section className="mx-auto mt-6 max-w-xl landing-surface-primary sm:mt-8">
             <h1 className="text-center text-xl font-semibold text-dark-50 sm:text-2xl">
-              Продолжим с вашим аккаунтом
+              Начните пользоваться VPN
             </h1>
             <p className="mt-2 text-center text-sm text-dark-400">
-              Войдите или создайте аккаунт — после этого вернём к оформлению выбранного доступа.
+              Создайте аккаунт или войдите, чтобы выбрать подходящий доступ и оформить подписку.
             </p>
             <div className="mt-6">
               <AuthPanel embedded initialMode={authMode} returnTo={continuation} />
