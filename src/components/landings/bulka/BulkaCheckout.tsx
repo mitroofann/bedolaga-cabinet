@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -10,7 +10,6 @@ import {
   CheckIcon,
   DevicesIcon,
   InfinityIcon,
-  TagIcon,
 } from '@/components/icons';
 import { LandingLegalFooter } from '../LandingLegalFooter';
 import { LandingProgressSteps } from '../LandingProgressSteps';
@@ -83,18 +82,49 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
     staleTime: 30_000,
   });
 
+  const availableDurations = useMemo(
+    () =>
+      [
+        ...new Set(
+          flow?.tariffs.flatMap((item) => item.periods.map((period) => period.days)) ?? [],
+        ),
+      ].sort((a, b) => a - b),
+    [flow?.tariffs],
+  );
+  const compatibleTariffs = useMemo(
+    () =>
+      flow?.tariffs.filter((item) =>
+        selectedPeriodDays === null
+          ? true
+          : item.periods.some((period) => period.days === selectedPeriodDays),
+      ) ?? [],
+    [flow?.tariffs, selectedPeriodDays],
+  );
   const tariff = useMemo(
-    () => flow?.tariffs.find((item) => item.id === selectedTariffId) ?? flow?.tariffs[0] ?? null,
-    [flow?.tariffs, selectedTariffId],
+    () =>
+      compatibleTariffs.find((item) => item.id === selectedTariffId) ??
+      compatibleTariffs[0] ??
+      null,
+    [compatibleTariffs, selectedTariffId],
   );
   const period = useMemo(
     () =>
       tariff?.periods.find((item) => item.days === selectedPeriodDays) ??
-      tariff?.periods[0] ??
+      (selectedPeriodDays === null ? tariff?.periods[0] : null) ??
       null,
     [tariff, selectedPeriodDays],
   );
   const method = flow?.payment_methods.find((item) => item.method_id === selectedMethod) ?? null;
+
+  useEffect(() => {
+    if (!flow || intent !== 'purchase') return;
+    const nextDuration = selectedPeriodDays ?? availableDurations[0] ?? null;
+    if (nextDuration !== selectedPeriodDays) {
+      setSelectedPeriodDays(nextDuration);
+      return;
+    }
+    if (tariff && tariff.id !== selectedTariffId) setSelectedTariffId(tariff.id);
+  }, [availableDurations, flow, intent, selectedPeriodDays, selectedTariffId, tariff]);
 
   const purchaseMutation = useMutation({
     mutationFn: (data: BulkaFlowPurchaseRequest) =>
@@ -212,18 +242,14 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
             </p>
           </div>
           {flow.trial.available ? (
-            <div className="landing-trial-tariff mt-5">
-              <div className="landing-trial-tariff__header">
-                <TagIcon className="h-4 w-4" />
-                <span>{flow.trial.tariff_name || 'Тариф пробного доступа'}</span>
-              </div>
+            <div className="mt-5 max-w-2xl">
               {flow.trial.tariff_description_html && (
                 <SanitizedHtml
                   html={flow.trial.tariff_description_html}
-                  className="landing-trial-tariff__description whitespace-pre-line text-sm leading-relaxed sm:text-base"
+                  className="whitespace-pre-line text-sm leading-relaxed text-dark-300 sm:text-base"
                 />
               )}
-              <div className="landing-access-metrics">
+              <div className="landing-access-metrics mt-5">
                 <AccessMetric
                   icon={CalendarIcon}
                   value={String(flow.trial.duration_days ?? 0)}
@@ -242,21 +268,38 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       ) : (
         <div className="landing-surface-primary space-y-5">
           <div>
+            <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Выберите срок подписки</h2>
+            <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+              Сначала выберите продолжительность доступа, затем подходящий тариф.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2" role="radiogroup" aria-label="Срок подписки">
+              {availableDurations.map((days) => (
+                <button
+                  key={days}
+                  type="button"
+                  role="radio"
+                  aria-checked={selectedPeriodDays === days}
+                  onClick={() => {
+                    setSelectedPeriodDays(days);
+                    setSubmitError(null);
+                  }}
+                  className={`rounded-xl border px-4 py-3 text-sm font-medium ${selectedPeriodDays === days ? 'border-accent-500 bg-accent-500/10 text-dark-100' : 'border-dark-700 landing-surface-inset text-dark-300 hover:border-dark-600'}`}
+                >
+                  {days} дней
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
             <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Выберите тариф</h2>
             <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
               После оплаты мы сразу активируем подписку и покажем, как подключить VPN на устройстве.
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Тариф">
-              {flow.tariffs.map((item) => {
+              {compatibleTariffs.map((item) => {
                 const selected = tariff?.id === item.id;
-                const minimumPeriod = item.periods.reduce(
-                  (minimum, candidate) => (candidate.days < minimum.days ? candidate : minimum),
-                  item.periods[0],
-                );
-                const lowestPrice = item.periods.reduce(
-                  (minimum, candidate) =>
-                    candidate.price_kopeks < minimum.price_kopeks ? candidate : minimum,
-                  item.periods[0],
+                const selectedItemPeriod = item.periods.find(
+                  (candidate) => candidate.days === selectedPeriodDays,
                 );
                 return (
                   <button
@@ -266,7 +309,6 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                     aria-checked={selected}
                     onClick={() => {
                       setSelectedTariffId(item.id);
-                      setSelectedPeriodDays(minimumPeriod?.days ?? null);
                       setSubmitError(null);
                     }}
                     className={`landing-tariff-card ${selected ? 'is-selected' : ''}`}
@@ -281,14 +323,16 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                         className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-400"
                       />
                     )}
-                    <div className="mt-4 text-left">
-                      <span className="block text-xs text-dark-400">
-                        от {formatAmount(lowestPrice.price_kopeks / 100, 0)} {currencySymbol}
-                      </span>
-                      <span className="mt-1 block text-sm font-medium text-dark-200">
-                        минимум на {minimumPeriod.days} дней
-                      </span>
-                    </div>
+                    {selectedItemPeriod && (
+                      <div className="mt-4 text-left">
+                        <span className="block text-xs text-dark-400">
+                          за {selectedPeriodDays} дней
+                        </span>
+                        <span className="mt-1 block text-lg font-semibold text-dark-100">
+                          {formatAmount(selectedItemPeriod.price_kopeks / 100, 0)} {currencySymbol}
+                        </span>
+                      </div>
+                    )}
                     <div className="landing-tariff-metrics mt-4">
                       <TrafficMetric trafficLimitGb={item.traffic_limit_gb} />
                       <DevicesMetric deviceLimit={item.device_limit} />
@@ -298,23 +342,6 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
               })}
             </div>
           </div>
-          {tariff && (
-            <div>
-              <p className="mb-3 text-base font-medium text-dark-200">Срок подписки</p>
-              <div className="flex flex-wrap gap-2">
-                {tariff.periods.map((item) => (
-                  <button
-                    key={item.days}
-                    type="button"
-                    onClick={() => setSelectedPeriodDays(item.days)}
-                    className={`rounded-xl border px-4 py-3 text-sm font-medium ${period?.days === item.days ? 'border-accent-500 bg-accent-500/10 text-dark-100' : 'border-dark-700 landing-surface-inset text-dark-300 hover:border-dark-600'}`}
-                  >
-                    {item.days} дней · {formatAmount(item.price_kopeks / 100, 0)} {currencySymbol}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
