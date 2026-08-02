@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -19,6 +18,20 @@ interface BulkaCheckoutProps {
   slug: string;
   initialIntent: 'trial' | 'purchase';
 }
+
+const TRIAL_FEATURES: { icon: string; title?: string; text: string; hint?: string }[] = [
+  { icon: '🌍', title: 'Полный безлимит', text: ' на зарубежных локациях' },
+  {
+    icon: '🛡️',
+    title: 'Обход БС',
+    text: ': пакет 50 ГБ LTE-трафика',
+    hint: 'Работает даже при самых жёстких ограничениях мобильного интернета',
+  },
+  { icon: '🏛', title: 'Умный VPN', text: ': российские сервисы не ругаются' },
+  { icon: '⚡️', text: 'Высокая скорость — 1 Гбит/с' },
+  { icon: '❤️', text: 'YouTube без рекламы' },
+  { icon: '📱', text: '5 устройств включено в подписку' },
+];
 
 function idempotencyKey() {
   return crypto.randomUUID();
@@ -66,8 +79,6 @@ function DevicesMetric({ deviceLimit }: { deviceLimit: number }) {
 
 export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
   const { formatAmount, currencySymbol } = useCurrency();
-  const { t } = useTranslation();
-  const trialDescriptionHtml = t('dashboard.trialOffer.bulkaPaidDesc');
   const [intent, setIntent] = useState<'trial' | 'purchase'>(initialIntent);
   const [selectedTariffId, setSelectedTariffId] = useState<number | null>(null);
   const [selectedPeriodDays, setSelectedPeriodDays] = useState<number | null>(null);
@@ -134,6 +145,14 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
     }
     if (tariff && tariff.id !== selectedTariffId) setSelectedTariffId(tariff.id);
   }, [availableDurations, flow, intent, selectedPeriodDays, selectedTariffId, tariff]);
+
+  useEffect(() => {
+    if (!flow || selectedMethod !== null) return;
+    const defaultMethod = flow.payment_methods[0];
+    if (!defaultMethod) return;
+    setSelectedMethod(defaultMethod.method_id);
+    setSelectedSubOption(defaultMethod.sub_options?.[0]?.id ?? null);
+  }, [flow, selectedMethod]);
 
   const purchaseMutation = useMutation({
     mutationFn: (data: BulkaFlowPurchaseRequest) =>
@@ -243,7 +262,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
 
       {isTrial ? (
         <div className="landing-surface-primary text-left">
-          <div className="max-w-2xl">
+          <div>
             <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Пробный период</h2>
             <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
               После подтверждения оплаты доступ активируется автоматически, а затем вы получите
@@ -251,14 +270,29 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
             </p>
           </div>
           {flow.trial.available ? (
-            <div className="mt-5 max-w-2xl">
-              {trialDescriptionHtml && (
-                <SanitizedHtml
-                  html={trialDescriptionHtml}
-                  className="whitespace-pre-line text-sm leading-relaxed text-dark-300 sm:text-base"
-                />
-              )}
-            </div>
+            <ul className="mt-6 space-y-3.5">
+              {TRIAL_FEATURES.map((feature) => (
+                <li key={feature.text} className="flex items-start gap-3.5">
+                  <span
+                    aria-hidden
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-lg leading-none"
+                  >
+                    {feature.icon}
+                  </span>
+                  <span className="min-w-0 text-sm leading-relaxed text-dark-300 sm:text-base">
+                    {feature.title && (
+                      <b className="font-semibold text-dark-100">{feature.title}</b>
+                    )}
+                    {feature.text}
+                    {feature.hint && (
+                      <span className="mt-0.5 block text-xs leading-relaxed text-dark-400 sm:text-sm">
+                        {feature.hint}
+                      </span>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
           ) : (
             <p className="mt-5 rounded-xl landing-surface-inset p-4 text-sm leading-relaxed text-dark-300 sm:text-base">
               {flow.trial.unavailable_reason || 'Пробный период недоступен для этого аккаунта.'}

@@ -347,8 +347,7 @@
       "freeTitle": "Free Trial Available",
       "paidTitle": "Trial Subscription",
       "freeDesc": "Try our VPN for free, no commitment required",
-      "paidDesc": "Get started with a trial subscription",
-      "bulkaPaidDesc": ""
+      "paidDesc": "Get started with a trial subscription"
     },
     "stats": {
       "balance": "Balance",
