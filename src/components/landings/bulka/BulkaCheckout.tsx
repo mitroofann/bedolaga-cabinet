@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -6,7 +7,7 @@ import { getApiErrorMessage } from '@/utils/api-error';
 import { SanitizedHtml } from '@/components/common/SanitizedHtml';
 import {
   ArrowDownIcon,
-  CalendarIcon,
+  type CalendarIcon,
   CheckIcon,
   DevicesIcon,
   InfinityIcon,
@@ -65,6 +66,8 @@ function DevicesMetric({ deviceLimit }: { deviceLimit: number }) {
 
 export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
   const { formatAmount, currencySymbol } = useCurrency();
+  const { t } = useTranslation();
+  const trialDescriptionHtml = t('dashboard.trialOffer.bulkaPaidDesc');
   const [intent, setIntent] = useState<'trial' | 'purchase'>(initialIntent);
   const [selectedTariffId, setSelectedTariffId] = useState<number | null>(null);
   const [selectedPeriodDays, setSelectedPeriodDays] = useState<number | null>(null);
@@ -118,7 +121,13 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
 
   useEffect(() => {
     if (!flow || intent !== 'purchase') return;
-    const nextDuration = selectedPeriodDays ?? availableDurations[0] ?? null;
+    const hasSelectedDuration =
+      selectedPeriodDays !== null && availableDurations.includes(selectedPeriodDays);
+    const nextDuration = hasSelectedDuration
+      ? selectedPeriodDays
+      : availableDurations.includes(90)
+        ? 90
+        : (availableDurations[0] ?? null);
     if (nextDuration !== selectedPeriodDays) {
       setSelectedPeriodDays(nextDuration);
       return;
@@ -243,21 +252,12 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           </div>
           {flow.trial.available ? (
             <div className="mt-5 max-w-2xl">
-              {flow.trial.tariff_description_html && (
+              {trialDescriptionHtml && (
                 <SanitizedHtml
-                  html={flow.trial.tariff_description_html}
+                  html={trialDescriptionHtml}
                   className="whitespace-pre-line text-sm leading-relaxed text-dark-300 sm:text-base"
                 />
               )}
-              <div className="landing-access-metrics mt-5">
-                <AccessMetric
-                  icon={CalendarIcon}
-                  value={String(flow.trial.duration_days ?? 0)}
-                  label="дней доступа"
-                />
-                <TrafficMetric trafficLimitGb={flow.trial.traffic_limit_gb ?? 0} />
-                <DevicesMetric deviceLimit={flow.trial.device_limit ?? 0} />
-              </div>
             </div>
           ) : (
             <p className="mt-5 rounded-xl landing-surface-inset p-4 text-sm leading-relaxed text-dark-300 sm:text-base">
