@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +6,11 @@ import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { landingApi } from '../api/landings';
 import { authApi } from '../api/auth';
+import { subscriptionApi } from '../api/subscription';
 import { useAuthStore } from '../store/auth';
 import { copyToClipboard } from '../utils/clipboard';
+import { resolveConnectionUrlForUi } from '../utils/connectionLink';
+import Layout from '@/components/layout/Layout';
 import { ConnectionExperience } from '@/components/connection/ConnectionExperience';
 import { LandingProgressSteps } from '@/components/landings/LandingProgressSteps';
 import { LandingLegalFooter } from '@/components/landings/LandingLegalFooter';
@@ -663,6 +666,84 @@ function GiftLinkShareState({
   );
 }
 
+function BulkaConnectionLink({ subscriptionId }: { subscriptionId: number }) {
+  const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Shares the query cache with ConnectionExperience (same key), so this is
+  // served from cache once the guide below has loaded — no extra request.
+  const { data: connectionLink } = useQuery({
+    queryKey: ['connectionLink', subscriptionId],
+    queryFn: () => subscriptionApi.getConnectionLink(subscriptionId),
+    retry: false,
+    staleTime: 0,
+  });
+
+  const connectionUrl = useMemo(
+    () =>
+      resolveConnectionUrlForUi({
+        mode: connectionLink?.connect_mode,
+        happSchemeLink: connectionLink?.happ_scheme_link,
+        displayLink: connectionLink?.display_link,
+        subscriptionUrl: connectionLink?.subscription_url,
+        happCryptLink: connectionLink?.happ_cryptolink,
+        happCryptoLink: connectionLink?.happ_crypto_link,
+        happLink: connectionLink?.happ_link,
+      }),
+    [connectionLink],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleCopy = useCallback(async () => {
+    if (!connectionUrl) return;
+    try {
+      await copyToClipboard(connectionUrl);
+      setCopied(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard write failed silently
+    }
+  }, [connectionUrl]);
+
+  if (!connectionUrl || connectionLink?.hide_link) return null;
+
+  return (
+    <div className="mt-6 rounded-xl landing-surface-inset p-4">
+      <p className="text-sm leading-relaxed text-dark-300">
+        Если вам нужно установить VPN на другом устройстве — скопируйте вашу ссылку для подключения
+        и откройте её на нужном устройстве.
+      </p>
+      <div className="mt-3 flex gap-2">
+        <code
+          className="block min-w-0 flex-1 truncate whitespace-nowrap rounded-lg bg-dark-800/40 px-3 py-2 font-mono text-[11px] text-dark-400"
+          title={connectionUrl}
+        >
+          {connectionUrl}
+        </code>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className={cn(
+            'flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
+            copied
+              ? 'bg-accent-500/15 text-accent-400'
+              : 'bg-dark-800/40 text-dark-300 hover:bg-dark-700/50 hover:text-dark-100',
+          )}
+        >
+          {copied ? <CheckIcon className="h-4 w-4" /> : <ClipboardIcon className="h-4 w-4" />}
+          <span>{copied ? 'Скопировано' : 'Скопировать'}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function BulkaFlowSuccessState({
   tariffName,
   periodDays,
@@ -675,7 +756,7 @@ function BulkaFlowSuccessState({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-dvh bg-dark-950 px-4 py-6 sm:py-10">
+    <Layout>
       <div className="mx-auto max-w-4xl space-y-6">
         <LandingProgressSteps current={4} />
         <section className="landing-surface-primary">
@@ -685,7 +766,7 @@ function BulkaFlowSuccessState({
             </div>
             <h1 className="mt-4 text-xl font-bold text-dark-50">Подписка активирована</h1>
             <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
-              Доступ уже готов. Выберите устройство и приложение, затем выполните инструкцию.
+              Доступ уже готов. Следуйте инструкции ниже, чтобы установить VPN на ваше устройство.
             </p>
             <p className="mt-2 text-sm text-dark-400">
               {tariffName || 'Доступ'}
@@ -693,10 +774,13 @@ function BulkaFlowSuccessState({
             </p>
           </div>
           {subscriptionId ? (
-            <ConnectionExperience
-              subscriptionId={subscriptionId}
-              onGoBack={() => navigate('/subscriptions')}
-            />
+            <>
+              <ConnectionExperience
+                subscriptionId={subscriptionId}
+                onGoBack={() => navigate('/subscriptions')}
+              />
+              <BulkaConnectionLink subscriptionId={subscriptionId} />
+            </>
           ) : (
             <div className="rounded-xl landing-surface-inset p-5 text-center">
               <p className="text-sm leading-relaxed text-dark-300">
@@ -724,7 +808,7 @@ function BulkaFlowSuccessState({
         </section>
         <LandingLegalFooter />
       </div>
-    </div>
+    </Layout>
   );
 }
 
