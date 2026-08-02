@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -8,6 +8,9 @@ import { landingApi } from '../api/landings';
 import { authApi } from '../api/auth';
 import { useAuthStore } from '../store/auth';
 import { copyToClipboard } from '../utils/clipboard';
+import { ConnectionExperience } from '@/components/connection/ConnectionExperience';
+import { LandingProgressSteps } from '@/components/landings/LandingProgressSteps';
+import { LandingLegalFooter } from '@/components/landings/LandingLegalFooter';
 import { CheckIcon, ClipboardIcon, ClockIcon, ExclamationIcon } from '@/components/icons';
 import { Spinner } from '@/components/ui/Spinner';
 import { AnimatedCheckmark } from '@/components/ui/AnimatedCheckmark';
@@ -663,44 +666,64 @@ function GiftLinkShareState({
 function BulkaFlowSuccessState({
   tariffName,
   periodDays,
-  subscriptionUrl,
-  cryptoLink,
+  subscriptionId,
 }: {
   tariffName: string | null;
   periodDays: number | null;
-  subscriptionUrl: string | null;
-  cryptoLink: string | null;
+  subscriptionId: number | null | undefined;
 }) {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-5 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-success-500/15 text-success-400">
-        <CheckIcon className="h-7 w-7" />
+    <div className="min-h-dvh bg-dark-950 px-4 py-6 sm:py-10">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <LandingProgressSteps current={4} />
+        <section className="landing-surface-primary">
+          <div className="mb-6 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-success-500/15 text-success-400">
+              <CheckIcon className="h-7 w-7" />
+            </div>
+            <h1 className="mt-4 text-xl font-bold text-dark-50">Подписка активирована</h1>
+            <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+              Доступ уже готов. Выберите устройство и приложение, затем выполните инструкцию.
+            </p>
+            <p className="mt-2 text-sm text-dark-400">
+              {tariffName || 'Доступ'}
+              {periodDays ? ` · ${periodDays} дней` : ''}
+            </p>
+          </div>
+          {subscriptionId ? (
+            <ConnectionExperience
+              subscriptionId={subscriptionId}
+              onGoBack={() => navigate('/subscriptions')}
+            />
+          ) : (
+            <div className="rounded-xl landing-surface-inset p-5 text-center">
+              <p className="text-sm leading-relaxed text-dark-300">
+                Не удалось определить подписку для инструкции. Откройте раздел подписок и выберите
+                нужную подписку, либо обратитесь в поддержку.
+              </p>
+              <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
+                <Link to="/subscriptions" className="btn-primary justify-center px-5 py-3">
+                  Мои подписки
+                </Link>
+                <Link to="/support" className="btn-secondary justify-center px-5 py-3">
+                  Написать в поддержку
+                </Link>
+              </div>
+            </div>
+          )}
+          <div className="mt-6 text-center">
+            <Link
+              to="/support"
+              className="text-sm font-medium text-accent-400 hover:text-accent-300"
+            >
+              Нужна помощь? Напишите в поддержку
+            </Link>
+          </div>
+        </section>
+        <LandingLegalFooter />
       </div>
-      <div>
-        <h1 className="text-xl font-bold text-dark-50">Подписка активирована</h1>
-        <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
-          Доступ уже готов. Откройте инструкцию, выберите приложение для своего устройства и
-          подключите VPN за пару минут.
-        </p>
-        <p className="mt-2 text-sm text-dark-400">
-          {tariffName || 'Доступ'}
-          {periodDays ? ` · ${periodDays} дней` : ''}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={() => navigate('/connection')}
-        className="w-full rounded-xl bg-accent-500 px-5 py-3.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-600"
-      >
-        Подключить устройство
-      </button>
-      {(subscriptionUrl || cryptoLink) && (
-        <p className="text-xs text-dark-500">
-          Ссылка подключения доступна в разделе подключения устройств.
-        </p>
-      )}
     </div>
   );
 }
@@ -828,6 +851,16 @@ export default function PurchaseSuccess() {
     !purchaseStatus.is_gift &&
     purchaseStatus.cabinet_email;
 
+  if (isSuccess && isBulkaFlow) {
+    return (
+      <BulkaFlowSuccessState
+        tariffName={purchaseStatus.tariff_name}
+        periodDays={purchaseStatus.period_days}
+        subscriptionId={purchaseStatus.subscription_id}
+      />
+    );
+  }
+
   return (
     <div className="flex min-h-dvh items-center justify-center bg-dark-950 px-4">
       <div
@@ -853,13 +886,6 @@ export default function PurchaseSuccess() {
             autoLoginToken={purchaseStatus.auto_login_token}
             tariffName={purchaseStatus.tariff_name}
             periodDays={purchaseStatus.period_days}
-          />
-        ) : isSuccess && isBulkaFlow ? (
-          <BulkaFlowSuccessState
-            tariffName={purchaseStatus.tariff_name}
-            periodDays={purchaseStatus.period_days}
-            subscriptionUrl={purchaseStatus.subscription_url}
-            cryptoLink={purchaseStatus.subscription_crypto_link}
           />
         ) : isSuccess ? (
           <SuccessState

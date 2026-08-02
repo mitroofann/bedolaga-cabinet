@@ -274,9 +274,6 @@ export const useAuthStore = create<AuthState>()(
           referralCode,
           acceptedLegalDocuments,
         );
-        // Clear only after successful auth — retry keeps the slugs
-        consumeCampaignSlug();
-        consumeReferralCode();
         tokenStorage.setTokens(response.access_token, response.refresh_token);
         set({
           accessToken: response.access_token,
@@ -285,6 +282,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           pendingCampaignBonus: response.campaign_bonus || null,
         });
+        consumeCampaignSlug(campaignSlug);
+        consumeReferralCode();
         await get().checkAdminStatus();
       },
 
@@ -297,8 +296,6 @@ export const useAuthStore = create<AuthState>()(
           referralCode,
           acceptedLegalDocuments,
         );
-        consumeCampaignSlug();
-        consumeReferralCode();
         tokenStorage.setTokens(response.access_token, response.refresh_token);
         set({
           accessToken: response.access_token,
@@ -307,6 +304,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           pendingCampaignBonus: response.campaign_bonus || null,
         });
+        consumeCampaignSlug(campaignSlug);
+        consumeReferralCode();
         await get().checkAdminStatus();
       },
 
@@ -319,8 +318,6 @@ export const useAuthStore = create<AuthState>()(
           referralCode,
           acceptedLegalDocuments,
         );
-        consumeCampaignSlug();
-        consumeReferralCode();
         tokenStorage.setTokens(response.access_token, response.refresh_token);
         set({
           accessToken: response.access_token,
@@ -329,6 +326,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           pendingCampaignBonus: response.campaign_bonus || null,
         });
+        consumeCampaignSlug(campaignSlug);
+        consumeReferralCode();
         await get().checkAdminStatus();
       },
 
@@ -336,8 +335,6 @@ export const useAuthStore = create<AuthState>()(
         const campaignSlug = getPendingCampaignSlug();
         const referralCode = getPendingReferralCode();
         const response = await authApi.loginEmail(email, password, campaignSlug, referralCode);
-        consumeCampaignSlug();
-        consumeReferralCode();
         tokenStorage.setTokens(response.access_token, response.refresh_token);
         set({
           accessToken: response.access_token,
@@ -346,6 +343,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           pendingCampaignBonus: response.campaign_bonus || null,
         });
+        consumeCampaignSlug(campaignSlug);
+        consumeReferralCode();
         await get().checkAdminStatus();
       },
 
@@ -360,8 +359,6 @@ export const useAuthStore = create<AuthState>()(
           campaignSlug,
           referralCode,
         );
-        consumeCampaignSlug();
-        consumeReferralCode();
         tokenStorage.setTokens(response.access_token, response.refresh_token);
         set({
           accessToken: response.access_token,
@@ -370,6 +367,8 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           pendingCampaignBonus: response.campaign_bonus || null,
         });
+        consumeCampaignSlug(campaignSlug);
+        consumeReferralCode();
         await get().checkAdminStatus();
       },
 
@@ -386,6 +385,7 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           pendingCampaignBonus: response.campaign_bonus || null,
         });
+        consumeCampaignSlug(campaignSlug);
         await get().checkAdminStatus();
       },
 

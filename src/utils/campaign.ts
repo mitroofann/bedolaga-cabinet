@@ -56,9 +56,9 @@ export function captureCampaignFromUrl(): void {
 /**
  * Consume (get + clear) the stored campaign slug. One-time use during auth.
  */
-export function consumeCampaignSlug(): string | null {
+export function consumeCampaignSlug(expectedSlug?: string | null): string | null {
   const slug = getValidSlug();
-  if (slug) clearSlug();
+  if (slug && (!expectedSlug || slug === expectedSlug)) clearSlug();
   return slug;
 }
 

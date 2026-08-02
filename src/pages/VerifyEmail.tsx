@@ -41,11 +41,11 @@ export default function VerifyEmail() {
       try {
         const campaignSlug = getPendingCampaignSlug();
         const response = await authApi.verifyEmail(token, campaignSlug);
-        consumeCampaignSlug();
         // Save tokens and log user in
         tokenStorage.setTokens(response.access_token, response.refresh_token);
         setTokens(response.access_token, response.refresh_token);
         setUser(response.user);
+        consumeCampaignSlug(campaignSlug);
         if (response.campaign_bonus) {
           useAuthStore.setState({ pendingCampaignBonus: response.campaign_bonus });
         }

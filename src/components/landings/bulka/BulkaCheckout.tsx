@@ -203,12 +203,14 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       </div>
 
       {isTrial ? (
-        <div className="landing-surface-primary">
-          <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Пробный период</h2>
-          <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
-            После подтверждения оплаты доступ активируется автоматически, а затем вы получите
-            инструкцию для подключения VPN.
-          </p>
+        <div className="landing-surface-primary text-left">
+          <div className="max-w-2xl">
+            <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Пробный период</h2>
+            <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+              После подтверждения оплаты доступ активируется автоматически, а затем вы получите
+              инструкцию для подключения VPN.
+            </p>
+          </div>
           {flow.trial.available ? (
             <div className="landing-trial-tariff mt-5">
               <div className="landing-trial-tariff__header">
@@ -247,6 +249,15 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
             <div className="mt-4 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Тариф">
               {flow.tariffs.map((item) => {
                 const selected = tariff?.id === item.id;
+                const minimumPeriod = item.periods.reduce(
+                  (minimum, candidate) => (candidate.days < minimum.days ? candidate : minimum),
+                  item.periods[0],
+                );
+                const lowestPrice = item.periods.reduce(
+                  (minimum, candidate) =>
+                    candidate.price_kopeks < minimum.price_kopeks ? candidate : minimum,
+                  item.periods[0],
+                );
                 return (
                   <button
                     key={item.id}
@@ -255,7 +266,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                     aria-checked={selected}
                     onClick={() => {
                       setSelectedTariffId(item.id);
-                      setSelectedPeriodDays(item.periods[0]?.days ?? null);
+                      setSelectedPeriodDays(minimumPeriod?.days ?? null);
                       setSubmitError(null);
                     }}
                     className={`landing-tariff-card ${selected ? 'is-selected' : ''}`}
@@ -270,6 +281,14 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                         className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-400"
                       />
                     )}
+                    <div className="mt-4 text-left">
+                      <span className="block text-xs text-dark-400">
+                        от {formatAmount(lowestPrice.price_kopeks / 100, 0)} {currencySymbol}
+                      </span>
+                      <span className="mt-1 block text-sm font-medium text-dark-200">
+                        минимум на {minimumPeriod.days} дней
+                      </span>
+                    </div>
                     <div className="landing-tariff-metrics mt-4">
                       <TrafficMetric trafficLimitGb={item.traffic_limit_gb} />
                       <DevicesMetric deviceLimit={item.device_limit} />

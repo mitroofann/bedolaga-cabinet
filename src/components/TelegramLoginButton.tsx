@@ -266,7 +266,7 @@ export default function TelegramLoginButton({
     pollInFlightRef.current = false;
 
     try {
-      // Consume campaign slug ONCE (first call only).
+      // Capture the campaign once so every poll for this deep-link token uses the same value.
       // Clears localStorage on first call, so subsequent retries reuse the ref.
       // Note: referral code is NOT consumed here — deep link auth is for existing
       // bot users where referrals don't apply. Leaving it in localStorage allows
