@@ -354,23 +354,21 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                     {item.description_html && (
                       <SanitizedHtml
                         html={item.description_html}
-                        className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-400"
+                        className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-300 [&_b]:font-semibold [&_b]:text-dark-100 [&_strong]:font-semibold [&_strong]:text-dark-100"
                       />
-                    )}
-                    {selectedItemPeriod && (
-                      <div className="mt-4 text-left">
-                        <span className="block text-xs text-dark-400">
-                          за {selectedPeriodDays} дней
-                        </span>
-                        <span className="mt-1 block text-lg font-semibold text-dark-100">
-                          {formatAmount(selectedItemPeriod.price_kopeks / 100, 0)} {currencySymbol}
-                        </span>
-                      </div>
                     )}
                     <div className="landing-tariff-metrics mt-4">
                       <TrafficMetric trafficLimitGb={item.traffic_limit_gb} />
                       <DevicesMetric deviceLimit={item.device_limit} />
                     </div>
+                    {selectedItemPeriod && (
+                      <div className="landing-tariff-card__price mt-4">
+                        <span className="text-xs text-dark-400">за {selectedPeriodDays} дней</span>
+                        <span className="text-lg font-bold text-dark-50">
+                          {formatAmount(selectedItemPeriod.price_kopeks / 100, 0)} {currencySymbol}
+                        </span>
+                      </div>
+                    )}
                   </button>
                 );
               })}
