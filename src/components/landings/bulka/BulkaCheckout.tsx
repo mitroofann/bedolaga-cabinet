@@ -4,7 +4,14 @@ import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { SanitizedHtml } from '@/components/common/SanitizedHtml';
-import { ArrowDownIcon, CalendarIcon, DevicesIcon, InfinityIcon } from '@/components/icons';
+import {
+  ArrowDownIcon,
+  CalendarIcon,
+  CheckIcon,
+  DevicesIcon,
+  InfinityIcon,
+  TagIcon,
+} from '@/components/icons';
 import { LandingLegalFooter } from '../LandingLegalFooter';
 import { LandingProgressSteps } from '../LandingProgressSteps';
 
@@ -197,26 +204,32 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
 
       {isTrial ? (
         <div className="landing-surface-primary">
-          <h2 className="text-xl font-semibold text-dark-50 sm:text-2xl">Пробный период</h2>
+          <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Пробный период</h2>
           <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
             После подтверждения оплаты доступ активируется автоматически, а затем вы получите
             инструкцию для подключения VPN.
           </p>
-          {flow.trial.tariff_description_html && (
-            <SanitizedHtml
-              html={flow.trial.tariff_description_html}
-              className="mt-4 whitespace-pre-line text-sm leading-relaxed text-dark-300 sm:text-base"
-            />
-          )}
           {flow.trial.available ? (
-            <div className="landing-access-metrics mt-5">
-              <AccessMetric
-                icon={CalendarIcon}
-                value={String(flow.trial.duration_days ?? 0)}
-                label="дней доступа"
-              />
-              <TrafficMetric trafficLimitGb={flow.trial.traffic_limit_gb ?? 0} />
-              <DevicesMetric deviceLimit={flow.trial.device_limit ?? 0} />
+            <div className="landing-trial-tariff mt-5">
+              <div className="landing-trial-tariff__header">
+                <TagIcon className="h-4 w-4" />
+                <span>{flow.trial.tariff_name || 'Тариф пробного доступа'}</span>
+              </div>
+              {flow.trial.tariff_description_html && (
+                <SanitizedHtml
+                  html={flow.trial.tariff_description_html}
+                  className="landing-trial-tariff__description whitespace-pre-line text-sm leading-relaxed sm:text-base"
+                />
+              )}
+              <div className="landing-access-metrics">
+                <AccessMetric
+                  icon={CalendarIcon}
+                  value={String(flow.trial.duration_days ?? 0)}
+                  label="дней доступа"
+                />
+                <TrafficMetric trafficLimitGb={flow.trial.traffic_limit_gb ?? 0} />
+                <DevicesMetric deviceLimit={flow.trial.device_limit ?? 0} />
+              </div>
             </div>
           ) : (
             <p className="mt-5 rounded-xl landing-surface-inset p-4 text-sm leading-relaxed text-dark-300 sm:text-base">
@@ -227,7 +240,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       ) : (
         <div className="landing-surface-primary space-y-5">
           <div>
-            <h2 className="text-xl font-semibold text-dark-50 sm:text-2xl">Выберите тариф</h2>
+            <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Выберите тариф</h2>
             <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
               После оплаты мы сразу активируем подписку и покажем, как подключить VPN на устройстве.
             </p>
@@ -245,9 +258,12 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                       setSelectedPeriodDays(item.periods[0]?.days ?? null);
                       setSubmitError(null);
                     }}
-                    className={`rounded-xl border p-4 text-left transition-colors ${selected ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
+                    className={`landing-tariff-card ${selected ? 'is-selected' : ''}`}
                   >
-                    <span className="block text-base font-semibold text-dark-100">{item.name}</span>
+                    <span className="landing-tariff-card__header">
+                      <span className="landing-tariff-card__name">{item.name}</span>
+                      {selected && <CheckIcon className="landing-tariff-card__check" />}
+                    </span>
                     {item.description_html && (
                       <SanitizedHtml
                         html={item.description_html}
@@ -284,7 +300,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       )}
 
       <div className="landing-surface-primary">
-        <h2 className="text-xl font-semibold text-dark-50 sm:text-2xl">Способ оплаты</h2>
+        <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Способ оплаты</h2>
         <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
           Выберите удобный способ. Оплата пройдёт на защищённой странице провайдера.
         </p>
