@@ -1,4 +1,4 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { retrieveRawInitData } from '@telegram-apps/sdk-react';
 import {
   tokenStorage,
@@ -78,6 +78,11 @@ const AUTH_ENDPOINTS = [
 
 function isAuthEndpoint(url: string | undefined): boolean {
   if (!url) return false;
+
+  // Public landing config/purchase endpoints share their prefix with the protected
+  // Bulka checkout API. The latter must receive the access token after login.
+  if (url.startsWith('/cabinet/landing/') && url.includes('/bulka-flow')) return false;
+
   return AUTH_ENDPOINTS.some((endpoint) => url.startsWith(endpoint));
 }
 
