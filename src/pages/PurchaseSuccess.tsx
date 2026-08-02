@@ -680,6 +680,10 @@ function BulkaFlowSuccessState({
       </div>
       <div>
         <h1 className="text-xl font-bold text-dark-50">Подписка активирована</h1>
+        <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+          Доступ уже готов. Откройте инструкцию, выберите приложение для своего устройства и
+          подключите VPN за пару минут.
+        </p>
         <p className="mt-2 text-sm text-dark-400">
           {tariffName || 'Доступ'}
           {periodDays ? ` · ${periodDays} дней` : ''}

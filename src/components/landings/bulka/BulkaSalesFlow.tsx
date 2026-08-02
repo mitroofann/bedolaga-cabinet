@@ -43,8 +43,9 @@ export function BulkaSalesFlow({ slug, intent, config, branding }: BulkaSalesFlo
             <h1 className="text-center text-xl font-semibold text-dark-50 sm:text-2xl">
               Начните пользоваться VPN
             </h1>
-            <p className="mt-2 text-center text-sm text-dark-400">
-              Создайте аккаунт или войдите, чтобы выбрать подходящий доступ и оформить подписку.
+            <p className="mt-3 text-center text-sm leading-relaxed text-dark-400 sm:text-base">
+              Создайте аккаунт или войдите. Затем выберите доступ, подтвердите оплату и получите
+              инструкцию для подключения VPN на устройстве.
             </p>
             <div className="mt-6">
               <AuthPanel embedded initialMode={authMode} returnTo={continuation} />

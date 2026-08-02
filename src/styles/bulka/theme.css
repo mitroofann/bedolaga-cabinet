@@ -197,10 +197,99 @@ html.theme-bulka .landing-surface-inset {
 html.theme-bulka .landing-auth-panel {
   background: transparent;
 }
+html.theme-bulka .landing-intent-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--glass-inner-border);
+  border-radius: 1rem;
+  background: var(--glass-inner-bg);
+}
+html.theme-bulka .landing-intent-switcher > button {
+  display: flex;
+  min-height: 4.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  color: rgb(var(--color-dark-300));
+  font-size: 1rem;
+  font-weight: 600;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+html.theme-bulka .landing-intent-switcher > button:hover {
+  background: rgb(var(--color-dark-800));
+  color: rgb(var(--color-dark-100));
+}
+html.theme-bulka .landing-intent-switcher > button.is-selected {
+  border-color: rgb(var(--color-accent-500));
+  background: rgb(var(--color-accent-500));
+  color: rgb(var(--color-on-accent));
+  box-shadow: 0 8px 20px rgb(var(--color-accent-500) / 0.18);
+}
+html.theme-bulka .landing-intent-switcher__hint {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.78;
+}
+html.theme-bulka .landing-access-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+html.theme-bulka .landing-access-metric {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--glass-inner-border);
+  border-radius: 0.75rem;
+  background: var(--glass-inner-bg);
+  padding: 0.875rem 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+html.theme-bulka .landing-access-metric > :nth-child(2) {
+  font-size: 1.125rem;
+}
+html.theme-bulka .landing-tariff-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+html.theme-bulka .landing-tariff-metrics .landing-access-metric {
+  min-width: auto;
+  flex-direction: row;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+html.theme-bulka .landing-tariff-metrics .landing-access-metric > :nth-child(2) {
+  font-size: 0.875rem;
+}
+html.theme-bulka .landing-payment-reassurance {
+  margin-top: 1rem;
+  text-align: center;
+  color: rgb(var(--color-dark-400));
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
 html.theme-bulka .landing-progress {
   margin-top: 1rem;
 }
 html.theme-bulka .landing-progress__mobile-summary {
+  display: none;
+}
+html.theme-bulka .landing-progress__mobile-detail {
   display: none;
 }
 html.theme-bulka .landing-progress__track {
@@ -253,6 +342,16 @@ html.theme-bulka .landing-progress__label.is-active {
   color: rgb(var(--color-dark-100));
 }
 @media (max-width: 639px) {
+  html.theme-bulka .landing-intent-switcher > button {
+    min-height: 4rem;
+    font-size: 0.9375rem;
+  }
+  html.theme-bulka .landing-access-metrics {
+    gap: 0.375rem;
+  }
+  html.theme-bulka .landing-access-metric {
+    padding: 0.75rem 0.375rem;
+  }
   html.theme-bulka .landing-progress__mobile-summary {
     display: flex;
     justify-content: space-between;
@@ -263,6 +362,16 @@ html.theme-bulka .landing-progress__label.is-active {
   }
   html.theme-bulka .landing-progress__label {
     display: none;
+  }
+  html.theme-bulka .landing-progress__mobile-detail {
+    display: block;
+    margin-top: 0.875rem;
+    border: 1px solid var(--glass-inner-border);
+    border-radius: 0.75rem;
+    background: var(--glass-inner-bg);
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
   }
 }
 html.theme-bulka .text-dark-50\/20 {

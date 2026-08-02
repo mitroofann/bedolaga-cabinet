@@ -4,6 +4,7 @@ import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { SanitizedHtml } from '@/components/common/SanitizedHtml';
+import { ArrowDownIcon, CalendarIcon, DevicesIcon, InfinityIcon } from '@/components/icons';
 import { LandingLegalFooter } from '../LandingLegalFooter';
 import { LandingProgressSteps } from '../LandingProgressSteps';
 
@@ -14,6 +15,46 @@ interface BulkaCheckoutProps {
 
 function idempotencyKey() {
   return crypto.randomUUID();
+}
+
+function AccessMetric({
+  icon: Icon,
+  value,
+  label,
+}: {
+  icon: typeof CalendarIcon;
+  value: string;
+  label: string;
+}) {
+  return (
+    <div className="landing-access-metric">
+      <Icon className="h-4 w-4 text-accent-400" />
+      <span className="font-semibold text-dark-100">{value}</span>
+      <span className="text-dark-400">{label}</span>
+    </div>
+  );
+}
+
+function TrafficMetric({ trafficLimitGb }: { trafficLimitGb: number }) {
+  const unlimited = trafficLimitGb === 0;
+  return (
+    <AccessMetric
+      icon={unlimited ? InfinityIcon : ArrowDownIcon}
+      value={unlimited ? '∞' : String(trafficLimitGb)}
+      label={unlimited ? 'трафик' : 'ГБ трафика'}
+    />
+  );
+}
+
+function DevicesMetric({ deviceLimit }: { deviceLimit: number }) {
+  const unlimited = deviceLimit === 0;
+  return (
+    <AccessMetric
+      icon={unlimited ? InfinityIcon : DevicesIcon}
+      value={unlimited ? '∞' : String(deviceLimit)}
+      label={unlimited ? 'устройства' : deviceLimit === 1 ? 'устройство' : 'устройства'}
+    />
+  );
 }
 
 export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
@@ -124,72 +165,61 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
     <div className="space-y-4">
       <LandingProgressSteps current={2} />
       <div className="landing-surface-primary">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-dark-100">Выберите доступ</p>
-            <p className="mt-1 text-xs text-dark-400">
-              Исходный вариант можно изменить перед оплатой.
-            </p>
-          </div>
-          <div
-            className="flex rounded-xl landing-surface-inset p-1 text-xs font-medium"
-            role="tablist"
-            aria-label="Вариант доступа"
+        <div className="text-center">
+          <h1 className="text-xl font-semibold text-dark-50 sm:text-2xl">Как хотите начать?</h1>
+          <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-dark-400 sm:text-base">
+            Выберите пробный доступ или сразу оформите подписку. Вариант можно изменить до оплаты.
+          </p>
+        </div>
+        <div className="landing-intent-switcher mt-5" role="tablist" aria-label="Вариант доступа">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={isTrial}
+            onClick={() => selectIntent('trial')}
+            className={isTrial ? 'is-selected' : ''}
           >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={isTrial}
-              onClick={() => selectIntent('trial')}
-              className={`rounded-lg px-3 py-2 ${isTrial ? 'bg-accent-500 text-on-accent' : 'text-dark-400 hover:text-dark-200'}`}
-            >
-              Попробовать
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={!isTrial}
-              onClick={() => selectIntent('purchase')}
-              className={`rounded-lg px-3 py-2 ${!isTrial ? 'bg-accent-500 text-on-accent' : 'text-dark-400 hover:text-dark-200'}`}
-            >
-              Купить
-            </button>
-          </div>
+            <span>Попробовать</span>
+            <span className="landing-intent-switcher__hint">Пробный доступ</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!isTrial}
+            onClick={() => selectIntent('purchase')}
+            className={!isTrial ? 'is-selected' : ''}
+          >
+            <span>Купить</span>
+            <span className="landing-intent-switcher__hint">Подписка VPN</span>
+          </button>
         </div>
       </div>
 
       {isTrial ? (
         <div className="landing-surface-primary">
-          <h1 className="text-xl font-semibold text-dark-50">Пробный период</h1>
+          <h2 className="text-xl font-semibold text-dark-50 sm:text-2xl">Пробный период</h2>
+          <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+            После подтверждения оплаты доступ активируется автоматически, а затем вы получите
+            инструкцию для подключения VPN.
+          </p>
           {flow.trial.tariff_description_html && (
             <SanitizedHtml
               html={flow.trial.tariff_description_html}
-              className="mt-3 text-sm leading-relaxed text-dark-300"
+              className="mt-4 whitespace-pre-line text-sm leading-relaxed text-dark-300 sm:text-base"
             />
           )}
           {flow.trial.available ? (
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-xl landing-surface-inset p-3">
-                <div className="text-base font-semibold text-dark-100">
-                  {flow.trial.duration_days}
-                </div>
-                <div className="text-[10px] text-dark-400">дней</div>
-              </div>
-              <div className="rounded-xl landing-surface-inset p-3">
-                <div className="text-base font-semibold text-dark-100">
-                  {flow.trial.traffic_limit_gb}
-                </div>
-                <div className="text-[10px] text-dark-400">ГБ</div>
-              </div>
-              <div className="rounded-xl landing-surface-inset p-3">
-                <div className="text-base font-semibold text-dark-100">
-                  {flow.trial.device_limit}
-                </div>
-                <div className="text-[10px] text-dark-400">устройства</div>
-              </div>
+            <div className="landing-access-metrics mt-5">
+              <AccessMetric
+                icon={CalendarIcon}
+                value={String(flow.trial.duration_days ?? 0)}
+                label="дней доступа"
+              />
+              <TrafficMetric trafficLimitGb={flow.trial.traffic_limit_gb ?? 0} />
+              <DevicesMetric deviceLimit={flow.trial.device_limit ?? 0} />
             </div>
           ) : (
-            <p className="mt-4 rounded-xl landing-surface-inset p-3 text-sm text-dark-400">
+            <p className="mt-5 rounded-xl landing-surface-inset p-4 text-sm leading-relaxed text-dark-300 sm:text-base">
               {flow.trial.unavailable_reason || 'Пробный период недоступен для этого аккаунта.'}
             </p>
           )}
@@ -197,8 +227,11 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       ) : (
         <div className="landing-surface-primary space-y-5">
           <div>
-            <h1 className="text-xl font-semibold text-dark-50">Выберите тариф</h1>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Тариф">
+            <h2 className="text-xl font-semibold text-dark-50 sm:text-2xl">Выберите тариф</h2>
+            <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+              После оплаты мы сразу активируем подписку и покажем, как подключить VPN на устройстве.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Тариф">
               {flow.tariffs.map((item) => {
                 const selected = tariff?.id === item.id;
                 return (
@@ -212,15 +245,19 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                       setSelectedPeriodDays(item.periods[0]?.days ?? null);
                       setSubmitError(null);
                     }}
-                    className={`rounded-xl border p-3 text-left ${selected ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
+                    className={`rounded-xl border p-4 text-left transition-colors ${selected ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
                   >
-                    <span className="block text-sm font-semibold text-dark-100">{item.name}</span>
+                    <span className="block text-base font-semibold text-dark-100">{item.name}</span>
                     {item.description_html && (
                       <SanitizedHtml
                         html={item.description_html}
-                        className="mt-1 text-xs text-dark-400"
+                        className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-400"
                       />
                     )}
+                    <div className="landing-tariff-metrics mt-4">
+                      <TrafficMetric trafficLimitGb={item.traffic_limit_gb} />
+                      <DevicesMetric deviceLimit={item.device_limit} />
+                    </div>
                   </button>
                 );
               })}
@@ -228,16 +265,16 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           </div>
           {tariff && (
             <div>
-              <p className="mb-2 text-sm font-medium text-dark-200">Срок подписки</p>
+              <p className="mb-3 text-base font-medium text-dark-200">Срок подписки</p>
               <div className="flex flex-wrap gap-2">
                 {tariff.periods.map((item) => (
                   <button
                     key={item.days}
                     type="button"
                     onClick={() => setSelectedPeriodDays(item.days)}
-                    className={`rounded-xl border px-3 py-2 text-sm ${period?.days === item.days ? 'border-accent-500 bg-accent-500/10 text-dark-100' : 'border-dark-700 landing-surface-inset text-dark-400 hover:border-dark-600'}`}
+                    className={`rounded-xl border px-4 py-3 text-sm font-medium ${period?.days === item.days ? 'border-accent-500 bg-accent-500/10 text-dark-100' : 'border-dark-700 landing-surface-inset text-dark-300 hover:border-dark-600'}`}
                   >
-                    {item.days} дней
+                    {item.days} дней · {formatAmount(item.price_kopeks / 100, 0)} {currencySymbol}
                   </button>
                 ))}
               </div>
@@ -247,8 +284,11 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       )}
 
       <div className="landing-surface-primary">
-        <p className="mb-3 text-sm font-semibold text-dark-100">Способ оплаты</p>
-        <div className="space-y-2" role="radiogroup" aria-label="Способ оплаты">
+        <h2 className="text-xl font-semibold text-dark-50 sm:text-2xl">Способ оплаты</h2>
+        <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+          Выберите удобный способ. Оплата пройдёт на защищённой странице провайдера.
+        </p>
+        <div className="mt-4 space-y-3" role="radiogroup" aria-label="Способ оплаты">
           {flow.payment_methods.map((item) => (
             <div key={item.method_id}>
               {
@@ -257,17 +297,28 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                   role="radio"
                   aria-checked={method?.method_id === item.method_id}
                   onClick={() => selectMethod(item.method_id)}
-                  className={`flex w-full items-center justify-between rounded-xl border p-3 text-left ${method?.method_id === item.method_id ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
+                  className={`flex w-full items-center justify-between gap-3 rounded-xl border p-4 text-left transition-colors ${method?.method_id === item.method_id ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
                 >
-                  <span>
-                    <span className="block text-sm font-medium text-dark-100">
-                      {item.display_name}
-                    </span>
-                    {item.description && (
-                      <span className="mt-0.5 block text-xs text-dark-400">{item.description}</span>
+                  <span className="flex min-w-0 items-center gap-3">
+                    {item.icon_url && (
+                      <img
+                        src={item.icon_url}
+                        alt=""
+                        className="h-8 w-8 shrink-0 rounded-lg object-contain"
+                      />
                     )}
+                    <span>
+                      <span className="block text-base font-medium text-dark-100">
+                        {item.display_name}
+                      </span>
+                      {item.description && (
+                        <span className="mt-1 block text-sm leading-relaxed text-dark-400">
+                          {item.description}
+                        </span>
+                      )}
+                    </span>
                   </span>
-                  <span className="text-xs text-dark-500">{item.currency || ''}</span>
+                  <span className="shrink-0 text-sm text-dark-400">{item.currency || ''}</span>
                 </button>
               }
               {method?.method_id === item.method_id &&
@@ -279,7 +330,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                         key={option.id}
                         type="button"
                         onClick={() => setSelectedSubOption(option.id)}
-                        className={`rounded-lg px-2.5 py-1.5 text-xs ${selectedSubOption === option.id ? 'bg-accent-500 text-on-accent' : 'landing-surface-inset text-dark-400'}`}
+                        className={`rounded-lg px-3 py-2 text-sm ${selectedSubOption === option.id ? 'bg-accent-500 text-on-accent' : 'landing-surface-inset text-dark-300'}`}
                       >
                         {option.name}
                       </button>
@@ -290,7 +341,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           ))}
         </div>
         {submitError && (
-          <p className="mt-3 text-sm text-error-400" aria-live="polite">
+          <p className="mt-4 text-sm text-error-400" aria-live="polite">
             {submitError}
           </p>
         )}
@@ -298,14 +349,18 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           type="button"
           disabled={!canPay || purchaseMutation.isPending}
           onClick={handlePayment}
-          className="mt-5 flex w-full items-center justify-center rounded-xl bg-accent-500 px-5 py-3.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-6 flex w-full items-center justify-center rounded-xl bg-accent-500 px-5 py-4 text-base font-semibold text-on-accent transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {purchaseMutation.isPending
             ? 'Создаём оплату…'
             : priceKopeks === null
               ? 'Выберите условия'
-              : `Оплатить ${formatAmount(priceKopeks / 100)} ${currencySymbol}`}
+              : `Перейти к оплате · ${formatAmount(priceKopeks / 100, 0)} ${currencySymbol}`}
         </button>
+        <p className="landing-payment-reassurance">
+          После подтверждения оплаты доступ активируется автоматически. На следующем шаге покажем
+          простую инструкцию для подключения устройства.
+        </p>
       </div>
       <LandingLegalFooter />
     </div>
