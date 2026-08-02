@@ -72,7 +72,7 @@ function DevicesMetric({ deviceLimit }: { deviceLimit: number }) {
     <AccessMetric
       icon={unlimited ? InfinityIcon : DevicesIcon}
       value={unlimited ? '∞' : String(deviceLimit)}
-      label={unlimited ? 'устройства' : deviceLimit === 1 ? 'устройство' : 'устройства'}
+      label={unlimited ? 'устройств' : deviceLimit === 1 ? 'устройство' : 'устройств'}
     />
   );
 }
@@ -270,7 +270,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
             </p>
           </div>
           {flow.trial.available ? (
-            <ul className="mt-6 space-y-3.5">
+            <ul className="mt-6 space-y-2.5">
               {TRIAL_FEATURES.map((feature) => (
                 <li key={feature.text} className="flex items-start gap-3.5">
                   <span
@@ -354,7 +354,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                     {item.description_html && (
                       <SanitizedHtml
                         html={item.description_html}
-                        className="mt-2 whitespace-pre-line text-sm leading-relaxed text-dark-300 [&_b]:font-semibold [&_b]:text-dark-100 [&_strong]:font-semibold [&_strong]:text-dark-100"
+                        className="mt-2 whitespace-pre-line text-[0.9375rem] leading-relaxed text-dark-300 sm:text-base [&_b]:font-semibold [&_b]:text-dark-100 [&_strong]:font-semibold [&_strong]:text-dark-100"
                       />
                     )}
                     <div className="landing-tariff-metrics mt-4">
@@ -363,8 +363,8 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
                     </div>
                     {selectedItemPeriod && (
                       <div className="landing-tariff-card__price mt-4">
-                        <span className="text-xs text-dark-400">за {selectedPeriodDays} дней</span>
-                        <span className="text-lg font-bold text-dark-50">
+                        <span className="text-sm text-dark-400">за {selectedPeriodDays} дней</span>
+                        <span className="text-xl font-bold text-dark-50">
                           {formatAmount(selectedItemPeriod.price_kopeks / 100, 0)} {currencySymbol}
                         </span>
                       </div>

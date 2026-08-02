@@ -289,8 +289,11 @@ html.theme-bulka .landing-tariff-metrics .landing-access-metric {
   background: var(--glass-inner-bg);
   text-align: left;
 }
+html.theme-bulka .landing-tariff-metrics .landing-access-metric {
+  font-size: 0.8125rem;
+}
 html.theme-bulka .landing-tariff-metrics .landing-access-metric > :nth-child(2) {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 html.theme-bulka .landing-payment-reassurance {
   margin-top: 1rem;
@@ -359,7 +362,7 @@ html.theme-bulka .landing-tariff-card__header {
   gap: 0.5rem;
 }
 html.theme-bulka .landing-tariff-card__name {
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: rgb(var(--color-dark-50));
 }
@@ -372,7 +375,7 @@ html.theme-bulka .landing-tariff-card__price {
   border-top: 1px solid rgba(255, 248, 240, 0.08);
 }
 html.theme-bulka .landing-tariff-card.is-selected .landing-tariff-card__price {
-  border-top-color: rgb(var(--color-accent-500) / 0.25);
+  border-top-color: rgb(var(--color-accent-500) / 0.12);
 }
 html.theme-bulka .landing-tariff-card__check {
   flex-shrink: 0;
