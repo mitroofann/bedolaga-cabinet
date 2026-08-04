@@ -1150,7 +1150,9 @@
     "contactSupport": "Please contact {{username}} for support",
     "contactUs": "Contact Support",
     "create_ticket": "Create ticket",
-    "writeButton": "Message"
+    "writeButton": "Message",
+    "faqTitle": "You may find the answer in the FAQ",
+    "faqDescription": "Have a quick look before contacting support — the answer may already be here."
   },
   "wheel": {
     "title": "Fortune Wheel",
@@ -4298,6 +4300,18 @@
       "slugHint": "Lowercase, numbers and hyphens",
       "pageTitle": "Title",
       "subtitle": "Subtitle",
+      "template": "Landing Template",
+      "templates": {
+        "classic": {
+          "title": "Classic Landing",
+          "description": "The current landing page with a standalone purchase form."
+        },
+        "bulkaSalesFlow": {
+          "title": "Bulka VPN — Sales Flow",
+          "description": "Step-by-step flow: authorization, payment, and device connection.",
+          "note": "Changing the template affects future visits. Existing purchases will finish in the previous flow."
+        }
+      },
       "footerText": "Footer (HTML)",
       "features": "Features",
       "addFeature": "Add",

@@ -1,0 +1,1 @@
+export { SupportFaq } from './SupportFaq';

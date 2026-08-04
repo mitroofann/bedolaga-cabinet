@@ -1023,7 +1023,9 @@
     "ticketsDisabled": "工单已禁用",
     "useExternalLink": "请使用外部链接获取支持",
     "create_ticket": "创建工单",
-    "writeButton": "发消息"
+    "writeButton": "发消息",
+    "faqTitle": "FAQ 中可能已有答案",
+    "faqDescription": "联系支持前可以先看一下，也许这里已经有解决方案。"
   },
   "wheel": {
     "title": "幸运转盘",

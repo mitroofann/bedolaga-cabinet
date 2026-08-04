@@ -17,6 +17,7 @@ import { ChatIcon, CloseIcon, ImageIcon, PlusIcon, SendIcon } from '@/components
 import { usePlatform } from '@/platform';
 import { linkifyText } from '../utils/linkify';
 import { resolveSupportContact } from '../utils/supportContact';
+import { SupportFaq } from '@/features/support-faq';
 
 const log = logger.createLogger('Support');
 
@@ -242,8 +243,9 @@ export default function Support() {
     const supportMessage = getSupportMessage();
 
     return (
-      <div className="mx-auto mt-12 max-w-md">
-        <Card className="text-center">
+      <div className="mx-auto mt-12 max-w-3xl space-y-6">
+        <SupportFaq />
+        <Card className="mx-auto max-w-md text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-dark-800">
             <ChatIcon className="h-8 w-8 text-dark-400" />
           </div>
@@ -327,6 +329,10 @@ export default function Support() {
           <PlusIcon />
           <span className="ml-2">{t('support.newTicket')}</span>
         </Button>
+      </motion.div>
+
+      <motion.div variants={staggerItem}>
+        <SupportFaq />
       </motion.div>
 
       {/* Contact support card for "both" mode — self-animated: mounts after the
