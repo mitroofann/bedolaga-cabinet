@@ -43,3 +43,37 @@ export const getFlagEmoji = (countryCode: string | null | undefined): string => 
     .map((char) => 127397 + char.charCodeAt(0));
   return String.fromCodePoint(...codePoints);
 };
+
+/**
+ * Проверяет, активно ли у пользователя бесплатное окно (expire-squad фича).
+ * Free-окно считается активным, если:
+ * - expire_free_until задан и дата в будущем, ИЛИ
+ * - expire_disabled_squads непусто (отложенные сквады при истечении)
+ */
+export const isFreeWindowActive = (
+  subscription:
+    | {
+        expire_free_until?: string | null;
+        expire_disabled_squads?: string[];
+      }
+    | null
+    | undefined,
+): boolean => {
+  if (!subscription) return false;
+
+  // Проверяем, есть ли отключенные сквады (они дают доступ к бесплатному контенту)
+  if (subscription.expire_disabled_squads && subscription.expire_disabled_squads.length > 0) {
+    return true;
+  }
+
+  // Проверяем, не истекло ли время бесплатного доступа
+  if (subscription.expire_free_until) {
+    const expireDate = new Date(subscription.expire_free_until);
+    const now = new Date();
+    if (expireDate > now) {
+      return true;
+    }
+  }
+
+  return false;
+};

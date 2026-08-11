@@ -2,7 +2,7 @@ import { uiLocale } from '@/utils/uiLocale';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useParams } from 'react-router';
+import { Navigate, useNavigate, useParams, Link } from 'react-router';
 import { subscriptionApi } from '../api/subscription';
 import { DEVICE_ALIAS_MAX_LENGTH } from '../constants/devices';
 import { WebBackButton } from '../components/WebBackButton';
@@ -30,6 +30,7 @@ import {
   getErrorMessage,
   getInsufficientBalanceError,
   getFlagEmoji,
+  isFreeWindowActive,
 } from '../utils/subscriptionHelpers';
 import { openPaymentUrl } from '../utils/openPaymentUrl';
 import { useToast } from '../components/Toast';
@@ -555,6 +556,47 @@ export default function Subscription() {
             : t('subscription.title')}
         </h1>
       </div>
+
+      {/* Free Access Window Notification */}
+      {subscription && isFreeWindowActive(subscription) && (
+        <div
+          style={{
+            background: '#fff3cd',
+            borderLeft: '4px solid #f39c12',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-xl" aria-hidden="true">
+              ⏳
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-dark-800">Временный бесплатный доступ</p>
+              <p className="mt-1 text-xs text-dark-600">
+                Основные серверы отключены, скорость ограничена.
+                <br />
+                Продлите подписку, чтобы вернуть все серверы и высокую скорость.
+              </p>
+              <div className="mt-2 flex items-center gap-2 text-xs text-dark-600">
+                <span>💡</span>
+                <span>
+                  Обновите подписку в приложении, чтобы появились бесплатные сервера
+                  <br />
+                  (кнопка «Обновить» рядом с названием Bulka VPN).
+                </span>
+              </div>
+              <Link
+                to="/subscription/purchase"
+                className="mt-3 inline-block rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-600"
+              >
+                Продлить подписку
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Current Subscription */}
       {subscription ? (

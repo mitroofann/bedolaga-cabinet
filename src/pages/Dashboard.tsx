@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/auth';
 import { displayName } from '../utils/displayName';
 import { useBlockingStore } from '../store/blocking';
+import { isFreeWindowActive } from '../utils/subscriptionHelpers';
 import { subscriptionApi } from '../api/subscription';
 import { referralApi } from '../api/referral';
 import { balanceApi } from '../api/balance';
@@ -256,6 +257,47 @@ export default function Dashboard() {
           <p className="text-dark-400">{t('dashboard.yourSubscription')}</p>
         </div>
       </div>
+
+      {/* Free Access Window Notification */}
+      {subscription && isFreeWindowActive(subscription) && (
+        <div
+          style={{
+            background: '#fff3cd',
+            borderLeft: '4px solid #f39c12',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-xl" aria-hidden="true">
+              ⏳
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-dark-800">Временный бесплатный доступ</p>
+              <p className="mt-1 text-xs text-dark-600">
+                Основные серверы отключены, скорость ограничена.
+                <br />
+                Продлите подписку, чтобы вернуть все серверы и высокую скорость.
+              </p>
+              <div className="mt-2 flex items-center gap-2 text-xs text-dark-600">
+                <span>💡</span>
+                <span>
+                  Обновите подписку в приложении, чтобы появились бесплатные сервера
+                  <br />
+                  (кнопка «Обновить» рядом с названием Bulka VPN).
+                </span>
+              </div>
+              <Link
+                to="/subscription/purchase"
+                className="mt-3 inline-block rounded-lg bg-accent-500 px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-600"
+              >
+                Продлить подписку
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pending Gift Activations */}
       {pendingGifts && pendingGifts.length > 0 && <PendingGiftCard gifts={pendingGifts} />}

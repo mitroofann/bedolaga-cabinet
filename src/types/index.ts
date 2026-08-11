@@ -102,6 +102,9 @@ export interface Subscription {
   tariff_id?: number;
   tariff_name?: string;
   traffic_reset_mode?: string;
+  // Free access window after subscription expiry (expire-squad feature)
+  expire_free_until?: string | null; // ISO datetime string
+  expire_disabled_squads?: string[]; // List of squad UUIDs that are disabled but accessible during free window
 }
 
 // Response wrapper for subscription status endpoint
