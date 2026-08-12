@@ -3688,7 +3688,15 @@
           "sbpCancelled": "SBP auto-payment disabled",
           "sbpStatus_PENDING": "Pending",
           "sbpStatus_ACTIVE": "Active",
-          "sbpStatus_PAST_DUE": "Payment failed"
+          "sbpStatus_PAST_DUE": "Payment failed",
+          "autopayEnabled": "Auto-renewal",
+          "autopayDaysBefore": "{{days}} days before expiry",
+          "autopayActive": "Enabled",
+          "disableAutopay": "Disable",
+          "autopayDisabled": "Auto-renewal disabled",
+          "savedCards": "Saved cards",
+          "defaultCard": "Default",
+          "cardDeleted": "Card deleted"
         },
         "balance": {
           "current": "Current balance",

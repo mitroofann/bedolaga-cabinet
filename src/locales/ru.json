@@ -4085,7 +4085,15 @@
           "sbpCancelled": "Автоплатёж по СБП отключён",
           "sbpStatus_PENDING": "Ожидает подтверждения",
           "sbpStatus_ACTIVE": "Активен",
-          "sbpStatus_PAST_DUE": "Платёж не прошёл"
+          "sbpStatus_PAST_DUE": "Платёж не прошёл",
+          "autopayEnabled": "Автопродление",
+          "autopayDaysBefore": "За {{days}} дней до окончания",
+          "autopayActive": "Включено",
+          "disableAutopay": "Отключить",
+          "autopayDisabled": "Автопродление отключено",
+          "savedCards": "Сохранённые карты",
+          "defaultCard": "Основная",
+          "cardDeleted": "Карта удалена"
         },
         "balance": {
           "current": "Текущий баланс",

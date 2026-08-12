@@ -9,6 +9,16 @@ export interface TrafficPurchaseInfo {
   is_expired: boolean;
 }
 
+export interface SavedPaymentCard {
+  id: string;
+  card_type: string;
+  last4: string;
+  expires_month: number;
+  expires_year: number;
+  is_default: boolean;
+  created_at: string;
+}
+
 export interface UserSubscriptionInfo {
   id: number;
   status: string;
@@ -21,8 +31,10 @@ export interface UserSubscriptionInfo {
   tariff_id: number | null;
   tariff_name: string | null;
   autopay_enabled: boolean;
+  autopay_days_before: number | null;
   sbp_recurring_status: string | null;
   sbp_recurring_id: number | null;
+  saved_cards: SavedPaymentCard[];
   is_active: boolean;
   days_remaining: number;
   purchased_traffic_gb: number;
@@ -514,6 +526,30 @@ export const adminUsersApi = {
   cancelSbpRecurring: async (userId: number, subId: number): Promise<{ status: string }> => {
     const response = await apiClient.post(
       `/cabinet/admin/users/${userId}/subscriptions/${subId}/cancel-sbp-recurring`,
+    );
+    return response.data;
+  },
+
+  // Disable autopay for a subscription
+  disableAutopay: async (userId: number, subId: number): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.post(
+      `/cabinet/admin/users/${userId}/subscriptions/${subId}/disable-autopay`,
+    );
+    return response.data;
+  },
+
+  // Get saved payment cards for a user's subscription
+  getSavedCards: async (userId: number, subId?: number): Promise<SavedPaymentCard[]> => {
+    const params = subId != null ? { subscription_id: subId } : undefined;
+    const response = await apiClient.get(`/cabinet/admin/users/${userId}/saved-cards`, { params });
+    return response.data;
+  },
+
+  // Delete a saved payment card
+  deleteSavedCard: async (userId: number, cardId: string, subId?: number): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.delete(
+      `/cabinet/admin/users/${userId}/saved-cards/${encodeURIComponent(cardId)}`,
+      { params: subId != null ? { subscription_id: subId } : undefined },
     );
     return response.data;
   },

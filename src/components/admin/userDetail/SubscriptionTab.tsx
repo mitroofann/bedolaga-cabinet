@@ -19,6 +19,7 @@ import type {
   UserSubscriptionInfo,
   UserNodeUsageItem,
   SubscriptionRequestRecord,
+  SavedPaymentCard,
 } from '../../../api/adminUsers';
 
 // ──────────────────────────────────────────────────────────────────
@@ -121,6 +122,10 @@ export interface SubscriptionTabProps {
   onRequestHistoryExpandedChange: (open: boolean) => void;
   onRequestHistorySubIdChange: (id: number | null) => void;
 
+  // Saved cards
+  savedCards: SavedPaymentCard[];
+  savedCardsLoading: boolean;
+
   // Mutation handlers (all parent-owned)
   actionLoading: boolean;
   confirmingAction: string | null;
@@ -131,6 +136,9 @@ export interface SubscriptionTabProps {
   onRemoveTraffic: (purchaseId: number) => Promise<void>;
   onResetDevices: () => Promise<void>;
   onCancelSbpRecurring: () => Promise<void>;
+  onDisableAutopay: () => Promise<void>;
+  onLoadSavedCards: () => Promise<void>;
+  onDeleteSavedCard: (cardId: string) => Promise<void>;
   onDeleteDevice: (hwid: string) => Promise<void>;
   onRenameDevice: (hwid: string) => Promise<void>;
   onLoadDevices: () => Promise<void>;
@@ -186,6 +194,8 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     requestHistoryExpanded,
     onRequestHistoryExpandedChange,
     onRequestHistorySubIdChange,
+    savedCards,
+    savedCardsLoading,
     actionLoading,
     confirmingAction,
     onInlineConfirm,
@@ -195,6 +205,9 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     onRemoveTraffic,
     onResetDevices,
     onCancelSbpRecurring,
+    onDisableAutopay,
+    onLoadSavedCards,
+    onDeleteSavedCard,
     onDeleteDevice,
     onRenameDevice,
     onLoadDevices,
@@ -262,7 +275,7 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                 <select
                   value={selectedTariffId || ''}
                   onChange={(e) =>
-                    onSelectedTariffIdChange(e.target.value ? parseInt(e.target.value) : null)
+                    onSelectedTariffIdChange(e.target.value ? parseInt(e.target.value, 10) : null)
                   }
                   className="input"
                 >
@@ -429,6 +442,101 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
             </div>
           )}
 
+          {/* Autopay settings */}
+          {selectedSub.autopay_enabled && (
+            <div className="rounded-xl bg-dark-800/50 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium text-dark-200">
+                    {t('admin.users.detail.subscription.autopayEnabled', 'Автопродление')}
+                  </div>
+                  <div className="mt-0.5 text-xs text-dark-400">
+                    {selectedSub.autopay_days_before
+                      ? t('admin.users.detail.subscription.autopayDaysBefore', 'За {{days}} дней до окончания', { days: selectedSub.autopay_days_before })
+                      : t('admin.users.detail.subscription.autopayActive', 'Включено')}
+                  </div>
+                </div>
+                {hasPermission('users:subscription') && (
+                  <button
+                    onClick={() =>
+                      onInlineConfirm(`disableAutopay_${selectedSub.id}`, onDisableAutopay)
+                    }
+                    disabled={actionLoading}
+                    className={`rounded-lg px-3 py-2 text-sm font-medium transition-all disabled:opacity-50 ${
+                      confirmingAction === `disableAutopay_${selectedSub.id}`
+                        ? 'bg-warning-500 text-white'
+                        : 'bg-warning-500/15 text-warning-400 hover:bg-warning-500/25'
+                    }`}
+                  >
+                    {confirmingAction === `disableAutopay_${selectedSub.id}`
+                      ? t('admin.users.detail.actions.areYouSure')
+                      : t('admin.users.detail.subscription.disableAutopay', 'Отключить')}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Saved payment cards */}
+          {savedCards.length > 0 && (
+            <div className="rounded-xl bg-dark-800/50 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm font-medium text-dark-200">
+                  {t('admin.users.detail.subscription.savedCards', 'Сохранённые карты')}
+                </span>
+                {savedCardsLoading && (
+                  <span className="text-xs text-dark-500">
+                    {t('common.loading')}
+                  </span>
+                )}
+              </div>
+              <div className="space-y-2">
+                {savedCards.map((card) => (
+                  <div
+                    key={card.id}
+                    className="flex items-center justify-between rounded-lg bg-dark-700/50 px-3 py-2"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-dark-600">
+                        <span className="text-lg">💳</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-dark-200">
+                          {card.card_type} •••• {card.last4}
+                        </div>
+                        <div className="text-xs text-dark-400">
+                          {String(card.expires_month).padStart(2, '0')}/{card.expires_year}
+                          {card.is_default && (
+                            <span className="ml-2 rounded-full bg-accent-500/20 px-1.5 py-0.5 text-[10px] text-accent-400">
+                              {t('admin.users.detail.subscription.defaultCard', 'Основная')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {hasPermission('users:subscription') && (
+                      <button
+                        onClick={() =>
+                          onInlineConfirm(`deleteCard_${card.id}`, () => onDeleteSavedCard(card.id))
+                        }
+                        disabled={actionLoading}
+                        className={`rounded-lg px-2 py-1 text-xs transition-all disabled:opacity-50 ${
+                          confirmingAction === `deleteCard_${card.id}`
+                            ? 'bg-error-500 text-white'
+                            : 'text-dark-500 hover:bg-error-500/15 hover:text-error-400'
+                        }`}
+                      >
+                        {confirmingAction === `deleteCard_${card.id}`
+                          ? t('admin.users.detail.actions.areYouSure')
+                          : t('common.delete')}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Traffic Packages */}
           {selectedSub.traffic_purchases && selectedSub.traffic_purchases.length > 0 && (
             <div className="rounded-xl bg-dark-800/50 p-4">
@@ -563,7 +671,7 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                   <select
                     value={selectedTariffId || ''}
                     onChange={(e) =>
-                      onSelectedTariffIdChange(e.target.value ? parseInt(e.target.value) : null)
+                      onSelectedTariffIdChange(e.target.value ? parseInt(e.target.value, 10) : null)
                     }
                     className="input"
                   >
@@ -608,7 +716,7 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
             <select
               value={selectedTariffId || ''}
               onChange={(e) =>
-                onSelectedTariffIdChange(e.target.value ? parseInt(e.target.value) : null)
+                onSelectedTariffIdChange(e.target.value ? parseInt(e.target.value, 10) : null)
               }
               className="input"
             >

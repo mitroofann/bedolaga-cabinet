@@ -16,6 +16,7 @@ import {
   type UpdateSubscriptionRequest,
   type AdminUserGiftsResponse,
   type SubscriptionRequestRecord,
+  type SavedPaymentCard,
 } from '../api/adminUsers';
 import { promocodesApi, type PromoGroup } from '../api/promocodes';
 import { RefreshIcon, TelegramSmallIcon as TelegramIcon } from '@/components/icons';
@@ -114,6 +115,10 @@ export default function AdminUserDetail() {
   const [editingDeviceHwid, setEditingDeviceHwid] = useState<string | null>(null);
   const [editingDeviceName, setEditingDeviceName] = useState('');
   const [renameSaving, setRenameSaving] = useState(false);
+
+  // Saved cards
+  const [savedCards, setSavedCards] = useState<SavedPaymentCard[]>([]);
+  const [savedCardsLoading, setSavedCardsLoading] = useState(false);
 
   // Gifts
   const [giftsData, setGiftsData] = useState<AdminUserGiftsResponse | null>(null);
@@ -314,9 +319,22 @@ export default function AdminUserDetail() {
     [devicesQuery.refetch],
   );
 
+  const loadSavedCards = async () => {
+    if (!userId || !selectedSub) return;
+    setSavedCardsLoading(true);
+    try {
+      const cards = await adminUsersApi.getSavedCards(userId, selectedSub.id);
+      setSavedCards(cards);
+    } catch {
+      // Silent fail - cards are optional info
+    } finally {
+      setSavedCardsLoading(false);
+    }
+  };
+
   const loadSubscriptionData = useCallback(async () => {
-    await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices()]);
-  }, [loadPanelInfo, loadNodeUsage, loadDevices]);
+    await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices(), loadSavedCards()]);
+  }, [loadPanelInfo, loadNodeUsage, loadDevices, loadSavedCards]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // (handleTicketReply / handleTicketStatusChange + selected-ticket/scroll
   // useEffects moved into TicketsTab.tsx)
@@ -662,6 +680,35 @@ export default function AdminUserDetail() {
     }
   };
 
+  const handleDisableAutopay = async () => {
+    if (!userId || !selectedSub) return;
+    setActionLoading(true);
+    try {
+      await adminUsersApi.disableAutopay(userId, selectedSub.id);
+      notify.success(t('admin.users.detail.subscription.autopayDisabled'), t('common.success'));
+      await loadUser();
+    } catch {
+      notify.error(t('admin.users.userActions.error'), t('common.error'));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteSavedCard = async (cardId: string) => {
+    if (!userId || !selectedSub) return;
+    setActionLoading(true);
+    try {
+      await adminUsersApi.deleteSavedCard(userId, cardId, selectedSub.id);
+      notify.success(t('admin.users.detail.subscription.cardDeleted'), t('common.success'));
+      await loadSavedCards();
+      await loadUser();
+    } catch {
+      notify.error(t('admin.users.userActions.error'), t('common.error'));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDisableUser = async () => {
     if (!userId) return;
     setActionLoading(true);
@@ -912,6 +959,8 @@ export default function AdminUserDetail() {
             requestHistoryExpanded={requestHistoryExpanded}
             onRequestHistoryExpandedChange={setRequestHistoryExpanded}
             onRequestHistorySubIdChange={setRequestHistorySubId}
+            savedCards={savedCards}
+            savedCardsLoading={savedCardsLoading}
             actionLoading={actionLoading}
             confirmingAction={confirmingAction}
             onInlineConfirm={handleInlineConfirm}
@@ -920,6 +969,9 @@ export default function AdminUserDetail() {
             onAddTraffic={handleAddTraffic}
             onRemoveTraffic={handleRemoveTraffic}
             onResetDevices={handleResetDevices}
+            onDisableAutopay={handleDisableAutopay}
+            onLoadSavedCards={loadSavedCards}
+            onDeleteSavedCard={handleDeleteSavedCard}
             onDeleteDevice={handleDeleteDevice}
             onRenameDevice={handleRenameDevice}
             onLoadDevices={loadDevices}
