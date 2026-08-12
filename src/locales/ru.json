@@ -4096,7 +4096,9 @@
           "autopayDisabled": "Автопродление отключено",
           "savedCards": "Сохранённые карты",
           "defaultCard": "Основная",
-          "cardDeleted": "Карта удалена"
+          "cardDeleted": "Карта удалена",
+          "noCards": "Нет карт",
+          "noCardsMessage": "У пользователя нет сохранённых карт"
         },
         "balance": {
           "current": "Текущий баланс",

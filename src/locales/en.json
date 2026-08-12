@@ -3699,7 +3699,9 @@
           "autopayDisabled": "Auto-renewal disabled",
           "savedCards": "Saved cards",
           "defaultCard": "Default",
-          "cardDeleted": "Card deleted"
+          "cardDeleted": "Card deleted",
+          "noCards": "No cards",
+          "noCardsMessage": "User has no saved cards"
         },
         "balance": {
           "current": "Current balance",

@@ -480,13 +480,18 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
           </div>
 
           {/* Saved payment cards */}
-          {savedCards.length > 0 && (
-            <div className="rounded-xl bg-dark-800/50 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm font-medium text-dark-200">
-                  {t('admin.users.detail.subscription.savedCards', 'Сохранённые карты')}
+          <div className="rounded-xl bg-dark-800/50 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-dark-200">
+                {t('admin.users.detail.subscription.savedCards', 'Сохранённые карты')}
+              </span>
+              {savedCards.length === 0 && (
+                <span className="text-xs text-dark-500">
+                  {t('admin.users.detail.subscription.noCards', 'Нет карт')}
                 </span>
-              </div>
+              )}
+            </div>
+            {savedCards.length > 0 ? (
               <div className="space-y-2">
                 {savedCards.map((card) => (
                   <div
@@ -531,8 +536,12 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-8 text-sm text-dark-500">
+                {t('admin.users.detail.subscription.noCardsMessage', 'У пользователя нет сохранённых карт')}
+              </div>
+            )}
+          </div>
 
           {/* Traffic Packages */}
           {selectedSub.traffic_purchases && selectedSub.traffic_purchases.length > 0 && (
