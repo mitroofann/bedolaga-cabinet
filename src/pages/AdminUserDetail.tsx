@@ -344,10 +344,13 @@ export default function AdminUserDetail() {
 
   // Update saved cards when selected subscription changes
   useEffect(() => {
-    if (selectedSub) {
-      setSavedCards(selectedSub.saved_cards || []);
+    if (user && activeSubscriptionId) {
+      const sub = user.subscriptions.find(s => s.id === activeSubscriptionId);
+      if (sub) {
+        setSavedCards(sub.saved_cards || []);
+      }
     }
-  }, [selectedSub?.id, selectedSub?.saved_cards]);
+  }, [activeSubscriptionId, user?.subscriptions]);
   useEffect(() => {
     if (!requestHistoryExpanded || requestHistorySubId === null) return;
     setRequestHistory([]);
@@ -701,7 +704,7 @@ export default function AdminUserDetail() {
     try {
       await adminUsersApi.deleteSavedCard(userId, cardId, selectedSub.id);
       notify.success(t('admin.users.detail.subscription.cardDeleted'), t('common.success'));
-      await loadSavedCards();
+      // Refresh user data to update the subscription
       await loadUser();
     } catch {
       notify.error(t('admin.users.userActions.error'), t('common.error'));
@@ -961,7 +964,6 @@ export default function AdminUserDetail() {
             onRequestHistoryExpandedChange={setRequestHistoryExpanded}
             onRequestHistorySubIdChange={setRequestHistorySubId}
             savedCards={savedCards}
-            savedCardsLoading={savedCardsLoading}
             actionLoading={actionLoading}
             confirmingAction={confirmingAction}
             onInlineConfirm={handleInlineConfirm}
@@ -971,7 +973,6 @@ export default function AdminUserDetail() {
             onRemoveTraffic={handleRemoveTraffic}
             onResetDevices={handleResetDevices}
             onDisableAutopay={handleDisableAutopay}
-            onLoadSavedCards={loadSavedCards}
             onDeleteSavedCard={handleDeleteSavedCard}
             onDeleteDevice={handleDeleteDevice}
             onRenameDevice={handleRenameDevice}

@@ -124,7 +124,6 @@ export interface SubscriptionTabProps {
 
   // Saved cards
   savedCards: SavedPaymentCard[];
-  savedCardsLoading: boolean;
 
   // Mutation handlers (all parent-owned)
   actionLoading: boolean;
@@ -206,7 +205,6 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     onResetDevices,
     onCancelSbpRecurring,
     onDisableAutopay,
-    onLoadSavedCards,
     onDeleteSavedCard,
     onDeleteDevice,
     onRenameDevice,
@@ -217,9 +215,8 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     formatDate,
     locale,
   } = props;
-  // Suppress unused prop warnings - these are called by parent component
+  // Suppress activeSubscriptionId-unused; the parent uses it for query keys.
   void activeSubscriptionId;
-  void onLoadSavedCards;
 
   return (
     <div className="space-y-4">
