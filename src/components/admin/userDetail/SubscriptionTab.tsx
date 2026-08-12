@@ -136,7 +136,6 @@ export interface SubscriptionTabProps {
   onResetDevices: () => Promise<void>;
   onCancelSbpRecurring: () => Promise<void>;
   onDisableAutopay: () => Promise<void>;
-  onLoadSavedCards: () => Promise<void>;
   onDeleteSavedCard: (cardId: string) => Promise<void>;
   onDeleteDevice: (hwid: string) => Promise<void>;
   onRenameDevice: (hwid: string) => Promise<void>;
@@ -194,7 +193,6 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     onRequestHistoryExpandedChange,
     onRequestHistorySubIdChange,
     savedCards,
-    savedCardsLoading,
     actionLoading,
     confirmingAction,
     onInlineConfirm,
@@ -488,11 +486,6 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                 <span className="text-sm font-medium text-dark-200">
                   {t('admin.users.detail.subscription.savedCards', 'Сохранённые карты')}
                 </span>
-                {savedCardsLoading && (
-                  <span className="text-xs text-dark-500">
-                    {t('common.loading')}
-                  </span>
-                )}
               </div>
               <div className="space-y-2">
                 {savedCards.map((card) => (
