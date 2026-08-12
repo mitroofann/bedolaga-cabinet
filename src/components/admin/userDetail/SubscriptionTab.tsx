@@ -220,12 +220,6 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
   // Suppress activeSubscriptionId-unused; the parent uses it for query keys.
   void activeSubscriptionId;
 
-  // DEBUG: Log subscription data
-  console.log('SubscriptionTab - selectedSub:', selectedSub);
-  console.log('SubscriptionTab - autopay_enabled:', selectedSub?.autopay_enabled);
-  console.log('SubscriptionTab - saved_cards:', savedCards);
-  console.log('SubscriptionTab - sbp_recurring_status:', selectedSub?.sbp_recurring_status);
-
   return (
     <div className="space-y-4">
       {/* Multi-subscription: Level 1 — subscription list */}
