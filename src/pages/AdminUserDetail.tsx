@@ -326,25 +326,20 @@ export default function AdminUserDetail() {
 
   const loadSavedCards = async () => {
     if (!userId || !selectedSub) return;
-    setSavedCardsLoading(true);
-    try {
-      const cards = await adminUsersApi.getSavedCards(userId, selectedSub.id);
-      console.log('=== SAVED CARDS DEBUG ===');
-      console.log('Cards loaded:', cards);
-      console.log('Cards length:', cards?.length);
-      console.log('First card:', cards?.[0]);
-      console.log('User object saved_cards:', user?.subscriptions?.find(s => s.id === selectedSub.id)?.saved_cards);
-      setSavedCards(cards);
-    } catch (err) {
-      console.error('ERROR loading saved cards:', err);
-    } finally {
-      setSavedCardsLoading(false);
-    }
+    // saved_cards already come from the user subscription object,
+    // no need for a separate API call
+    console.log('=== SAVED CARDS DEBUG ===');
+    console.log('Selected sub saved_cards:', selectedSub.saved_cards);
+    setSavedCards(selectedSub.saved_cards || []);
   };
 
   const loadSubscriptionData = useCallback(async () => {
-    await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices(), loadSavedCards()]);
-  }, [loadPanelInfo, loadNodeUsage, loadDevices, loadSavedCards]); // eslint-disable-line react-hooks/exhaustive-deps
+    await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices()]);
+    // Load saved cards from the selected subscription object
+    if (selectedSub) {
+      loadSavedCards();
+    }
+  }, [loadPanelInfo, loadNodeUsage, loadDevices, selectedSub]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // (handleTicketReply / handleTicketStatusChange + selected-ticket/scroll
   // useEffects moved into TicketsTab.tsx)
@@ -356,7 +351,12 @@ export default function AdminUserDetail() {
     // user data is auto-loaded by userQuery (enabled when userId is valid)
   }, [userId, navigate]);
 
-  // Reload request history when the request-history subscription selector changes
+  // Update saved cards when selected subscription changes
+  useEffect(() => {
+    if (selectedSub) {
+      loadSavedCards();
+    }
+  }, [selectedSub?.id, selectedSub?.saved_cards]);
   useEffect(() => {
     if (!requestHistoryExpanded || requestHistorySubId === null) return;
     setRequestHistory([]);
