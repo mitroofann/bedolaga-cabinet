@@ -323,9 +323,12 @@ export default function AdminUserDetail() {
     if (!userId || !selectedSub) return;
     setSavedCardsLoading(true);
     try {
+      console.log('DEBUG: Loading saved cards for user', userId, 'sub', selectedSub.id);
       const cards = await adminUsersApi.getSavedCards(userId, selectedSub.id);
+      console.log('DEBUG: Loaded saved cards:', cards);
       setSavedCards(cards);
-    } catch {
+    } catch (error) {
+      console.error('ERROR loading saved cards:', error);
       // Silent fail - cards are optional info
     } finally {
       setSavedCardsLoading(false);
@@ -333,6 +336,7 @@ export default function AdminUserDetail() {
   };
 
   const loadSubscriptionData = useCallback(async () => {
+    console.log('DEBUG: loadSubscriptionData called, loading saved cards...');
     await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices(), loadSavedCards()]);
   }, [loadPanelInfo, loadNodeUsage, loadDevices, loadSavedCards]); // eslint-disable-line react-hooks/exhaustive-deps
 
