@@ -118,7 +118,6 @@ export default function AdminUserDetail() {
 
   // Saved cards
   const [savedCards, setSavedCards] = useState<SavedPaymentCard[]>([]);
-  const [savedCardsLoading, setSavedCardsLoading] = useState(false);
 
   // Gifts
   const [giftsData, setGiftsData] = useState<AdminUserGiftsResponse | null>(null);
@@ -324,22 +323,14 @@ export default function AdminUserDetail() {
     [devicesQuery.refetch],
   );
 
-  const loadSavedCards = async () => {
-    if (!userId || !selectedSub) return;
-    // saved_cards already come from the user subscription object,
-    // no need for a separate API call
-    console.log('=== SAVED CARDS DEBUG ===');
-    console.log('Selected sub saved_cards:', selectedSub.saved_cards);
-    setSavedCards(selectedSub.saved_cards || []);
-  };
-
   const loadSubscriptionData = useCallback(async () => {
     await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices()]);
     // Load saved cards from the selected subscription object
-    if (selectedSub) {
-      loadSavedCards();
+    if (userId && user?.subscriptions?.length) {
+      const sub = user.subscriptions.find(s => s.id === activeSubscriptionId) || user.subscriptions[0];
+      setSavedCards(sub.saved_cards || []);
     }
-  }, [loadPanelInfo, loadNodeUsage, loadDevices, selectedSub]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [loadPanelInfo, loadNodeUsage, loadDevices, userId, activeSubscriptionId, user?.subscriptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // (handleTicketReply / handleTicketStatusChange + selected-ticket/scroll
   // useEffects moved into TicketsTab.tsx)
@@ -354,7 +345,7 @@ export default function AdminUserDetail() {
   // Update saved cards when selected subscription changes
   useEffect(() => {
     if (selectedSub) {
-      loadSavedCards();
+      setSavedCards(selectedSub.saved_cards || []);
     }
   }, [selectedSub?.id, selectedSub?.saved_cards]);
   useEffect(() => {
