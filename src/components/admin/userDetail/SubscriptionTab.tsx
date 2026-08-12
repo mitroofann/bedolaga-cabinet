@@ -217,8 +217,9 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     formatDate,
     locale,
   } = props;
-  // Suppress activeSubscriptionId-unused; the parent uses it for query keys.
+  // Suppress unused prop warnings - these are called by parent component
   void activeSubscriptionId;
+  void onLoadSavedCards;
 
   return (
     <div className="space-y-4">
