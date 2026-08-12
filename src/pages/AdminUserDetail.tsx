@@ -147,7 +147,12 @@ export default function AdminUserDetail() {
   });
 
   useEffect(() => {
-    if (userQuery.data) setUser(userQuery.data);
+    if (userQuery.data) {
+      setUser(userQuery.data);
+      console.log('=== USER DATA DEBUG ===');
+      console.log('User subscriptions:', userQuery.data.subscriptions);
+      console.log('User subscription saved_cards:', userQuery.data.subscriptions?.map(s => ({ id: s.id, cards: s.saved_cards })));
+    }
   }, [userQuery.data]);
 
   useEffect(() => {
@@ -324,9 +329,14 @@ export default function AdminUserDetail() {
     setSavedCardsLoading(true);
     try {
       const cards = await adminUsersApi.getSavedCards(userId, selectedSub.id);
+      console.log('=== SAVED CARDS DEBUG ===');
+      console.log('Cards loaded:', cards);
+      console.log('Cards length:', cards?.length);
+      console.log('First card:', cards?.[0]);
+      console.log('User object saved_cards:', user?.subscriptions?.find(s => s.id === selectedSub.id)?.saved_cards);
       setSavedCards(cards);
-    } catch {
-      // Silent fail - cards are optional info
+    } catch (err) {
+      console.error('ERROR loading saved cards:', err);
     } finally {
       setSavedCardsLoading(false);
     }
