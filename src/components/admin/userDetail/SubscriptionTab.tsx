@@ -443,20 +443,22 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
           )}
 
           {/* Autopay settings */}
-          {selectedSub.autopay_enabled && (
-            <div className="rounded-xl bg-dark-800/50 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-medium text-dark-200">
-                    {t('admin.users.detail.subscription.autopayEnabled', 'Автопродление')}
-                  </div>
-                  <div className="mt-0.5 text-xs text-dark-400">
-                    {selectedSub.autopay_days_before
-                      ? t('admin.users.detail.subscription.autopayDaysBefore', 'За {{days}} дней до окончания', { days: selectedSub.autopay_days_before })
-                      : t('admin.users.detail.subscription.autopayActive', 'Включено')}
-                  </div>
+          <div className="rounded-xl bg-dark-800/50 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-dark-200">
+                  {t('admin.users.detail.subscription.autopayTitle', 'Автопродление')}
                 </div>
-                {hasPermission('users:subscription') && (
+                <div className="mt-0.5 text-xs text-dark-400">
+                  {selectedSub.autopay_enabled
+                    ? (selectedSub.autopay_days_before
+                        ? t('admin.users.detail.subscription.autopayDaysBefore', 'За {{days}} дней до окончания', { days: selectedSub.autopay_days_before })
+                        : t('admin.users.detail.subscription.autopayActive', 'Включено'))
+                    : t('admin.users.detail.subscription.autopayDisabledStatus', 'Отключено')}
+                </div>
+              </div>
+              {hasPermission('users:subscription') && (
+                selectedSub.autopay_enabled ? (
                   <button
                     onClick={() =>
                       onInlineConfirm(`disableAutopay_${selectedSub.id}`, onDisableAutopay)
@@ -472,10 +474,14 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                       ? t('admin.users.detail.actions.areYouSure')
                       : t('admin.users.detail.subscription.disableAutopay', 'Отключить')}
                   </button>
-                )}
-              </div>
+                ) : (
+                  <span className="rounded-full bg-dark-600 px-2 py-0.5 text-[10px] font-medium text-dark-400">
+                    {t('admin.users.detail.subscription.autopayOff', 'Выкл')}
+                  </span>
+                )
+              )}
             </div>
-          )}
+          </div>
 
           {/* Saved payment cards */}
           {savedCards.length > 0 && (
