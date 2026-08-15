@@ -2090,8 +2090,15 @@
         "Telegram Widget Request Access": "请求访问权限",
         "telegramOidcEnabled": "启用 OIDC",
         "telegramOidcClientId": "Client ID（机器人 ID）",
-        "telegramOidcClientSecret": "Client Secret"
+        "telegramOidcClientSecret": "Client Secret",
+        "Stale Sub Enabled": "检查过期订阅",
+        "Stale Sub Check Time": "检查时间",
+        "Stale Sub Last Seen Hours": "近期活动（小时）",
+        "Stale Sub Last Request Hours": "订阅更新限制（小时）",
+        "Stale Sub Cooldown Days": "通知间隔（天）",
+        "Stale Sub Recommend Apps": "推荐 Happ/INCY"
       },
+      "staleSubHint": "机器人每天检查一次，看用户是否有正在使用但长期未请求服务器列表的设备（订阅已“过期”）。这些用户会收到通知，建议手动更新订阅并推荐 Happ/INCY 应用。重复通知的发送频率不会高于每 COOLDOWN_DAYS 天一次。",
       "offlineConv": "离线转化",
       "apiKey": "API 密钥",
       "legalFooter": "法律页脚",

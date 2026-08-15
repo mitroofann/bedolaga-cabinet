@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SettingDefinition } from '../../api/adminSettings';
+import type { SettingDefinition } from '../../api/adminSettings';
 import { CheckIcon, CloseIcon, EditIcon } from './icons';
 
 interface SettingInputProps {
@@ -28,7 +28,10 @@ function isListOrJsonKey(key: string): boolean {
     lowerKey.includes('_template') ||
     lowerKey.includes('_periods') ||
     lowerKey.includes('_discounts') ||
-    lowerKey.includes('_packages')
+    lowerKey.includes('_packages') ||
+    // Время вида HH:MM (например, NOTIFY_STALE_SUB_CHECK_TIME) — нативное
+    // время-поле вместо раскрытия в большой редактируемый блок.
+    lowerKey.endsWith('_hh')
   );
 }
 
@@ -44,6 +47,17 @@ export function SettingInput({ setting, onUpdate, disabled }: SettingInputProps)
   // never pre-filled with the masked value, so leaving the field empty means "keep current".
   const needsTextarea =
     !setting.is_secret && (isLongValue(currentValue) || isListOrJsonKey(setting.key));
+
+  // Числовые настройки и время HH:MM получают соответствующий инпут-тип
+  // (NOTIFY_STALE_SUB_CHECK_TIME и т.п. — нативное время-поле).
+  const isTimeFormat = setting.hint?.format === 'HH:MM';
+  const inputType = setting.is_secret
+    ? 'password'
+    : isTimeFormat
+      ? 'time'
+      : setting.type === 'int' || setting.type === 'float'
+        ? 'number'
+        : 'text';
 
   // Auto-resize textarea
   useEffect(() => {
@@ -139,13 +153,7 @@ export function SettingInput({ setting, onUpdate, disabled }: SettingInputProps)
       <div className="flex items-center gap-2">
         <input
           ref={inputRef}
-          type={
-            setting.is_secret
-              ? 'password'
-              : setting.type === 'int' || setting.type === 'float'
-                ? 'number'
-                : 'text'
-          }
+          type={inputType}
           autoComplete={setting.is_secret ? 'new-password' : undefined}
           value={value}
           onChange={(e) => setValue(e.target.value)}

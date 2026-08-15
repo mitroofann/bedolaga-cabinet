@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { SettingDefinition } from '../../api/adminSettings';
+import type { SettingDefinition } from '../../api/adminSettings';
 import { cn } from '../../lib/utils';
 import { StarIcon, LockIcon, RefreshIcon } from './icons';
 import { SettingInput } from './SettingInput';
@@ -56,7 +56,10 @@ export function SettingsTableRow({
       key.includes('_list') ||
       key.includes('_json') ||
       key.includes('_periods') ||
-      key.includes('_discounts')
+      key.includes('_discounts') ||
+      // Время вида HH:MM (например, NOTIFY_STALE_SUB_CHECK_TIME) — нативное
+      // время-поле вместо раскрытия в большой редактируемый блок.
+      key.endsWith('_HH')
     );
   })();
 
@@ -139,6 +142,15 @@ export function SettingsTableRow({
           ) : (
             <div className={cn(isLongValue && 'w-full')}>
               <SettingInput setting={setting} onUpdate={onUpdate} disabled={isUpdating} />
+              {/* Подсказка формата/примера, как у остальных настроек категории */}
+              {!isLongValue && setting.hint?.format && (
+                <span className="ml-1 text-[11px] text-dark-500">
+                  {setting.hint.format}
+                  {setting.hint.example
+                    ? ` · ${t('admin.settings.example')}: ${setting.hint.example}`
+                    : ''}
+                </span>
+              )}
             </div>
           )}
 

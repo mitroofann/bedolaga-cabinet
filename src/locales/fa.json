@@ -2023,8 +2023,15 @@
         "Telegram Widget Request Access": "درخواست دسترسی",
         "telegramOidcEnabled": "فعال‌سازی OIDC",
         "telegramOidcClientId": "Client ID (شناسه ربات)",
-        "telegramOidcClientSecret": "Client Secret"
+        "telegramOidcClientSecret": "Client Secret",
+        "Stale Sub Enabled": "بررسی اشتراک‌های قدیمی",
+        "Stale Sub Check Time": "زمان بررسی",
+        "Stale Sub Last Seen Hours": "فعالیت اخیر (ساعت)",
+        "Stale Sub Last Request Hours": "محدودیت به‌روزرسانی اشتراک (ساعت)",
+        "Stale Sub Cooldown Days": "فاصله بین اعلان‌ها (روز)",
+        "Stale Sub Recommend Apps": "پیشنهاد Happ/INCY"
       },
+      "staleSubHint": "هر روز یک‌بار، ربات بررسی می‌کند که آیا کاربران دستگاه‌هایی دارند که فعالانه استفاده می‌شوند اما مدت‌هاست فهرست سرورها را درخواست نکرده‌اند (اشتراک «کهنه» شده است). این کاربران اعلانی دریافت می‌کنند که در آن توصیه می‌شود اشتراک را دستی به‌روزرسانی کنند و اپلیکیشن‌های Happ/INCY پیشنهاد می‌شود. اعلان تکراری بیش از یک بار در هر COOLDOWN_DAYS روز ارسال نمی‌شود.",
       "offlineConv": "تبدیل‌های آفلاین",
       "apiKey": "کلید API",
       "legalFooter": "پاورقی حقوقی",

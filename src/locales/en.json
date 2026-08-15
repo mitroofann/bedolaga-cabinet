@@ -2360,8 +2360,15 @@
         "Telegram Widget Request Access": "Request Access",
         "telegramOidcEnabled": "OIDC Enabled",
         "telegramOidcClientId": "Client ID (Bot ID)",
-        "telegramOidcClientSecret": "Client Secret"
+        "telegramOidcClientSecret": "Client Secret",
+        "Stale Sub Enabled": "Stale subscription check",
+        "Stale Sub Check Time": "Check time",
+        "Stale Sub Last Seen Hours": "Recent activity (hours)",
+        "Stale Sub Last Request Hours": "Subscription update limit (hours)",
+        "Stale Sub Cooldown Days": "Cooldown between notifications (days)",
+        "Stale Sub Recommend Apps": "Recommend Happ/INCY"
       },
+      "staleSubHint": "Once a day, the bot checks whether users have devices that are actively used but haven't requested the server list in a long time (the subscription has \"gone stale\"). These users receive a notification advising them to update the subscription manually, along with a recommendation for the Happ/INCY apps. Repeat notifications are not sent more often than once every COOLDOWN_DAYS days.",
       "offlineConv": "Offline Conversions",
       "apiKey": "API Key",
       "legalFooter": "Legal Footer",
