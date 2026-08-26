@@ -6,7 +6,7 @@ import { useAuthStore } from './store/auth';
  * Wrapper around React.lazy that auto-reloads the page when a chunk fails to load
  * (e.g. after a new deploy with different chunk hashes).
  */
-function lazyWithRetry<T extends ComponentType<unknown>>(factory: () => Promise<{ default: T }>) {
+function lazyWithRetry<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   return lazy(() =>
     factory().catch(() => {
       const key = 'chunk_reload_ts';
@@ -623,11 +623,9 @@ function App() {
         <Route
           path="/info/:slug"
           element={
-            <ProtectedRoute>
-              <LazyPage>
-                <InfoPageView />
-              </LazyPage>
-            </ProtectedRoute>
+            <LazyPage>
+              <InfoPageView publicView />
+            </LazyPage>
           }
         />
 

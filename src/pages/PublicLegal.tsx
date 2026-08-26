@@ -1,10 +1,15 @@
+import { lazy, Suspense } from 'react';
 import { uiLocale } from '@/utils/uiLocale';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { infoApi } from '../api/info';
+import { infoPagesApi } from '../api/infoPages';
 import { formatContent } from '../utils/legalContent';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+
+// Lazy so the InfoPage renderer stays in its own chunk.
+const InfoPageView = lazy(() => import('./InfoPageView'));
 
 export type PublicLegalDoc = 'offer' | 'privacy' | 'recurrent';
 
@@ -48,6 +53,16 @@ export default function PublicLegal({ doc }: PublicLegalProps) {
   const { t } = useTranslation();
   const config = DOC_CONFIG[doc];
 
+  // If an admin-configured InfoPage replaces this tab (offer/privacy), serve it
+  // publicly instead of the built-in service document. recurrent has no mapping
+  // in ReplacesTab, so it always uses the service content.
+  const { data: tabReplacements } = useQuery({
+    queryKey: ['info-pages', 'tab-replacements'],
+    queryFn: infoPagesApi.getTabReplacements,
+    staleTime: 5 * 60 * 1000,
+  });
+  const replacementSlug = doc === 'recurrent' ? null : (tabReplacements?.[doc] ?? null);
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ['public-legal', config.queryKey],
     queryFn: config.fetch,
@@ -55,6 +70,22 @@ export default function PublicLegal({ doc }: PublicLegalProps) {
   });
 
   const title = t(config.titleKey, config.titleFallback);
+
+  // Replace the built-in document with the matching InfoPage (same public
+  // standalone rendering as /info/:slug).
+  if (replacementSlug) {
+    return (
+      <Suspense
+        fallback={
+          <div className="flex min-h-viewport items-center justify-center bg-dark-950">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
+          </div>
+        }
+      >
+        <InfoPageView slug={replacementSlug} publicView />
+      </Suspense>
+    );
+  }
 
   return (
     <div className="min-h-viewport bg-dark-950 px-4 py-8 sm:py-12">

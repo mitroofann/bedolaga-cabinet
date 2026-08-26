@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useEffect, useMemo, useRef, useState, useCallback, type ReactNode } from 'react';
+import { useParams, useNavigate, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
@@ -8,6 +8,7 @@ import { BackIcon, SearchIcon } from '@/components/icons';
 import { infoPagesApi } from '../api/infoPages';
 import { usePlatform } from '../platform/hooks/usePlatform';
 import type { FaqItem } from '../api/infoPages';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 /**
  * Sanitization config — same strict allowlist as NewsArticlePage.
@@ -281,8 +282,16 @@ function FaqView({ items }: { items: FaqItem[] }) {
   );
 }
 
-export default function InfoPageView() {
-  const { slug } = useParams<{ slug: string }>();
+interface InfoPageViewProps {
+  /** Overrides the route param: used when a public legal page renders a replacement InfoPage. */
+  slug?: string;
+  /** Render standalone for unauthenticated users (own background, language switcher, back-to-login). */
+  publicView?: boolean;
+}
+
+export default function InfoPageView({ slug: slugProp, publicView = false }: InfoPageViewProps) {
+  const { slug: routeSlug } = useParams<{ slug: string }>();
+  const slug = slugProp ?? routeSlug;
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { capabilities, backButton } = usePlatform();
@@ -340,8 +349,23 @@ export default function InfoPageView() {
     return sanitizeHtml(rawContent);
   }, [page, locale, isFaq]);
 
+  // Wraps the page in a standalone public shell (own background + language
+  // switcher + max-width container) when rendered without the app Layout, e.g.
+  // for unauthenticated visitors reaching /info/:slug directly.
+  const shell = (child: ReactNode) =>
+    publicView ? (
+      <div className="min-h-viewport bg-dark-950 px-4 py-8 sm:py-12">
+        <div className="fixed right-4 top-4 z-50">
+          <LanguageSwitcher />
+        </div>
+        <div className="mx-auto w-full max-w-3xl">{child}</div>
+      </div>
+    ) : (
+      child
+    );
+
   if (isLoading) {
-    return (
+    return shell(
       <div className="space-y-6">
         <div className="skeleton h-8 w-32 rounded-lg" />
         <div className="skeleton h-10 w-3/4 rounded-lg" />
@@ -351,16 +375,16 @@ export default function InfoPageView() {
           <div className="skeleton h-4 w-5/6 rounded" />
           <div className="skeleton h-4 w-4/6 rounded" />
         </div>
-      </div>
+      </div>,
     );
   }
 
   if (isError || !page) {
-    return (
+    return shell(
       <div className="space-y-6">
         {!capabilities.hasBackButton && (
           <button
-            onClick={() => navigate('/info')}
+            onClick={() => navigate(publicView ? '/login' : '/info')}
             className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-dark-700 bg-dark-800 transition-colors hover:border-dark-600"
             aria-label={t('common.back')}
           >
@@ -370,11 +394,18 @@ export default function InfoPageView() {
         <div className="rounded-xl border border-dark-700 bg-dark-800/50 p-8 text-center text-dark-400">
           {t('admin.infoPages.notFound')}
         </div>
-      </div>
+        {publicView && (
+          <div className="mt-6">
+            <Link to="/login" className="btn-secondary">
+              {t('auth.backToLogin', 'Вернуться ко входу')}
+            </Link>
+          </div>
+        )}
+      </div>,
     );
   }
 
-  return (
+  return shell(
     <div className="space-y-6">
       {/* Back button */}
       {!capabilities.hasBackButton && (
@@ -406,6 +437,15 @@ export default function InfoPageView() {
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         />
       )}
-    </div>
+
+      {/* Back to login (public standalone view) */}
+      {publicView && (
+        <div className="mt-6">
+          <Link to="/login" className="btn-secondary">
+            {t('auth.backToLogin', 'Вернуться ко входу')}
+          </Link>
+        </div>
+      )}
+    </div>,
   );
 }
