@@ -29,6 +29,7 @@ import { ActivityTab } from '../components/admin/userDetail/ActivityTab';
 import { TicketsTab } from '../components/admin/userDetail/TicketsTab';
 import { InfoTab } from '../components/admin/userDetail/InfoTab';
 import { SubscriptionTab } from '../components/admin/userDetail/SubscriptionTab';
+import { getApiErrorMessage } from '../utils/api-error';
 import { toNumber } from '../utils/inputHelpers';
 import { usePermissionStore } from '../store/permissions';
 
@@ -150,7 +151,10 @@ export default function AdminUserDetail() {
       setUser(userQuery.data);
       console.log('=== USER DATA DEBUG ===');
       console.log('User subscriptions:', userQuery.data.subscriptions);
-      console.log('User subscription saved_cards:', userQuery.data.subscriptions?.map(s => ({ id: s.id, cards: s.saved_cards })));
+      console.log(
+        'User subscription saved_cards:',
+        userQuery.data.subscriptions?.map((s) => ({ id: s.id, cards: s.saved_cards })),
+      );
     }
   }, [userQuery.data]);
 
@@ -327,10 +331,18 @@ export default function AdminUserDetail() {
     await Promise.all([loadPanelInfo(), loadNodeUsage(), loadDevices()]);
     // Load saved cards from the selected subscription object
     if (userId && user?.subscriptions?.length) {
-      const sub = user.subscriptions.find(s => s.id === activeSubscriptionId) || user.subscriptions[0];
+      const sub =
+        user.subscriptions.find((s) => s.id === activeSubscriptionId) || user.subscriptions[0];
       setSavedCards(sub.saved_cards || []);
     }
-  }, [loadPanelInfo, loadNodeUsage, loadDevices, userId, activeSubscriptionId, user?.subscriptions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    loadPanelInfo,
+    loadNodeUsage,
+    loadDevices,
+    userId,
+    activeSubscriptionId,
+    user?.subscriptions,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // (handleTicketReply / handleTicketStatusChange + selected-ticket/scroll
   // useEffects moved into TicketsTab.tsx)
@@ -345,7 +357,7 @@ export default function AdminUserDetail() {
   // Update saved cards when selected subscription changes
   useEffect(() => {
     if (user && activeSubscriptionId) {
-      const sub = user.subscriptions.find(s => s.id === activeSubscriptionId);
+      const sub = user.subscriptions.find((s) => s.id === activeSubscriptionId);
       if (sub) {
         setSavedCards(sub.saved_cards || []);
       }
@@ -713,6 +725,28 @@ export default function AdminUserDetail() {
     }
   };
 
+  const handleDeleteSubscription = async () => {
+    if (!userId || !selectedSub) return;
+    setActionLoading(true);
+    try {
+      // Активную платную подписку сервер по умолчанию бережёт — админ уже
+      // подтвердил намерение кнопкой, поэтому просим удалить именно её.
+      const force = Boolean(selectedSub.is_active) && !selectedSub.is_trial;
+      await adminUsersApi.deleteSubscription(userId, selectedSub.id, force);
+      notify.success(t('admin.users.detail.subscription.deleted'), t('common.success'));
+      setSubscriptionDetailView(false);
+      await loadUser();
+    } catch (err) {
+      // Отказы тут осмысленные и действенные: открытый временный доступ
+      // (409, «сначала заверши или восстанови grace»), активная платная без
+      // force (409), подписки нет (404). Общее «Ошибка» оставило бы админа
+      // гадать, почему кнопка не сработала, — показываем текст сервера.
+      notify.error(getApiErrorMessage(err, t('admin.users.userActions.error')), t('common.error'));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDisableUser = async () => {
     if (!userId) return;
     setActionLoading(true);
@@ -925,6 +959,7 @@ export default function AdminUserDetail() {
             userSubscriptions={userSubscriptions}
             selectedSub={selectedSub}
             onCancelSbpRecurring={handleCancelSbpRecurring}
+            onDeleteSubscription={handleDeleteSubscription}
             activeSubscriptionId={activeSubscriptionId}
             onActiveSubscriptionChange={setActiveSubscriptionId}
             subscriptionDetailView={subscriptionDetailView}

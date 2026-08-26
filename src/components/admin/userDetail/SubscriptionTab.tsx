@@ -137,6 +137,7 @@ export interface SubscriptionTabProps {
   onCancelSbpRecurring: () => Promise<void>;
   onDisableAutopay: () => Promise<void>;
   onDeleteSavedCard: (cardId: string) => Promise<void>;
+  onDeleteSubscription: () => Promise<void>;
   onDeleteDevice: (hwid: string) => Promise<void>;
   onRenameDevice: (hwid: string) => Promise<void>;
   onLoadDevices: () => Promise<void>;
@@ -204,6 +205,7 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
     onCancelSbpRecurring,
     onDisableAutopay,
     onDeleteSavedCard,
+    onDeleteSubscription,
     onDeleteDevice,
     onRenameDevice,
     onLoadDevices,
@@ -447,14 +449,18 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                 </div>
                 <div className="mt-0.5 text-xs text-dark-400">
                   {selectedSub.autopay_enabled
-                    ? (selectedSub.autopay_days_before
-                        ? t('admin.users.detail.subscription.autopayDaysBefore', 'За {{days}} дней до окончания', { days: selectedSub.autopay_days_before })
-                        : t('admin.users.detail.subscription.autopayActive', 'Включено'))
+                    ? selectedSub.autopay_days_before
+                      ? t(
+                          'admin.users.detail.subscription.autopayDaysBefore',
+                          'За {{days}} дней до окончания',
+                          { days: selectedSub.autopay_days_before },
+                        )
+                      : t('admin.users.detail.subscription.autopayActive', 'Включено')
                     : t('admin.users.detail.subscription.autopayDisabledStatus', 'Отключено')}
                 </div>
               </div>
-              {hasPermission('users:subscription') && (
-                selectedSub.autopay_enabled ? (
+              {hasPermission('users:subscription') &&
+                (selectedSub.autopay_enabled ? (
                   <button
                     onClick={() =>
                       onInlineConfirm(`disableAutopay_${selectedSub.id}`, onDisableAutopay)
@@ -474,8 +480,7 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
                   <span className="rounded-full bg-dark-600 px-2 py-0.5 text-[10px] font-medium text-dark-400">
                     {t('admin.users.detail.subscription.autopayOff', 'Выкл')}
                   </span>
-                )
-              )}
+                ))}
             </div>
           </div>
 
@@ -538,10 +543,48 @@ export function SubscriptionTab(props: SubscriptionTabProps) {
               </div>
             ) : (
               <div className="text-center py-8 text-sm text-dark-500">
-                {t('admin.users.detail.subscription.noCardsMessage', 'У пользователя нет сохранённых карт')}
+                {t(
+                  'admin.users.detail.subscription.noCardsMessage',
+                  'У пользователя нет сохранённых карт',
+                )}
               </div>
             )}
           </div>
+
+          {/* Delete this subscription — in multi-tariff mode spent trials
+              pile up in the card, and removing one used to be possible
+              only through the bulk-actions screen. */}
+          {hasPermission('users:subscription') && (
+            <div className="rounded-xl bg-dark-800/50 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-medium text-dark-200">
+                    {t('admin.users.detail.subscription.deleteTitle')}
+                  </div>
+                  <div className="mt-0.5 text-xs text-dark-400">
+                    {t('admin.users.detail.subscription.deleteHint')}
+                  </div>
+                </div>
+                <button
+                  // Per-subscription confirm key: an armed confirm must not
+                  // survive switching to another subscription in the picker.
+                  onClick={() =>
+                    onInlineConfirm(`deleteSubscription_${selectedSub.id}`, onDeleteSubscription)
+                  }
+                  disabled={actionLoading}
+                  className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-all disabled:opacity-50 ${
+                    confirmingAction === `deleteSubscription_${selectedSub.id}`
+                      ? 'bg-error-500 text-white'
+                      : 'bg-error-500/15 text-error-400 hover:bg-error-500/25'
+                  }`}
+                >
+                  {confirmingAction === `deleteSubscription_${selectedSub.id}`
+                    ? t('admin.users.detail.actions.areYouSure')
+                    : t('admin.users.detail.subscription.deleteButton')}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Traffic Packages */}
           {selectedSub.traffic_purchases && selectedSub.traffic_purchases.length > 0 && (
