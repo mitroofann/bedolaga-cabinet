@@ -948,6 +948,77 @@
       else if (!reduce) { tick(); }
     });
   })();
+
+  // ============ Campaign parameter forwarding ============
+  (function() {
+    'use strict';
+
+    const CAMPAIGN_KEY = 'campaign_slug';
+    const CAMPAIGN_TTL_KEY = 'campaign_slug_ttl';
+    const TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+    const SLUG_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
+
+    // Capture campaign from URL (?s= or ?campaign=)
+    function captureCampaign() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get('s') || params.get('campaign');
+
+        if (!slug || !SLUG_PATTERN.test(slug)) return null;
+
+        localStorage.setItem(CAMPAIGN_KEY, slug);
+        localStorage.setItem(CAMPAIGN_TTL_KEY, String(Date.now() + TTL_MS));
+
+        return slug;
+      } catch {
+        return null;
+      }
+    }
+
+    // Get valid campaign from localStorage
+    function getStoredCampaign() {
+      try {
+        const slug = localStorage.getItem(CAMPAIGN_KEY);
+        if (!slug) return null;
+
+        const ttl = localStorage.getItem(CAMPAIGN_TTL_KEY);
+        if (!ttl || isNaN(Number(ttl)) || Date.now() > Number(ttl)) {
+          localStorage.removeItem(CAMPAIGN_KEY);
+          localStorage.removeItem(CAMPAIGN_TTL_KEY);
+          return null;
+        }
+
+        return slug;
+      } catch {
+        return null;
+      }
+    }
+
+    // Append campaign to all cabinet links
+    function appendCampaignToLinks() {
+      const campaign = captureCampaign() || getStoredCampaign();
+      if (!campaign) return;
+
+      const links = document.querySelectorAll('a[href*="cabinet.bulkavpn.net"]');
+      links.forEach(function(link) {
+        try {
+          const url = new URL(link.href);
+          // Don't overwrite existing campaign parameter
+          if (!url.searchParams.has('campaign')) {
+            url.searchParams.set('campaign', campaign);
+            link.href = url.toString();
+          }
+        } catch {}
+      });
+    }
+
+    // Run on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', appendCampaignToLinks);
+    } else {
+      appendCampaignToLinks();
+    }
+  })();
 </script>
 </body>
 </html>
