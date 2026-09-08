@@ -1,4 +1,5 @@
 export { AddonsTab } from './AddonsTab';
+export { CampaignFilter } from './CampaignFilter';
 export { DepositsTab } from './DepositsTab';
 export { DonutChart } from './DonutChart';
 export { DualAreaChart } from './DualAreaChart';

@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { SalesStatsParams } from '../api/adminSalesStats';
@@ -22,6 +23,7 @@ import {
 import { StatCard } from '../components/stats';
 import {
   AddonsTab,
+  CampaignFilter,
   DepositsTab,
   PaymentHealthTab,
   PeriodSelector,
@@ -69,6 +71,7 @@ function computeDelta(current: number, previous: number): Delta | null {
 export default function AdminSalesStats() {
   const { t } = useTranslation();
   const { formatWithCurrency } = useCurrency();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabId>('trials');
   const [period, setPeriod] = useState<{
@@ -77,13 +80,35 @@ export default function AdminSalesStats() {
     endDate?: string;
   }>(() => getMonthToDateRange());
 
+  // Campaign filter from URL
+  const [campaignId, setCampaignId] = useState<number | null>(() => {
+    const id = searchParams.get('campaign_id');
+    return id ? Number(id) : null;
+  });
+
+  // Sync campaign filter to URL
+  useEffect(() => {
+    const current = searchParams.get('campaign_id');
+    const target = campaignId?.toString() ?? null;
+
+    if (current !== target) {
+      if (campaignId === null) {
+        searchParams.delete('campaign_id');
+      } else {
+        searchParams.set('campaign_id', campaignId.toString());
+      }
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [campaignId, searchParams, setSearchParams]);
+
   const params: SalesStatsParams = useMemo(
     () => ({
       days: period.days,
       start_date: period.startDate,
       end_date: period.endDate,
+      campaign_id: campaignId ?? undefined,
     }),
-    [period.days, period.startDate, period.endDate],
+    [period.days, period.startDate, period.endDate, campaignId],
   );
 
   const isValidPeriod = period.days !== undefined || (!!period.startDate && !!period.endDate);
@@ -158,6 +183,9 @@ export default function AdminSalesStats() {
 
       {/* Period selector */}
       <PeriodSelector value={period} onChange={setPeriod} />
+
+      {/* Campaign filter */}
+      <CampaignFilter value={campaignId} onChange={setCampaignId} />
 
       {/* Summary cards */}
       {summaryError && (

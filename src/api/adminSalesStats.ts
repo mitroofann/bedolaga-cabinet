@@ -6,6 +6,7 @@ export interface SalesStatsParams {
   days?: number;
   start_date?: string;
   end_date?: string;
+  campaign_id?: number; // Filter by campaign
 }
 
 // ============ Summary ============
