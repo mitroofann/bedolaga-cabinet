@@ -38,17 +38,21 @@ type Delta = { percent: number; trend: 'up' | 'down' | 'stable' };
 
 /** Same-length window immediately before the selected one, for period-over-period
  * deltas. Returns null for "all time" — nothing meaningful to compare against. */
-function getPreviousPeriodParams(period: {
-  days?: number;
-  startDate?: string;
-  endDate?: string;
-}): SalesStatsParams | null {
+function getPreviousPeriodParams(
+  period: {
+    days?: number;
+    startDate?: string;
+    endDate?: string;
+  },
+  campaignId?: number | null,
+): SalesStatsParams | null {
   if (period.startDate && period.endDate) {
     const start = new Date(period.startDate).getTime();
     const length = new Date(period.endDate).getTime() - start;
     return {
       start_date: new Date(start - length).toISOString(),
       end_date: new Date(start).toISOString(),
+      campaign_id: campaignId ?? undefined,
     };
   }
   if (period.days !== undefined && period.days > 0) {
@@ -57,6 +61,7 @@ function getPreviousPeriodParams(period: {
     return {
       start_date: new Date(now - 2 * period.days * dayMs).toISOString(),
       end_date: new Date(now - period.days * dayMs).toISOString(),
+      campaign_id: campaignId ?? undefined,
     };
   }
   return null;
@@ -125,7 +130,10 @@ export default function AdminSalesStats() {
     placeholderData: keepPreviousData,
   });
 
-  const prevParams = useMemo(() => getPreviousPeriodParams(period), [period]);
+  const prevParams = useMemo(
+    () => getPreviousPeriodParams(period, campaignId),
+    [period, campaignId],
+  );
   const { data: prevSummary } = useQuery({
     queryKey: ['sales-stats', 'summary', prevParams],
     queryFn: () => salesStatsApi.getSummary(prevParams as SalesStatsParams),
