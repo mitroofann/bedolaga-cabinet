@@ -10,6 +10,7 @@ import { brandingApi } from '../api/branding';
 import { partnerApi } from '../api/partners';
 import { withdrawalApi } from '../api/withdrawals';
 import { CampaignCard } from '../components/partner/CampaignCard';
+import { useWholeAmount } from '../components/referral/ReferralPromoBanner';
 import { useCurrency } from '../hooks/useCurrency';
 import { StatCard } from '@/components/stats';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
@@ -261,7 +262,8 @@ export function RewardSettings({
 
 export function ProgrammeTerms({ terms }: { terms: ReferralTerms }) {
   const { t } = useTranslation();
-  const { formatAmount, currencySymbol } = useCurrency();
+  const { currencySymbol } = useCurrency();
+  const formatWhole = useWholeAmount();
   const isTiers = terms.levels_mode === 'tiers';
   const levels = terms.levels ?? [];
   // Строки-описания остаются запасным путём: они приходят из того же источника
@@ -285,7 +287,7 @@ export function ProgrammeTerms({ terms }: { terms: ReferralTerms }) {
         {maxCommissionKopeks > 0 && (
           <p className="mt-3 text-sm font-medium text-dark-200">
             {t('referral.promo.title', {
-              max: `${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`,
+              max: `${formatWhole(maxCommissionKopeks / 100)} ${currencySymbol}`,
             })}
           </p>
         )}
@@ -378,7 +380,7 @@ export function ProgrammeTerms({ terms }: { terms: ReferralTerms }) {
         <p className="mt-4 text-sm text-dark-300">
           {t('referral.terms.maxCommission')}:{' '}
           <span className="font-medium text-dark-100">
-            {formatAmount(maxCommissionKopeks / 100)} {currencySymbol}
+            {formatWhole(maxCommissionKopeks / 100)} {currencySymbol}
           </span>
         </p>
       )}
@@ -413,7 +415,8 @@ export function tierProgressText(
 export default function Referral() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { formatAmount, currencySymbol, formatPositive, formatWithCurrency } = useCurrency();
+  const { currencySymbol, formatPositive, formatWithCurrency } = useCurrency();
+  const formatWhole = useWholeAmount();
   const queryClient = useQueryClient();
   const [copiedLink, setCopiedLink] = useState<'cabinet' | 'bot' | null>(null);
   const [rewardChoiceError, setRewardChoiceError] = useState<string | null>(null);
@@ -562,14 +565,14 @@ export default function Referral() {
           <div className="mb-4">
             <p className="text-sm font-medium text-dark-200">
               {t('referral.promo.title', {
-                max: `${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`,
+                max: `${formatWhole(maxCommissionKopeks / 100)} ${currencySymbol}`,
               })}
             </p>
             <p className="mt-1 text-sm leading-snug text-dark-400 whitespace-pre-line">
               {t('referral.promo.description', {
                 percent: terms.commission_percent,
-                minTopup: `${formatAmount(terms.minimum_topup_rubles)} ${currencySymbol}`,
-                maxCommission: `${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`,
+                minTopup: `${formatWhole(terms.minimum_topup_rubles)} ${currencySymbol}`,
+                maxCommission: `${formatWhole(maxCommissionKopeks / 100)} ${currencySymbol}`,
               })}
             </p>
           </div>
@@ -583,14 +586,14 @@ export default function Referral() {
           />
           <StatCard
             label={t('referral.terms.minTopup')}
-            value={`${formatAmount(terms.minimum_topup_rubles)} ${currencySymbol}`}
+            value={`${formatWhole(terms.minimum_topup_rubles)} ${currencySymbol}`}
             icon={<BanknotesIcon className="h-5 w-5" />}
             tone="neutral"
           />
           {maxCommissionKopeks > 0 && (
             <StatCard
               label={t('referral.terms.maxCommission')}
-              value={`${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`}
+              value={`${formatWhole(maxCommissionKopeks / 100)} ${currencySymbol}`}
               icon={<PercentIcon className="h-5 w-5" />}
               tone="neutral"
             />
@@ -614,7 +617,7 @@ export default function Referral() {
         </div>
       </div>
     );
-  }, [terms, t, formatAmount, formatPositive, currencySymbol]);
+  }, [terms, t, formatWhole, formatPositive, currencySymbol]);
 
   const copyLink = async (link: string, type: 'cabinet' | 'bot') => {
     if (!link) return;

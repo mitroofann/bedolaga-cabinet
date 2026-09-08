@@ -4,6 +4,16 @@ import { GiftIcon } from '@/components/icons';
 import { useCurrency } from '../../hooks/useCurrency';
 import type { ReferralTerms } from '../../types';
 
+/**
+ * [Форк] Сумма без «лишних» копеек: целые рубли печатаются без дробной части
+ * (1000, а не 1000.00), дробные — с двумя знаками как раньше. Внутри — общий
+ * formatAmount, меняется только количество знаков.
+ */
+export function useWholeAmount() {
+  const { formatAmount } = useCurrency();
+  return (rubAmount: number) => formatAmount(rubAmount, Number.isInteger(rubAmount) ? 0 : 2);
+}
+
 interface ReferralPromoBannerProps {
   /** Terms from GET /cabinet/referral/terms (may be undefined while loading) */
   terms?: ReferralTerms;
@@ -31,7 +41,8 @@ export function ReferralPromoBanner({
   className,
 }: ReferralPromoBannerProps) {
   const { t } = useTranslation();
-  const { formatAmount, currencySymbol } = useCurrency();
+  const { currencySymbol } = useCurrency();
+  const formatWhole = useWholeAmount();
 
   const maxCommissionKopeks = terms?.max_commission_kopeks ?? 0;
   // Баннер имеет смысл только когда есть что обещать: потолок > 0.
@@ -44,8 +55,8 @@ export function ReferralPromoBanner({
 
   const description = t('referral.promo.description', {
     percent,
-    minTopup: `${formatAmount(minTopupRubles)} ${currencySymbol}`,
-    maxCommission: `${formatAmount(maxRubles)} ${currencySymbol}`,
+    minTopup: `${formatWhole(minTopupRubles)} ${currencySymbol}`,
+    maxCommission: `${formatWhole(maxRubles)} ${currencySymbol}`,
   });
 
   return (
@@ -66,7 +77,7 @@ export function ReferralPromoBanner({
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[15px] font-semibold text-dark-100">
-            {t('referral.promo.title', { max: `${formatAmount(maxRubles)} ${currencySymbol}` })}
+            {t('referral.promo.title', { max: `${formatWhole(maxRubles)} ${currencySymbol}` })}
           </div>
           <p className="mt-1 text-sm leading-snug text-dark-400 whitespace-pre-line">
             {description}
