@@ -145,6 +145,7 @@ const AdminEmailTemplates = lazyWithRetry(() => import('./pages/AdminEmailTempla
 const AdminTrafficUsage = lazyWithRetry(() => import('./pages/AdminTrafficUsage'));
 const AdminBulkActions = lazyWithRetry(() => import('./pages/AdminBulkActions'));
 const AdminSalesStats = lazyWithRetry(() => import('./pages/AdminSalesStats'));
+const AdminMarketingBots = lazyWithRetry(() => import('./pages/AdminMarketingBots'));
 const AdminUpdates = lazyWithRetry(() => import('./pages/AdminUpdates'));
 const AdminUserDetail = lazyWithRetry(() => import('./pages/AdminUserDetail'));
 const AdminBroadcastDetail = lazyWithRetry(() => import('./pages/AdminBroadcastDetail'));
@@ -989,6 +990,16 @@ function App() {
             <PermissionRoute permission="campaigns:read">
               <LazyPage>
                 <AdminCampaigns />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/marketing-bots"
+          element={
+            <PermissionRoute permission="marketing_bots:read">
+              <LazyPage>
+                <AdminMarketingBots />
               </LazyPage>
             </PermissionRoute>
           }

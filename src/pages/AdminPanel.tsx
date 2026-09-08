@@ -50,6 +50,7 @@ import {
   WheelIcon,
   XIcon,
   RadarIcon,
+  BotIcon,
 } from '@/components/icons';
 
 const CABINET_VERSION = __APP_VERSION__;
@@ -72,6 +73,7 @@ const icons = {
   layout: <CabinetIcon />,
   newspaper: <NewsIcon />,
   megaphone: <MegaphoneIcon />,
+  bot: <BotIcon />,
   send: <SendIcon />,
   pin: <PinIcon />,
   'circle-dot': <WheelIcon />,
@@ -235,6 +237,12 @@ const sections: AdminSection[] = [
         icon: 'megaphone',
         to: '/admin/campaigns',
         permission: 'campaigns:read',
+      },
+      {
+        name: 'admin.nav.marketingBots',
+        icon: 'bot',
+        to: '/admin/marketing-bots',
+        permission: 'marketing_bots:read',
       },
       {
         name: 'admin.nav.broadcasts',

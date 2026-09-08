@@ -1420,6 +1420,7 @@
       "emailTemplates": "Email Templates",
       "paymentMethods": "Payment Methods",
       "campaigns": "Campaigns",
+      "marketingBots": "Marketing Bots",
       "promoOffers": "Promo Offers",
       "promocodes": "Promo Codes",
       "coupons": "Coupons",
@@ -3726,6 +3727,81 @@
       "updateError": "Failed to save changes",
       "validation": {
         "nameRequired": "Name is required"
+      }
+    },
+    "marketingBots": {
+      "title": "Marketing Bots",
+      "subtitle": "Auto-responders with a welcome message and image",
+      "createButton": "Add bot",
+      "noData": "No marketing bots yet",
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "button": "Button",
+        "noButton": "No button",
+        "created": "Created {{date}}",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "modal": {
+        "createTitle": "New marketing bot",
+        "editTitle": "Edit bot",
+        "cancel": "Cancel",
+        "save": "Save",
+        "create": "Create"
+      },
+      "fields": {
+        "name": "Bot name",
+        "namePlaceholder": "e.g. Autumn promo bot",
+        "token": "Bot token",
+        "tokenHint": "Get the token from @BotFather in Telegram",
+        "imageUrl": "Image URL",
+        "imageUrlHint": "Direct link to an image (optional)",
+        "welcomeMessage": "Welcome message",
+        "welcomeMessagePlaceholder": "Welcome! 🎉\n\nLearn more via the link...",
+        "buttonText": "Button text",
+        "buttonTextPlaceholder": "Open the main bot",
+        "buttonTextHint": "Text of the link button under the message (optional)",
+        "buttonUrl": "Button URL",
+        "buttonUrlHint": "Link for the button (optional, requires button text)",
+        "isActive": "Active"
+      },
+      "format": {
+        "showHelp": "Formatting",
+        "hideHelp": "Hide help",
+        "title": "HTML formatting is supported:"
+      },
+      "preview": {
+        "label": "Preview",
+        "fallbackMessage": "Welcome message"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameTooLong": "Maximum 255 characters",
+        "tokenRequired": "Token is required",
+        "tokenInvalid": "Invalid Telegram bot token format",
+        "messageRequired": "Welcome message is required",
+        "invalidUrl": "Enter a valid URL (http/https)",
+        "buttonPair": "Button text and URL must be filled together",
+        "buttonTextTooLong": "Recommended up to 64 characters"
+      },
+      "delete": {
+        "success": "Bot deleted",
+        "failed": "Failed to delete bot"
+      },
+      "save": {
+        "successCreate": "Bot created",
+        "successEdit": "Changes saved",
+        "failedCreate": "Failed to create bot",
+        "failedEdit": "Failed to save changes"
+      },
+      "confirm": {
+        "deleteTitle": "Delete bot?",
+        "deleteText": "Bot \"{{name}}\" will be permanently deleted.",
+        "cancel": "Cancel",
+        "delete": "Delete"
       }
     },
     "withdrawals": {

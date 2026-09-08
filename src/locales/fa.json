@@ -1280,6 +1280,7 @@
       "paymentMethods": "روش‌های پرداخت",
       "banSystem": "نظارت بر مسدودسازی",
       "campaigns": "کمپین‌ها",
+      "marketingBots": "ربات‌های بازاریابی",
       "payments": "پرداخت‌ها",
       "promoOffers": "پیشنهادات تبلیغاتی",
       "promocodes": "کدهای تخفیف",
@@ -2848,6 +2849,81 @@
         "nameRequired": "نام الزامی است"
       },
       "loadMore": "بارگذاری بیشتر"
+    },
+    "marketingBots": {
+      "title": "ربات‌های بازاریابی",
+      "subtitle": "پاسخ‌گوی خودکار با پیام خوش‌آمد و تصویر",
+      "createButton": "افزودن ربات",
+      "noData": "هنوز ربات بازاریابی وجود ندارد",
+      "status": {
+        "active": "فعال",
+        "inactive": "غیرفعال"
+      },
+      "table": {
+        "button": "دکمه",
+        "noButton": "بدون دکمه",
+        "created": "ایجاد شده {{date}}",
+        "edit": "ویرایش",
+        "delete": "حذف"
+      },
+      "modal": {
+        "createTitle": "ربات بازاریابی جدید",
+        "editTitle": "ویرایش ربات",
+        "cancel": "لغو",
+        "save": "ذخیره",
+        "create": "ایجاد"
+      },
+      "fields": {
+        "name": "نام ربات",
+        "namePlaceholder": "مثلاً: ربات پروموت پاییزی",
+        "token": "توکن ربات",
+        "tokenHint": "توکن را از @BotFather در تلگرام دریافت کنید",
+        "imageUrl": "URL تصویر",
+        "imageUrlHint": "لینک مستقیم تصویر (اختیاری)",
+        "welcomeMessage": "پیام خوش‌آمد",
+        "welcomeMessagePlaceholder": "خوش آمدید! 🎉\n\nاز لینک بیشتر بدانید...",
+        "buttonText": "متن دکمه",
+        "buttonTextPlaceholder": "رفتن به ربات اصلی",
+        "buttonTextHint": "متن دکمه لینک زیر پیام (اختیاری)",
+        "buttonUrl": "URL دکمه",
+        "buttonUrlHint": "لینک دکمه (اختیاری، نیازمند متن دکمه)",
+        "isActive": "فعال"
+      },
+      "format": {
+        "showHelp": "قالب‌بندی",
+        "hideHelp": "پنهان کردن راهنما",
+        "title": "قالب‌بندی HTML پشتیبانی می‌شود:"
+      },
+      "preview": {
+        "label": "پیش‌نمایش",
+        "fallbackMessage": "پیام خوش‌آمد"
+      },
+      "validation": {
+        "nameRequired": "نام الزامی است",
+        "nameTooLong": "حداکثر ۲۵۵ کاراکتر",
+        "tokenRequired": "توکن الزامی است",
+        "tokenInvalid": "قالب توکن ربات تلگرام نامعتبر است",
+        "messageRequired": "پیام خوش‌آمد الزامی است",
+        "invalidUrl": "URL معتبر وارد کنید (http/https)",
+        "buttonPair": "متن دکمه و لینک باید با هم پر شوند",
+        "buttonTextTooLong": "توصیه می‌شود حداکثر ۶۴ کاراکتر"
+      },
+      "delete": {
+        "success": "ربات حذف شد",
+        "failed": "حذف ربات ناموفق بود"
+      },
+      "save": {
+        "successCreate": "ربات ایجاد شد",
+        "successEdit": "تغییرات ذخیره شد",
+        "failedCreate": "ایجاد ربات ناموفق بود",
+        "failedEdit": "ذخیره تغییرات ناموفق بود"
+      },
+      "confirm": {
+        "deleteTitle": "حذف ربات؟",
+        "deleteText": "ربات «{{name}}» برای همیشه حذف خواهد شد.",
+        "cancel": "لغو",
+        "delete": "حذف"
+      }
     },
     "withdrawals": {
       "title": "برداشت‌ها",

@@ -1280,6 +1280,7 @@
       "paymentMethods": "支付方式",
       "banSystem": "封禁监控",
       "campaigns": "活动",
+      "marketingBots": "营销机器人",
       "payments": "支付",
       "promoOffers": "促销优惠",
       "promocodes": "促销码",
@@ -2847,6 +2848,81 @@
         "nameRequired": "名称为必填项"
       },
       "loadMore": "加载更多"
+    },
+    "marketingBots": {
+      "title": "营销机器人",
+      "subtitle": "带欢迎消息和图片的自动回复",
+      "createButton": "添加机器人",
+      "noData": "暂无营销机器人",
+      "status": {
+        "active": "启用",
+        "inactive": "停用"
+      },
+      "table": {
+        "button": "按钮",
+        "noButton": "无按钮",
+        "created": "创建于 {{date}}",
+        "edit": "编辑",
+        "delete": "删除"
+      },
+      "modal": {
+        "createTitle": "新建营销机器人",
+        "editTitle": "编辑机器人",
+        "cancel": "取消",
+        "save": "保存",
+        "create": "创建"
+      },
+      "fields": {
+        "name": "机器人名称",
+        "namePlaceholder": "例如：秋季促销机器人",
+        "token": "机器人令牌",
+        "tokenHint": "在 Telegram 中从 @BotFather 获取令牌",
+        "imageUrl": "图片 URL",
+        "imageUrlHint": "图片直链（可选）",
+        "welcomeMessage": "欢迎消息",
+        "welcomeMessagePlaceholder": "欢迎！🎉\n\n点击链接了解更多...",
+        "buttonText": "按钮文字",
+        "buttonTextPlaceholder": "打开主机器人",
+        "buttonTextHint": "消息下方链接按钮的文字（可选）",
+        "buttonUrl": "按钮 URL",
+        "buttonUrlHint": "按钮链接（可选，需要按钮文字）",
+        "isActive": "启用"
+      },
+      "format": {
+        "showHelp": "格式化",
+        "hideHelp": "隐藏帮助",
+        "title": "支持 HTML 格式化："
+      },
+      "preview": {
+        "label": "预览",
+        "fallbackMessage": "欢迎消息"
+      },
+      "validation": {
+        "nameRequired": "名称为必填项",
+        "nameTooLong": "最多 255 个字符",
+        "tokenRequired": "令牌为必填项",
+        "tokenInvalid": "Telegram 机器人令牌格式错误",
+        "messageRequired": "欢迎消息为必填项",
+        "invalidUrl": "请输入有效的 URL（http/https）",
+        "buttonPair": "按钮文字和链接必须同时填写",
+        "buttonTextTooLong": "建议不超过 64 个字符"
+      },
+      "delete": {
+        "success": "机器人已删除",
+        "failed": "删除机器人失败"
+      },
+      "save": {
+        "successCreate": "机器人已创建",
+        "successEdit": "更改已保存",
+        "failedCreate": "创建机器人失败",
+        "failedEdit": "保存更改失败"
+      },
+      "confirm": {
+        "deleteTitle": "删除机器人？",
+        "deleteText": "机器人“{{name}}”将被永久删除。",
+        "cancel": "取消",
+        "delete": "删除"
+      }
     },
     "withdrawals": {
       "title": "提现",

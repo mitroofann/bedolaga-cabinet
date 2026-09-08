@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getApiErrorMessage } from '@/utils/api-error';
+import { safeSession } from '@/utils/safeStorage';
 import { SanitizedHtml } from '@/components/common/SanitizedHtml';
 import {
   ArrowDownIcon,
@@ -190,8 +191,8 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
         payment_method: selectedMethod,
         payment_sub_option: selectedSubOption,
         language: 'ru',
-        referrer: sessionStorage.getItem('landing_referrer'),
-        subid: sessionStorage.getItem('landing_subid'),
+        referrer: safeSession.getItem('landing_referrer'),
+        subid: safeSession.getItem('landing_subid'),
       });
       return;
     }
@@ -203,8 +204,8 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       payment_method: selectedMethod,
       payment_sub_option: selectedSubOption,
       language: 'ru',
-      referrer: sessionStorage.getItem('landing_referrer'),
-      subid: sessionStorage.getItem('landing_subid'),
+      referrer: safeSession.getItem('landing_referrer'),
+      subid: safeSession.getItem('landing_subid'),
     });
   };
 

@@ -1432,6 +1432,7 @@
       "emailTemplates": "Email-шаблоны",
       "paymentMethods": "Платёжные методы",
       "campaigns": "Кампании",
+      "marketingBots": "Маркетинговые боты",
       "promoOffers": "Промопредложения",
       "promocodes": "Промокоды",
       "coupons": "Купоны",
@@ -4144,6 +4145,81 @@
       "updateError": "Не удалось сохранить изменения",
       "validation": {
         "nameRequired": "Название обязательно"
+      }
+    },
+    "marketingBots": {
+      "title": "Маркетинговые боты",
+      "subtitle": "Автоответчики с приветствием и картинкой",
+      "createButton": "Добавить бота",
+      "noData": "Нет маркетинговых ботов",
+      "status": {
+        "active": "Активен",
+        "inactive": "Неактивен"
+      },
+      "table": {
+        "button": "Кнопка",
+        "noButton": "Кнопки нет",
+        "created": "Создан {{date}}",
+        "edit": "Редактировать",
+        "delete": "Удалить"
+      },
+      "modal": {
+        "createTitle": "Новый маркетинговый бот",
+        "editTitle": "Редактирование бота",
+        "cancel": "Отмена",
+        "save": "Сохранить",
+        "create": "Создать"
+      },
+      "fields": {
+        "name": "Название бота",
+        "namePlaceholder": "Например: Промо-бот осенняя акция",
+        "token": "Токен бота",
+        "tokenHint": "Получите токен у @BotFather в Telegram",
+        "imageUrl": "URL картинки",
+        "imageUrlHint": "Прямая ссылка на изображение (необязательно)",
+        "welcomeMessage": "Приветственное сообщение",
+        "welcomeMessagePlaceholder": "Добро пожаловать! 🎉\n\nУзнайте больше по ссылке...",
+        "buttonText": "Текст кнопки",
+        "buttonTextPlaceholder": "Перейти в основной бот",
+        "buttonTextHint": "Текст кнопки-ссылки под сообщением (необязательно)",
+        "buttonUrl": "URL кнопки",
+        "buttonUrlHint": "Ссылка для кнопки (необязательно, требует текст кнопки)",
+        "isActive": "Активен"
+      },
+      "format": {
+        "showHelp": "Форматирование",
+        "hideHelp": "Скрыть справку",
+        "title": "Поддерживается HTML-форматирование:"
+      },
+      "preview": {
+        "label": "Предпросмотр",
+        "fallbackMessage": "Приветственное сообщение"
+      },
+      "validation": {
+        "nameRequired": "Название обязательно",
+        "nameTooLong": "Максимум 255 символов",
+        "tokenRequired": "Токен обязателен",
+        "tokenInvalid": "Неверный формат токена Telegram",
+        "messageRequired": "Приветственное сообщение обязательно",
+        "invalidUrl": "Введите корректный URL (http/https)",
+        "buttonPair": "Текст кнопки и ссылка заполняются вместе",
+        "buttonTextTooLong": "Рекомендуется до 64 символов"
+      },
+      "delete": {
+        "success": "Бот удалён",
+        "failed": "Не удалось удалить бота"
+      },
+      "save": {
+        "successCreate": "Бот создан",
+        "successEdit": "Изменения сохранены",
+        "failedCreate": "Не удалось создать бота",
+        "failedEdit": "Не удалось сохранить изменения"
+      },
+      "confirm": {
+        "deleteTitle": "Удалить бота?",
+        "deleteText": "Бот «{{name}}» будет удалён безвозвратно.",
+        "cancel": "Отмена",
+        "delete": "Удалить"
       }
     },
     "withdrawals": {
