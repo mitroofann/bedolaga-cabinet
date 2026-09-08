@@ -1176,7 +1176,7 @@
       "kindDaysHint": "The reward extends your subscription"
     },
     "promo": {
-      "title": "Invite a friend — get up to {{max}}!",
+      "title": "Invite a friend — get {{max}}!",
       "description": "{{percent}}% commission to your balance from your friend's first top-up of {{minTopup}} or more, but no more than {{maxCommission}}.\nThe more friends — the more commissions, no limit 😉",
       "cta": "Invite & earn"
     }

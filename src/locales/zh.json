@@ -1051,7 +1051,7 @@
       "kindDaysHint": "奖励延长您的订阅"
     },
     "promo": {
-      "title": "邀请好友 — 最高获得 {{max}}！",
+      "title": "邀请好友 — 获得 {{max}}！",
       "description": "好友首次充值满 {{minTopup}}，您即可获得 {{percent}}% 佣金至余额，单次不超过 {{maxCommission}}。\n好友越多 — 佣金越多，数量不限 😉",
       "cta": "邀请好友赚取奖励"
     }
