@@ -24,7 +24,6 @@ import TicketNotificationBell from '@/components/TicketNotificationBell';
 
 // Icons
 import {
-  HomeIcon,
   SubscriptionIcon,
   WalletIcon,
   UsersIcon,
@@ -149,7 +148,7 @@ export function AppHeader({
   const isAdminActive = () => location.pathname.startsWith('/admin');
 
   const navItems = [
-    { path: '/', label: t('nav.dashboard'), icon: HomeIcon },
+    // Custom fork: «Главная» hidden — `/` redirects to /subscriptions.
     { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
     { path: '/balance', label: t('nav.balance'), icon: WalletIcon },
     ...(referralEnabled ? [{ path: '/referral', label: t('nav.referral'), icon: UsersIcon }] : []),

@@ -50,9 +50,6 @@ import ResetPassword from './pages/ResetPassword';
 import PublicLegal from './pages/PublicLegal';
 import OAuthCallback from './pages/OAuthCallback';
 
-// Dashboard - load eagerly (default route, LCP-critical)
-import Dashboard from './pages/Dashboard';
-
 // User pages - lazy load
 const Subscriptions = lazyWithRetry(() => import('./pages/Subscriptions'));
 const Subscription = lazyWithRetry(() => import('./pages/Subscription'));
@@ -349,16 +346,9 @@ function App() {
         />
 
         {/* Protected routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <LazyPage>
-                <Dashboard />
-              </LazyPage>
-            </ProtectedRoute>
-          }
-        />
+        {/* Custom fork: Dashboard hidden — `/` redirects to /subscriptions.
+            Upstream Dashboard component left intact for future merges. */}
+        <Route path="/" element={<Navigate to="/subscriptions" replace />} />
         <Route
           path="/subscriptions"
           element={

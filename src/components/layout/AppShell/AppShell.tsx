@@ -25,7 +25,6 @@ import TicketNotificationBell from '@/components/TicketNotificationBell';
 import {
   SubscriptionIcon,
   GiftIcon,
-  HomeIcon,
   CreditCardIcon,
   ChatIcon,
   UserIcon,
@@ -114,8 +113,8 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   // Desktop navigation — labels always visible (no hover-reveal gimmick)
+  // Custom fork: «Главная» hidden — `/` redirects to /subscriptions.
   const desktopNav = [
-    { path: '/', label: t('nav.dashboard'), icon: HomeIcon },
     { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
     { path: '/balance', label: t('nav.balance'), icon: CreditCardIcon },
     ...(referralEnabled ? [{ path: '/referral', label: t('nav.referral'), icon: UsersIcon }] : []),

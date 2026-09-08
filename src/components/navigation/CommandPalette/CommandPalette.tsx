@@ -25,7 +25,6 @@ import {
 
 // Icons
 import {
-  HomeIcon,
   SubscriptionIcon,
   WalletIcon,
   UsersIcon,
@@ -76,8 +75,8 @@ export function CommandPalette({
   );
 
   // Navigation items
+  // Custom fork: «Главная» hidden — `/` redirects to /subscriptions.
   const navigationItems = [
-    { label: t('nav.dashboard'), icon: HomeIcon, path: '/' },
     { label: t('nav.subscription'), icon: SubscriptionIcon, path: '/subscriptions' },
     { label: t('nav.balance'), icon: WalletIcon, path: '/balance' },
     ...(referralEnabled ? [{ label: t('nav.referral'), icon: UsersIcon, path: '/referral' }] : []),

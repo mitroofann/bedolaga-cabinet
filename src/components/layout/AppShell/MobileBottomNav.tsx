@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { usePlatform } from '@/platform';
 
 // Icons
-import { HomeIcon, SubscriptionIcon, WalletIcon, UsersIcon, ChatIcon, WheelIcon } from './icons';
+import { SubscriptionIcon, WalletIcon, UsersIcon, ChatIcon, WheelIcon } from './icons';
 
 interface MobileBottomNavProps {
   isKeyboardOpen: boolean;
@@ -43,7 +43,7 @@ export function MobileBottomNav({
   //   - Referral falls back to the hamburger drawer
   // When only one of them is enabled, that one fills the slot.
   const coreItems = [
-    { path: '/', label: t('nav.dashboard'), icon: HomeIcon },
+    // Custom fork: «Главная» hidden — `/` redirects to /subscriptions.
     { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
     { path: '/balance', label: t('nav.balance'), icon: WalletIcon },
     ...(wheelEnabled
