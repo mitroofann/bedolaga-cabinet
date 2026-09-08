@@ -897,7 +897,8 @@
       "startingLevel": "立即可用",
       "refereeGets": "受邀用户获得：{{reward}}",
       "paysNothing": "不向您发放",
-      "personalRate": "您有 {{percent}}% 的专属费率——适用于任何等级。"
+      "personalRate": "您有 {{percent}}% 的专属费率——适用于任何等级。",
+      "maxCommission": "单笔充值上限"
     },
     "yourReferrals": "您的推荐",
     "noReferrals": "暂无推荐。分享链接邀请好友！",
@@ -1048,6 +1049,11 @@
       "saveError": "设置保存失败",
       "kindMoneyHint": "奖励以金额计入余额",
       "kindDaysHint": "奖励延长您的订阅"
+    },
+    "promo": {
+      "title": "邀请好友 — 最高获得 {{max}}！",
+      "description": "好友首次充值满 {{minTopup}}，您即可获得 {{percent}}% 佣金至余额，单次不超过 {{maxCommission}}。\n好友越多 — 佣金越多，数量不限 😉",
+      "cta": "邀请好友赚取奖励"
     }
   },
   "support": {

@@ -472,6 +472,12 @@ export interface ReferralTerms {
   inviter_bonus_kopeks: number;
   inviter_bonus_rubles: number;
   max_commission_payments: number;
+  /**
+   * [Форк] Потолок разовой процентной комиссии с одного пополнения реферала
+   * (REFERRAL_MAX_COMMISSION_KOPEKS). 0 — лимит выключен. Приходит только
+   * с новых версий бэкенда; старые поле не отдают — читаем через ?? 0.
+   */
+  max_commission_kopeks?: number;
   partner_section_visible?: boolean;
   /**
    * Under the `levels` scheme the flat fields above govern nothing: payouts come

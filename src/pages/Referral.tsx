@@ -261,12 +261,15 @@ export function RewardSettings({
 
 export function ProgrammeTerms({ terms }: { terms: ReferralTerms }) {
   const { t } = useTranslation();
+  const { formatAmount, currencySymbol } = useCurrency();
   const isTiers = terms.levels_mode === 'tiers';
   const levels = terms.levels ?? [];
   // Строки-описания остаются запасным путём: они приходят из того же источника
   // и покрывают старый сервер, который ещё не отдаёт разбор по частям.
   const fallbackLines = terms.level_descriptions ?? [];
   const progress = tierProgressText(terms, t);
+  // [Форк] Потолок комиссии (0 — выключен или старый бэкенд без поля).
+  const maxCommissionKopeks = terms.max_commission_kopeks ?? 0;
 
   return (
     <div className="bento-card">
@@ -278,6 +281,14 @@ export function ProgrammeTerms({ terms }: { terms: ReferralTerms }) {
         <p className="mt-1 text-sm text-dark-400">
           {isTiers ? t('referral.terms.modeTiers') : t('referral.terms.modeChain')}
         </p>
+        {/* [Форк] Акция «Пригласи друга» — теми же цифрами, что платит бот. */}
+        {maxCommissionKopeks > 0 && (
+          <p className="mt-3 text-sm font-medium text-dark-200">
+            {t('referral.promo.title', {
+              max: `${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`,
+            })}
+          </p>
+        )}
       </div>
 
       {levels.length > 0 ? (
@@ -360,6 +371,16 @@ export function ProgrammeTerms({ terms }: { terms: ReferralTerms }) {
         </ul>
       ) : (
         <p className="text-sm text-dark-400">{t('referral.terms.noLevels')}</p>
+      )}
+
+      {/* [Форк] Потолок комиссии с одного пополнения — в общем стиле карточки. */}
+      {maxCommissionKopeks > 0 && (
+        <p className="mt-4 text-sm text-dark-300">
+          {t('referral.terms.maxCommission')}:{' '}
+          <span className="font-medium text-dark-100">
+            {formatAmount(maxCommissionKopeks / 100)} {currencySymbol}
+          </span>
+        </p>
       )}
 
       {terms.personal_percent != null && (
@@ -517,7 +538,13 @@ export default function Referral() {
 
     const showNewUserBonus = terms.first_topup_bonus_kopeks > 0;
     const showInviterBonus = terms.inviter_bonus_kopeks > 0;
-    const cardCount = 2 + (showNewUserBonus ? 1 : 0) + (showInviterBonus ? 1 : 0);
+    // [Форк] Потолок комиссии (0 — выключен или старый бэкенд без поля).
+    const maxCommissionKopeks = terms.max_commission_kopeks ?? 0;
+    const cardCount =
+      2 +
+      (maxCommissionKopeks > 0 ? 1 : 0) +
+      (showNewUserBonus ? 1 : 0) +
+      (showInviterBonus ? 1 : 0);
     const gridColsMap: Record<number, string> = {
       2: 'md:grid-cols-2',
       3: 'md:grid-cols-3',
@@ -528,6 +555,25 @@ export default function Referral() {
     return (
       <div className="bento-card">
         <h2 className="mb-4 text-lg font-semibold text-dark-100">{t('referral.terms.title')}</h2>
+        {/* [Форк] Акция «Пригласи друга» сразу под заголовком, теми же цифрами,
+            что платит бот. Показываем только когда есть потолок — иначе обещали
+            бы сумму, которой не существует. */}
+        {maxCommissionKopeks > 0 && (
+          <div className="mb-4">
+            <p className="text-sm font-medium text-dark-200">
+              {t('referral.promo.title', {
+                max: `${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`,
+              })}
+            </p>
+            <p className="mt-1 text-sm leading-snug text-dark-400 whitespace-pre-line">
+              {t('referral.promo.description', {
+                percent: terms.commission_percent,
+                minTopup: `${formatAmount(terms.minimum_topup_rubles)} ${currencySymbol}`,
+                maxCommission: `${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`,
+              })}
+            </p>
+          </div>
+        )}
         <div className={`grid grid-cols-2 gap-4 ${gridCols}`}>
           <StatCard
             label={t('referral.terms.commission')}
@@ -541,6 +587,14 @@ export default function Referral() {
             icon={<BanknotesIcon className="h-5 w-5" />}
             tone="neutral"
           />
+          {maxCommissionKopeks > 0 && (
+            <StatCard
+              label={t('referral.terms.maxCommission')}
+              value={`${formatAmount(maxCommissionKopeks / 100)} ${currencySymbol}`}
+              icon={<PercentIcon className="h-5 w-5" />}
+              tone="neutral"
+            />
+          )}
           {showNewUserBonus && (
             <StatCard
               label={t('referral.terms.newUserBonus')}

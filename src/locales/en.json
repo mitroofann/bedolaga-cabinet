@@ -1022,7 +1022,8 @@
       "startingLevel": "available right away",
       "refereeGets": "the invited user gets: {{reward}}",
       "paysNothing": "pays you nothing",
-      "personalRate": "You have a personal rate of {{percent}}% — it applies at any level."
+      "personalRate": "You have a personal rate of {{percent}}% — it applies at any level.",
+      "maxCommission": "Max per top-up"
     },
     "yourReferrals": "Your Referrals",
     "noReferrals": "No referrals yet. Share your link to invite friends!",
@@ -1173,6 +1174,11 @@
       "saveError": "Could not save the setting",
       "kindMoneyHint": "The reward arrives as an amount on your balance",
       "kindDaysHint": "The reward extends your subscription"
+    },
+    "promo": {
+      "title": "Invite a friend — get up to {{max}}!",
+      "description": "{{percent}}% commission to your balance from your friend's first top-up of {{minTopup}} or more, but no more than {{maxCommission}}.\nThe more friends — the more commissions, no limit 😉",
+      "cta": "Invite & earn"
     }
   },
   "support": {

@@ -8,6 +8,8 @@ import { DEVICE_ALIAS_MAX_LENGTH } from '../constants/devices';
 import { WebBackButton } from '../components/WebBackButton';
 import { useDestructiveConfirm } from '../platform/hooks/useNativeDialog';
 import SubscriptionSummaryCard from '../components/dashboard/SubscriptionSummaryCard';
+import { ReferralPromoBanner } from '../components/referral/ReferralPromoBanner';
+import { referralApi } from '../api/referral';
 import { useTrafficZone } from '../hooks/useTrafficZone';
 import { getGlassColors } from '../utils/glassTheme';
 import { copyToClipboard } from '../utils/clipboard';
@@ -122,6 +124,13 @@ export default function Subscription() {
 
   // Extract subscription from response (null if no subscription)
   const subscription = subscriptionResponse?.subscription ?? null;
+
+  // [Форк] Условия реферальной программы — для промо-баннера «Пригласи друга».
+  const { data: referralTerms } = useQuery({
+    queryKey: ['referral-terms'],
+    queryFn: referralApi.getReferralTerms,
+    staleTime: 300_000,
+  });
   const displayedConnectionUrl = useMemo(
     () =>
       resolveConnectionUrlForUi({
@@ -624,7 +633,17 @@ export default function Subscription() {
                 refreshing={refreshTrafficMutation.isPending}
                 refreshCooldown={trafficRefreshCooldown}
                 footer={
-                  <PurchaseCTAButton subscription={subscription} isMultiTariff={isMultiTariff} />
+                  <>
+                    {/* [Форк] Промо «Пригласи друга» перед кнопкой продления.
+                        Не показываем тем, у кого ещё не было подписки (null) —
+                        им показывается триал/покупка. */}
+                    {subscription && (
+                      <div className="mb-3">
+                        <ReferralPromoBanner terms={referralTerms} />
+                      </div>
+                    )}
+                    <PurchaseCTAButton subscription={subscription} isMultiTariff={isMultiTariff} />
+                  </>
                 }
               />
 
