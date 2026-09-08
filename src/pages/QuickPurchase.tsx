@@ -8,11 +8,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { landingApi } from '../api/landings';
 import {
   brandingApi,
+  getLogoBlobUrl,
   getCachedBranding,
   setCachedBranding,
   preloadLogo,
-  getLogoBlobUrl,
 } from '../api/branding';
+import { setFavicon, letterFaviconDataUri, roundedFaviconDataUri } from '../utils/favicon';
 import type {
   LandingConfig,
   LandingTariff,
@@ -34,8 +35,8 @@ import { getApiErrorMessage } from '../utils/api-error';
 import { getPendingCampaignSlug } from '../utils/campaign';
 import { readContactPrefill, stripContactFromUrl } from '../utils/contactPrefill';
 import { formatPrice } from '../utils/format';
-import { setFavicon, letterFaviconDataUri, roundedFaviconDataUri } from '../utils/favicon';
 import { useCurrency } from '../hooks/useCurrency';
+import { safeSession } from '../utils/safeStorage';
 
 function detectContactType(value: string): 'email' | 'telegram' {
   return value.startsWith('@') ? 'telegram' : 'email';
@@ -546,6 +547,8 @@ function SummaryCard({
           <div
             className="fixed bottom-0 left-0 right-0 z-50 p-3"
             style={{
+              // Ярлык iOS: под кнопкой ещё индикатор «Домой» (safe-area снизу).
+              paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))',
               background:
                 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 70%, transparent 100%)',
             }}
@@ -824,13 +827,13 @@ export default function QuickPurchase() {
   // Clamp to 500 chars -- backend `referrer` column is max_length=500 and would
   // otherwise reject long ad-click referrers (gclid+gbraid+params) with 422.
   useEffect(() => {
-    if (document.referrer && !sessionStorage.getItem('landing_referrer')) {
-      sessionStorage.setItem('landing_referrer', document.referrer.slice(0, 500));
+    if (document.referrer && !safeSession.getItem('landing_referrer')) {
+      safeSession.setItem('landing_referrer', document.referrer.slice(0, 500));
     }
     // Save subid from URL (also clamped to backend limit of 255)
     const urlSubid = new URLSearchParams(window.location.search).get('subid');
     if (urlSubid) {
-      sessionStorage.setItem('landing_subid', urlSubid.slice(0, 255));
+      safeSession.setItem('landing_subid', urlSubid.slice(0, 255));
     }
   }, []);
 
@@ -1058,7 +1061,7 @@ export default function QuickPurchase() {
       payment_method: paymentMethod,
       language: i18n.language,
       is_gift: isGift,
-      referrer: sessionStorage.getItem('landing_referrer') || undefined,
+      referrer: safeSession.getItem('landing_referrer') || undefined,
     };
 
     if (isGift && giftRecipient) {
@@ -1070,7 +1073,7 @@ export default function QuickPurchase() {
     // Get Yandex CID for offline conversions (sync from localStorage)
     const ymCid = getYandexCid();
     if (ymCid) data.yandex_cid = ymCid;
-    const subid = sessionStorage.getItem('landing_subid');
+    const subid = safeSession.getItem('landing_subid');
     if (subid) (data as unknown as Record<string, unknown>).subid = subid;
 
     // Слаг рекламной кампании захватил captureCampaignFromUrl() при заходе по

@@ -55,9 +55,14 @@ import {
   BackIcon,
   ChevronRightIcon,
   GeoCheckIcon,
+  RadarIcon,
 } from '../components/icons';
 import { GeoCheckModal } from '../components/admin/remnawave/GeoCheckModal';
+import { buildReachabilityLink } from '../components/admin/reachability/deepLink';
+import { useReachabilityAvailable } from '../components/admin/reachability/useReachabilityStatus';
+import { usePermissionStore } from '../store/permissions';
 import { supportsGeoCheck } from '../utils/nodeVersion';
+import { Skeleton, SkeletonGroup } from '../components/ui/skeleton';
 
 const formatBytes = (bytes: number): string => {
   if (bytes === 0) return '0 B';
@@ -157,6 +162,12 @@ function NodeCard({ node, providerName, realtime, onAction, isLoading }: NodeCar
   // GeoCheck умеет только узел 3.3.0+; на старом узле кнопку не показываем,
   // чтобы админ не упирался в ошибку панели.
   const canGeoCheck = supportsGeoCheck(node.versions);
+  // Ярлык в BSCHEKER: только с правом запуска и при включённой интеграции.
+  // Оба хука вызываются безусловно — правило хуков, объединяем результат после.
+  const navigate = useNavigate();
+  const canRunReachability = usePermissionStore((s) => s.hasPermission('reachability:run'));
+  const reachabilityAvailable = useReachabilityAvailable();
+  const canReach = canRunReachability && reachabilityAvailable;
 
   const isUp = node.is_connected && node.is_node_online && !node.is_disabled;
   const dotColor = node.is_disabled ? 'bg-dark-500' : isUp ? 'bg-success-400' : 'bg-error-400';
@@ -245,6 +256,19 @@ function NodeCard({ node, providerName, realtime, onAction, isLoading }: NodeCar
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5">
+            {canReach && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(buildReachabilityLink({ targets: [{ kind: 'node', ref: node.uuid }] }));
+                }}
+                className="rounded-lg bg-dark-700 p-1.5 text-dark-300 transition-colors hover:bg-dark-600 hover:text-dark-100"
+                title={t('admin.reachability.shortcuts.checkNode')}
+                aria-label={t('admin.reachability.shortcuts.checkNode')}
+              >
+                <RadarIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
             {canGeoCheck && (
               <button
                 onClick={(e) => {
@@ -638,9 +662,15 @@ function OverviewTab({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
-      </div>
+      <SkeletonGroup className="space-y-6">
+        <Skeleton className="h-5 w-40" />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+        </div>
+      </SkeletonGroup>
     );
   }
 
@@ -1012,9 +1042,19 @@ function NodesTab({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
-      </div>
+      <SkeletonGroup className="space-y-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton count={3} className="h-9 w-24 shrink-0 rounded-lg" />
+        </div>
+        <Skeleton variant="card" count={2} className="h-32" />
+      </SkeletonGroup>
     );
   }
 
@@ -1145,9 +1185,15 @@ function SquadsTab({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
-      </div>
+      <SkeletonGroup className="space-y-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+          <StatCard loading />
+        </div>
+        <Skeleton variant="card" count={2} className="h-32" />
+      </SkeletonGroup>
     );
   }
 
@@ -1239,9 +1285,9 @@ function SyncTab({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-500 border-t-transparent" />
-      </div>
+      <SkeletonGroup className="space-y-6">
+        <Skeleton variant="card" count={2} className="h-40" />
+      </SkeletonGroup>
     );
   }
 

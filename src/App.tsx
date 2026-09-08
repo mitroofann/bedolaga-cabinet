@@ -1,3 +1,4 @@
+import { safeSession } from './utils/safeStorage';
 import { lazy, Suspense, type ComponentType } from 'react';
 import { Routes, Route, Navigate, useLocation, useParams } from 'react-router';
 import { useAuthStore } from './store/auth';
@@ -10,9 +11,12 @@ function lazyWithRetry<T extends ComponentType<any>>(factory: () => Promise<{ de
   return lazy(() =>
     factory().catch(() => {
       const key = 'chunk_reload_ts';
-      const last = Number(sessionStorage.getItem(key) || '0');
-      if (Date.now() - last > 30_000) {
-        sessionStorage.setItem(key, String(Date.now()));
+      const last = Number(safeSession.getItem(key) || '0');
+      // Метка обязана пережить сам reload — в этом её единственный смысл. Если
+      // сохранить её негде, перезагрузка станет бесконечной: после reload метки
+      // не окажется, и условие снова выполнится. Лучше отдать ошибку в
+      // ErrorBoundary, чем крутить страницу по кругу.
+      if (Date.now() - last > 30_000 && safeSession.setItem(key, String(Date.now()))) {
         window.location.reload();
       }
       // Re-throw so ErrorBoundary catches it if reload guard prevents loop
@@ -84,6 +88,7 @@ const AdminPanel = lazyWithRetry(() => import('./pages/AdminPanel'));
 const AdminTickets = lazyWithRetry(() => import('./pages/AdminTickets'));
 const AdminTicketSettings = lazyWithRetry(() => import('./pages/AdminTicketSettings'));
 const AdminSettings = lazyWithRetry(() => import('./pages/AdminSettings'));
+const AdminGraceAccess = lazyWithRetry(() => import('./pages/AdminGraceAccess'));
 const AdminApps = lazyWithRetry(() => import('./pages/AdminApps'));
 const AdminWheel = lazyWithRetry(() => import('./pages/AdminWheel'));
 const AdminTariffs = lazyWithRetry(() => import('./pages/AdminTariffs'));
@@ -109,6 +114,7 @@ const AdminCampaignStats = lazyWithRetry(() => import('./pages/AdminCampaignStat
 const AdminCampaignEdit = lazyWithRetry(() => import('./pages/AdminCampaignEdit'));
 const AdminPartners = lazyWithRetry(() => import('./pages/AdminPartners'));
 const AdminPartnerSettings = lazyWithRetry(() => import('./pages/AdminPartnerSettings'));
+const AdminReferralLevels = lazyWithRetry(() => import('./pages/AdminReferralLevels'));
 const AdminPartnerDetail = lazyWithRetry(() => import('./pages/AdminPartnerDetail'));
 const AdminApplicationReview = lazyWithRetry(() => import('./pages/AdminApplicationReview'));
 const AdminPartnerCommission = lazyWithRetry(() => import('./pages/AdminPartnerCommission'));
@@ -130,6 +136,9 @@ const AdminPromoOfferTemplateEdit = lazyWithRetry(
   () => import('./pages/AdminPromoOfferTemplateEdit'),
 );
 const AdminPromoOfferSend = lazyWithRetry(() => import('./pages/AdminPromoOfferSend'));
+const AdminReachability = lazyWithRetry(() => import('./pages/AdminReachability'));
+const AdminReachabilityHistory = lazyWithRetry(() => import('./pages/AdminReachabilityHistory'));
+const AdminReachabilityOther = lazyWithRetry(() => import('./pages/AdminReachabilityOther'));
 const AdminRemnawave = lazyWithRetry(() => import('./pages/AdminRemnawave'));
 const AdminRemnawaveSquadDetail = lazyWithRetry(() => import('./pages/AdminRemnawaveSquadDetail'));
 const AdminEmailTemplates = lazyWithRetry(() => import('./pages/AdminEmailTemplates'));
@@ -148,6 +157,7 @@ const AdminRoleAssign = lazyWithRetry(() => import('./pages/AdminRoleAssign'));
 const AdminPolicies = lazyWithRetry(() => import('./pages/AdminPolicies'));
 const AdminPolicyEdit = lazyWithRetry(() => import('./pages/AdminPolicyEdit'));
 const AdminAuditLog = lazyWithRetry(() => import('./pages/AdminAuditLog'));
+const AdminSystemErrors = lazyWithRetry(() => import('./pages/AdminSystemErrors'));
 const AdminLandings = lazyWithRetry(() => import('./pages/AdminLandings'));
 const AdminLandingEditor = lazyWithRetry(() => import('./pages/AdminLandingEditor'));
 const AdminLandingStats = lazyWithRetry(() => import('./pages/AdminLandingStats'));
@@ -684,6 +694,16 @@ function App() {
           }
         />
         <Route
+          path="/admin/grace-access"
+          element={
+            <PermissionRoute permission="settings:read">
+              <LazyPage>
+                <AdminGraceAccess />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
           path="/admin/apps"
           element={
             <PermissionRoute permission="apps:read">
@@ -809,6 +829,36 @@ function App() {
             <PermissionRoute permission="ban_system:read">
               <LazyPage>
                 <AdminBanSystem />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/reachability"
+          element={
+            <PermissionRoute permission="reachability:read">
+              <LazyPage>
+                <AdminReachability />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/reachability/history"
+          element={
+            <PermissionRoute permission="reachability:read">
+              <LazyPage>
+                <AdminReachabilityHistory />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/reachability/other"
+          element={
+            <PermissionRoute permission="reachability:read">
+              <LazyPage>
+                <AdminReachabilityOther />
               </LazyPage>
             </PermissionRoute>
           }
@@ -989,6 +1039,19 @@ function App() {
             <PermissionRoute permission="partners:read">
               <LazyPage>
                 <AdminPartnerSettings />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+        <Route
+          path="/admin/partners/referral-levels"
+          element={
+            /* Право совпадает с тем, что требуют сами эндпоинты уровней:
+               с одним partners:read страница открывалась и падала в общую
+               ошибку загрузки, не сообщая, что дело в правах. */
+            <PermissionRoute permission="partners:settings">
+              <LazyPage>
+                <AdminReferralLevels />
               </LazyPage>
             </PermissionRoute>
           }
@@ -1434,6 +1497,17 @@ function App() {
             <PermissionRoute permission="audit_log:read">
               <LazyPage>
                 <AdminAuditLog />
+              </LazyPage>
+            </PermissionRoute>
+          }
+        />
+
+        <Route
+          path="/admin/system-errors"
+          element={
+            <PermissionRoute permission="system_errors:read">
+              <LazyPage>
+                <AdminSystemErrors />
               </LazyPage>
             </PermissionRoute>
           }

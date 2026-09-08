@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/auth';
 import { useShallow } from 'zustand/shallow';
 import { consumeCampaignSlug, getPendingCampaignSlug } from '../utils/campaign';
 import { tokenStorage, isValidRedirectUrl } from '../utils/token';
+import { getApiErrorMessage } from '../utils/api-error';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function VerifyEmail() {
@@ -57,8 +58,7 @@ export default function VerifyEmail() {
         redirectTimer = setTimeout(() => navigate(returnTo, { replace: true }), 1500);
       } catch (err: unknown) {
         setStatus('error');
-        const error = err as { response?: { data?: { detail?: string } } };
-        setError(error.response?.data?.detail || t('emailVerification.failed'));
+        setError(getApiErrorMessage(err, t('emailVerification.failed')));
       }
     };
 

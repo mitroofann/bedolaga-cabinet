@@ -13,6 +13,7 @@ import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PlatformProvider } from './platform/PlatformProvider';
 import { ThemeColorsProvider } from './providers/ThemeColorsProvider';
+import { DocumentBranding } from './components/DocumentBranding';
 import { FontScaleProvider } from './features/font-scale';
 import { WebSocketProvider } from './providers/WebSocketProvider';
 import { ToastProvider } from './components/Toast';
@@ -237,6 +238,7 @@ export function AppWithNavigator() {
       <ErrorBoundary level="page">
         <PlatformProvider>
           <ThemeColorsProvider>
+            <DocumentBranding />
             <FontScaleProvider>
               <TooltipProvider>
                 <ToastProvider>

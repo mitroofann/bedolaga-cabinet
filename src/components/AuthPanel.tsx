@@ -14,6 +14,7 @@ import { closeMiniApp } from '@telegram-apps/sdk-react';
 import TelegramLoginButton from './TelegramLoginButton';
 import OAuthProviderIcon from './OAuthProviderIcon';
 import { saveOAuthState } from '../utils/oauth';
+import { safeLocal, safeSession } from '../utils/safeStorage';
 import { getPendingReferralCode } from '../utils/referral';
 import { EmailIcon, RefreshIcon, ChevronDownIcon } from './icons';
 import LegalFooter from './LegalFooter';
@@ -193,7 +194,11 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
         throw new Error('Invalid OAuth redirect URL');
       }
 
-      saveOAuthState(state, provider, getReturnUrl());
+      if (!saveOAuthState(state, provider, getReturnUrl())) {
+        // Уйти к провайдеру без сохранённого state — значит гарантированно не
+        // вернуться в логин: та же ошибка, что и раньше, но без потери страницы.
+        throw new Error('OAuth state is not persistable');
+      }
       window.location.href = authorize_url;
     } catch {
       setError(t('auth.oauthError', 'Authorization was denied or failed'));
@@ -263,10 +268,10 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
   const handleRetryTelegramAuth = () => {
     // Clear ALL cached auth state to prevent stale token/initData loops
     tokenStorage.clearTokens();
-    sessionStorage.removeItem('tapps/launchParams');
-    sessionStorage.removeItem('telegram_init_data');
-    localStorage.removeItem('cabinet-auth');
-    localStorage.removeItem('tg_user_id');
+    safeSession.removeItem('tapps/launchParams');
+    safeSession.removeItem('telegram_init_data');
+    safeLocal.removeItem('cabinet-auth');
+    safeLocal.removeItem('tg_user_id');
 
     try {
       // Close miniapp — Telegram will provide fresh initData on reopen

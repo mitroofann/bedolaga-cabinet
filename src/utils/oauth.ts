@@ -1,3 +1,5 @@
+import { safeSession } from './safeStorage';
+
 export const LINK_OAUTH_STATE_KEY = 'link_oauth_state';
 export const LINK_OAUTH_PROVIDER_KEY = 'link_oauth_provider';
 
@@ -6,11 +8,27 @@ const OAUTH_PROVIDER_KEY = 'oauth_provider';
 
 const OAUTH_RETURN_TO_KEY = 'oauth_return_to';
 
-export function saveOAuthState(state: string, provider: string, returnTo?: string): void {
-  sessionStorage.setItem(OAUTH_STATE_KEY, state);
-  sessionStorage.setItem(OAUTH_PROVIDER_KEY, provider);
-  if (returnTo) sessionStorage.setItem(OAUTH_RETURN_TO_KEY, returnTo);
-  else sessionStorage.removeItem(OAUTH_RETURN_TO_KEY);
+/**
+ * Сохраняет CSRF-state перед уходом на внешнего провайдера.
+ *
+ * Возвращает false, если запись не переживёт редирект (хранилище заблокировано
+ * или переполнено): in-memory фоллбек умирает вместе со страницей, а на возврате
+ * OAuthCallback не найдёт состояния и уйдёт в ветку link-server, то есть попробует
+ * ПРИВЯЗКУ вместо логина. Вызывающий обязан не делать переход при false.
+ */
+export function saveOAuthState(state: string, provider: string, returnTo?: string): boolean {
+  const savedState = safeSession.setItem(OAUTH_STATE_KEY, state);
+  const savedProvider = safeSession.setItem(OAUTH_PROVIDER_KEY, provider);
+  if (returnTo) safeSession.setItem(OAUTH_RETURN_TO_KEY, returnTo);
+  else safeSession.removeItem(OAUTH_RETURN_TO_KEY);
+  return savedState && savedProvider;
+}
+
+/** То же для привязки аккаунта: см. saveOAuthState. */
+export function saveLinkOAuthState(state: string, provider: string): boolean {
+  const savedState = safeSession.setItem(LINK_OAUTH_STATE_KEY, state);
+  const savedProvider = safeSession.setItem(LINK_OAUTH_PROVIDER_KEY, provider);
+  return savedState && savedProvider;
 }
 
 export function loadOAuthState(): {
@@ -18,28 +36,28 @@ export function loadOAuthState(): {
   provider: string;
   returnTo: string | null;
 } | null {
-  const state = sessionStorage.getItem(OAUTH_STATE_KEY);
-  const provider = sessionStorage.getItem(OAUTH_PROVIDER_KEY);
+  const state = safeSession.getItem(OAUTH_STATE_KEY);
+  const provider = safeSession.getItem(OAUTH_PROVIDER_KEY);
   if (!state || !provider) return null;
-  return { state, provider, returnTo: sessionStorage.getItem(OAUTH_RETURN_TO_KEY) };
+  return { state, provider, returnTo: safeSession.getItem(OAUTH_RETURN_TO_KEY) };
 }
 
 export function clearOAuthState(): void {
-  sessionStorage.removeItem(OAUTH_STATE_KEY);
-  sessionStorage.removeItem(OAUTH_PROVIDER_KEY);
-  sessionStorage.removeItem(OAUTH_RETURN_TO_KEY);
+  safeSession.removeItem(OAUTH_STATE_KEY);
+  safeSession.removeItem(OAUTH_PROVIDER_KEY);
+  safeSession.removeItem(OAUTH_RETURN_TO_KEY);
 }
 
 export function peekLinkOAuthState(): { state: string; provider: string } | null {
-  const state = sessionStorage.getItem(LINK_OAUTH_STATE_KEY);
-  const provider = sessionStorage.getItem(LINK_OAUTH_PROVIDER_KEY);
+  const state = safeSession.getItem(LINK_OAUTH_STATE_KEY);
+  const provider = safeSession.getItem(LINK_OAUTH_PROVIDER_KEY);
   if (!state || !provider) return null;
   return { state, provider };
 }
 
 export function clearLinkOAuthState(): void {
-  sessionStorage.removeItem(LINK_OAUTH_STATE_KEY);
-  sessionStorage.removeItem(LINK_OAUTH_PROVIDER_KEY);
+  safeSession.removeItem(LINK_OAUTH_STATE_KEY);
+  safeSession.removeItem(LINK_OAUTH_PROVIDER_KEY);
 }
 
 export function getErrorDetail(err: unknown): string | null {
