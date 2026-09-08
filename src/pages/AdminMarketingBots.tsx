@@ -9,6 +9,7 @@ import { usePlatform } from '../platform/hooks/usePlatform';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { BotIcon, BackIcon, EditIcon, TrashIcon, PlusIcon } from '../components/icons';
 import { Skeleton, SkeletonGroup } from '../components/ui/skeleton';
+import { TelegramHtml } from '../components/marketing/TelegramHtml';
 import { useToast } from '../components/Toast';
 
 const localeMap: Record<string, string> = { ru: 'ru-RU', en: 'en-US', zh: 'zh-CN', fa: 'fa-IR' };
@@ -522,7 +523,13 @@ function MarketingBotModal({ bot, onClose }: MarketingBotModalProps) {
                   )}
                   <div className="mb-2 max-w-[85%] rounded-xl rounded-tl-sm bg-[#2b2b2b] px-3 py-2">
                     <p className="whitespace-pre-wrap break-words text-sm text-[#e9eaeb]">
-                      {welcomeMessage.trim() || t('admin.marketingBots.preview.fallbackMessage')}
+                      {/* [Форк] Рендерим Telegram-HTML так, как его отрисует сам
+                          Telegram (parse_mode='HTML' на бэкенде). */}
+                      {welcomeMessage.trim() ? (
+                        <TelegramHtml text={welcomeMessage} />
+                      ) : (
+                        t('admin.marketingBots.preview.fallbackMessage')
+                      )}
                     </p>
                   </div>
                   {buttonText.trim() && buttonUrl.trim() && (
