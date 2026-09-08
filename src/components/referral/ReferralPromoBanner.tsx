@@ -71,31 +71,29 @@ export function ReferralPromoBanner({
         }`
       }
     >
-      <div className="flex items-start gap-4">
+      {/* [Форк] Иконка в строке с заголовком, описание — ниже во всю ширину:
+          на узких экранах боковая колонка под иконку съедала место. */}
+      <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-accent-500/20 text-accent-400">
           <GiftIcon className="h-5 w-5" />
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="text-[15px] font-semibold text-dark-100">
-            {t('referral.promo.title', { max: `${formatWhole(maxRubles)} ${currencySymbol}` })}
-          </div>
-          <p className="mt-1 text-sm leading-snug text-dark-400 whitespace-pre-line">
-            {description}
-          </p>
-          <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent-400 transition-transform duration-200 group-hover:translate-x-0.5">
-            {t('referral.promo.cta')}
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H7" />
-            </svg>
-          </span>
+        <div className="text-[15px] font-semibold text-dark-100">
+          {t('referral.promo.title', { max: `${formatWhole(maxRubles)} ${currencySymbol}` })}
         </div>
       </div>
+      <p className="mt-1 text-sm leading-snug text-dark-400 whitespace-pre-line">{description}</p>
+      <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent-400 transition-transform duration-200 group-hover:translate-x-0.5">
+        {t('referral.promo.cta')}
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H7" />
+        </svg>
+      </span>
     </Link>
   );
 }
