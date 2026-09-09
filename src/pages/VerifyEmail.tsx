@@ -52,8 +52,18 @@ export default function VerifyEmail() {
         }
         checkAdminStatus();
         setStatus('success');
+        // [Форк] Путь возврата после верификации. Приоритет: 1) return_to из
+        // ссылки письма (бэкенд подставляет его при регистрации с лендинга —
+        // работает и когда письмо открыто в другом табе/браузере, где
+        // sessionStorage исходного таба недоступен); 2) sessionStorage, куда
+        // AuthPanel пишет путь при регистрации в самом кабинете; 3) '/'.
+        const urlReturnTo = searchParams.get('return_to');
         const savedReturnTo = sessionStorage.getItem('email_verification_return_to');
-        const returnTo = savedReturnTo && isValidRedirectUrl(savedReturnTo) ? savedReturnTo : '/';
+        const returnToCandidate =
+          urlReturnTo && isValidRedirectUrl(urlReturnTo) ? urlReturnTo : null;
+        const returnTo =
+          returnToCandidate ??
+          (savedReturnTo && isValidRedirectUrl(savedReturnTo) ? savedReturnTo : '/');
         sessionStorage.removeItem('email_verification_return_to');
         redirectTimer = setTimeout(() => navigate(returnTo, { replace: true }), 1500);
       } catch (err: unknown) {
