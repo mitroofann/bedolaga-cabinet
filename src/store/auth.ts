@@ -69,6 +69,9 @@ interface AuthState {
     firstName?: string,
     referralCode?: string,
     acceptedLegalDocuments?: string[],
+    /** [Форк] Путь возврата после верификации email (подставляется бэкендом
+     *  в ссылку письма). См. VerifyEmail: return_to из URL имеет приоритет. */
+    returnTo?: string,
   ) => Promise<RegisterResponse>;
 }
 
@@ -396,6 +399,7 @@ export const useAuthStore = create<AuthState>()(
         firstName,
         referralCode,
         acceptedLegalDocuments,
+        returnTo,
       ) => {
         const code = referralCode || getPendingReferralCode() || undefined;
         const campaignSlug = getPendingCampaignSlug() || undefined;
@@ -407,6 +411,7 @@ export const useAuthStore = create<AuthState>()(
           referral_code: code,
           campaign_slug: campaignSlug,
           accepted_legal_documents: acceptedLegalDocuments,
+          return_to: returnTo,
         });
         consumeReferralCode();
         return response;

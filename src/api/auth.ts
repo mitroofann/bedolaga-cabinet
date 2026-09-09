@@ -123,6 +123,10 @@ export const authApi = {
     referral_code?: string;
     campaign_slug?: string;
     accepted_legal_documents?: string[];
+    /** [Форк] Путь возврата после верификации email (письмо открывают в новом
+     *  табе — sessionStorage исходного там недоступен). Бэкенд подставит его
+     *  в ссылку письма. Только локальный path, валидация на бэкенде. */
+    return_to?: string;
   }): Promise<RegisterResponse> => {
     const response = await apiClient.post<RegisterResponse>(
       '/cabinet/auth/email/register/standalone',

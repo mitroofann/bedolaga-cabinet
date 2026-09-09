@@ -317,6 +317,9 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
           firstName || undefined,
           referralCode || undefined,
           acceptedDocumentKeys,
+          // [Форк] Бэкенд подставит путь в ссылку письма — после верификации
+          // пользователь вернётся во флоу, даже если откроет письмо в другом табе.
+          getReturnUrl(),
         );
         sessionStorage.setItem('email_verification_return_to', getReturnUrl());
         // Show "check your email" screen
@@ -336,6 +339,7 @@ export default function AuthPanel({ returnTo, initialMode, embedded = false }: A
           firstName || undefined,
           referralCode || undefined,
           accepted,
+          getReturnUrl(),
         );
         setPendingConsentRetry(null);
         setRegisteredEmail(retried.email);
