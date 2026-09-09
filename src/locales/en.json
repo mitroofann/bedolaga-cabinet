@@ -1449,7 +1449,8 @@
       "bulkActions": "Bulk Actions",
       "infoPages": "Info Pages",
       "legalPages": "System pages",
-      "systemErrors": "System errors"
+      "systemErrors": "System errors",
+      "salesStatsShort": "Stats"
     },
     "panel": {
       "title": "Admin Panel",

@@ -1461,7 +1461,8 @@
       "bulkActions": "Массовые действия",
       "infoPages": "Инфо-страницы",
       "legalPages": "Системные страницы",
-      "systemErrors": "Ошибки системы"
+      "systemErrors": "Ошибки системы",
+      "salesStatsShort": "Статистика"
     },
     "panel": {
       "title": "Панель администратора",

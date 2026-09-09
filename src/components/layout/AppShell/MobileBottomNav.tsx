@@ -9,7 +9,7 @@ import { usePlatform } from '@/platform';
 import { SubscriptionIcon, WalletIcon, UsersIcon, ChatIcon, WheelIcon } from './icons';
 // [Форк] Админские иконки — напрямую из централизованного набора, чтобы не
 // расширять общий реэкспорт ./icons (меньше шансов на конфликт с апстримом).
-import { ChartBarIcon, TicketIcon, ShieldIcon } from '@/components/icons';
+import { ChartBarIcon, ShieldIcon } from '@/components/icons';
 import { useAuthStore } from '@/store/auth';
 
 interface MobileBottomNavProps {
@@ -69,8 +69,8 @@ export function MobileBottomNav({
   const adminItems = [
     { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
     { path: '/balance', label: t('nav.balance'), icon: WalletIcon },
-    { path: '/admin/sales-stats', label: t('admin.nav.salesStats'), icon: ChartBarIcon },
-    { path: '/admin/tickets', label: t('admin.nav.tickets'), icon: TicketIcon },
+    { path: '/admin/sales-stats', label: t('admin.nav.salesStatsShort'), icon: ChartBarIcon },
+    { path: '/admin/tickets', label: t('admin.nav.tickets'), icon: ChatIcon },
     { path: '/admin', label: t('admin.nav.title'), icon: ShieldIcon },
   ];
 

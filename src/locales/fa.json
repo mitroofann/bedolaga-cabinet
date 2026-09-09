@@ -1311,7 +1311,8 @@
       "news": "اخبار",
       "infoPages": "صفحات اطلاعات",
       "legalPages": "صفحات سیستمی",
-      "systemErrors": "خطاهای سیستم"
+      "systemErrors": "خطاهای سیستم",
+      "salesStatsShort": "آمار"
     },
     "panel": {
       "title": "پنل مدیریت",
