@@ -7,6 +7,10 @@ import { usePlatform } from '@/platform';
 
 // Icons
 import { SubscriptionIcon, WalletIcon, UsersIcon, ChatIcon, WheelIcon } from './icons';
+// [Форк] Админские иконки — напрямую из централизованного набора, чтобы не
+// расширять общий реэкспорт ./icons (меньше шансов на конфликт с апстримом).
+import { ChartBarIcon, TicketIcon, ShieldIcon } from '@/components/icons';
+import { useAuthStore } from '@/store/auth';
 
 interface MobileBottomNavProps {
   isKeyboardOpen: boolean;
@@ -25,9 +29,15 @@ export function MobileBottomNav({
   const { t } = useTranslation();
   const location = useLocation();
   const { haptic } = usePlatform();
+  // [Форк] Админам — своё нижнее меню (быстрый доступ в админку из любого места).
+  const isAdmin = useAuthStore((state) => state.isAdmin);
 
-  const isActive = (path: string) =>
-    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+  const isActive = (path: string) => {
+    // [Форк] /admin (панель целиком) подсвечиваем только на нём самом — иначе
+    // он подсвечивался бы вместе с /admin/tickets и /admin/sales-stats.
+    if (path === '/admin') return location.pathname === '/admin';
+    return path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+  };
 
   // Core navigation items for bottom bar.
   //
@@ -52,6 +62,16 @@ export function MobileBottomNav({
         ? [{ path: '/referral', label: t('nav.referral'), icon: UsersIcon }]
         : []),
     { path: '/support', label: t('nav.support'), icon: ChatIcon },
+  ];
+
+  // [Форк] Меню для админов: 5-й слот отдаётся под вход в админку.
+  // Показывается везде, не только внутри /admin — быстрый переход с любой страницы.
+  const adminItems = [
+    { path: '/subscriptions', label: t('nav.subscription'), icon: SubscriptionIcon },
+    { path: '/balance', label: t('nav.balance'), icon: WalletIcon },
+    { path: '/admin/sales-stats', label: t('admin.nav.salesStats'), icon: ChartBarIcon },
+    { path: '/admin/tickets', label: t('admin.nav.tickets'), icon: TicketIcon },
+    { path: '/admin', label: t('admin.nav.title'), icon: ShieldIcon },
   ];
 
   const handleNavClick = () => {
@@ -81,7 +101,7 @@ export function MobileBottomNav({
       }}
     >
       <div className="flex justify-around">
-        {coreItems.map((item) => (
+        {(isAdmin ? adminItems : coreItems).map((item) => (
           <Link
             key={item.path}
             to={item.path}
