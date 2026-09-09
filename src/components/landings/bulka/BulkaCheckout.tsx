@@ -28,7 +28,7 @@ const TRIAL_FEATURES: { icon: string; title?: string; text: string; hint?: strin
     text: ': пакет 50 ГБ LTE-трафика',
     hint: 'Работает даже при самых жёстких ограничениях мобильного интернета',
   },
-  { icon: '🏛', title: 'Умный VPN', text: ': российские сервисы не ругаются' },
+  { icon: '🇷🇺', title: 'Работают с VPN', text: ': Банки, ВК, ВБ, Озон и т.д.' },
   { icon: '⚡️', text: 'Высокая скорость — 1 Гбит/с' },
   { icon: '❤️', text: 'YouTube без рекламы' },
   { icon: '📱', text: '5 устройств включено в подписку' },
