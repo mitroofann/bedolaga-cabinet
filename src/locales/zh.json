@@ -3105,6 +3105,50 @@
         "referrals": "推荐人",
         "registrations": "注册"
       },
+      "legacySettings": {
+        "title": "个人推荐设置",
+        "description": "仅为该已批准合作伙伴设置 legacy 覆盖值。",
+        "futureOnly": "这些设置仅影响未来收益；已发放的奖励不会重新计算。",
+        "nullVsZero": "空值或重置表示继承全局默认值；0 表示明确禁用数值设置。",
+        "effective": "实际生效",
+        "inherited": "全局默认值",
+        "inheritPlaceholder": "继承全局默认值",
+        "units": "金额以卢布输入；API 接收戈比。Tiers 示例：0:100,1:50。",
+        "resetField": "重置字段",
+        "resetAll": "全部重置",
+        "resetAllConfirm": "重置该合作伙伴的所有个人设置？",
+        "success": "个人设置已保存",
+        "resetAllSuccess": "个人设置已重置",
+        "fields": {
+          "minimum_topup_kopeks": "最低充值，₽",
+          "first_topup_bonus_kopeks": "首次充值奖励，₽",
+          "inviter_bonus_kopeks": "邀请人奖励，₽",
+          "commission_percent": "佣金，%",
+          "first_payment_commission_percent": "首次付款佣金，%",
+          "recurring_commission_tiers": "持续佣金阶梯",
+          "max_commission_payments": "最多佣金付款次数",
+          "max_commission_kopeks": "最高佣金，₽"
+        },
+        "sources": {
+          "partner": "合作伙伴覆盖",
+          "partnerProfile": "合作伙伴资料",
+          "global": "全局默认值"
+        },
+        "validation": {
+          "number": "请输入大于或等于 0 的整数。",
+          "percent": "百分比必须在 0 到 100 之间。",
+          "tiersLength": "阶梯不能超过 500 个字符。",
+          "tiersFormat": "请使用无空格格式 0:100,1:50。"
+        },
+        "errors": {
+          "unauthorized": "会话已过期，请重新登录。",
+          "forbidden": "您没有更改这些设置的权限。",
+          "notFound": "未找到用户。",
+          "notApproved": "设置仅适用于已批准的合作伙伴。",
+          "network": "无法连接服务器。",
+          "generic": "无法加载或保存设置。"
+        }
+      },
       "dangerZone": {
         "title": "危险操作",
         "revokeButton": "撤销合作伙伴身份"

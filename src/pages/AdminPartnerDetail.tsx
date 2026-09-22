@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { partnerApi } from '../api/partners';
 import { AdminBackButton } from '../components/admin';
+import { PartnerLegacyReferralSettings } from '../components/admin/PartnerLegacyReferralSettings';
 import { useCurrency } from '../hooks/useCurrency';
 import { StatCard } from '@/components/stats';
 import { PageSkeleton, Skeleton } from '@/components/ui/skeleton';
@@ -212,6 +213,10 @@ export default function AdminPartnerDetail() {
             </button>
           </div>
         </div>
+
+        {partner.partner_status === 'approved' && (
+          <PartnerLegacyReferralSettings userId={partner.user_id} />
+        )}
 
         {/* Campaigns */}
         <div className="rounded-xl border border-dark-700 bg-dark-800 p-4">

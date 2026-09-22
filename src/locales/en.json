@@ -3985,6 +3985,50 @@
         "referrals": "Referrals",
         "registrations": "Registrations"
       },
+      "legacySettings": {
+        "title": "Personal referral settings",
+        "description": "Legacy overrides for this approved partner only.",
+        "futureOnly": "These settings affect future earnings only; issued rewards are not recalculated.",
+        "nullVsZero": "An empty value or reset inherits the global default; 0 explicitly disables a numeric setting.",
+        "effective": "Effective",
+        "inherited": "Global default",
+        "inheritPlaceholder": "Inherit global default",
+        "units": "Enter money in rubles; the API receives kopeks. Tiers example: 0:100,1:50.",
+        "resetField": "Reset field",
+        "resetAll": "Reset all",
+        "resetAllConfirm": "Reset all personal settings for this partner?",
+        "success": "Personal settings saved",
+        "resetAllSuccess": "Personal settings reset",
+        "fields": {
+          "minimum_topup_kopeks": "Minimum top-up, ₽",
+          "first_topup_bonus_kopeks": "First top-up bonus, ₽",
+          "inviter_bonus_kopeks": "Inviter bonus, ₽",
+          "commission_percent": "Commission, %",
+          "first_payment_commission_percent": "First payment commission, %",
+          "recurring_commission_tiers": "Recurring commission tiers",
+          "max_commission_payments": "Maximum commission payments",
+          "max_commission_kopeks": "Maximum commission, ₽"
+        },
+        "sources": {
+          "partner": "Partner override",
+          "partnerProfile": "Partner profile",
+          "global": "Global default"
+        },
+        "validation": {
+          "number": "Enter an integer of 0 or more.",
+          "percent": "Percentage must be between 0 and 100.",
+          "tiersLength": "Tiers must be 500 characters or fewer.",
+          "tiersFormat": "Use the format 0:100,1:50 without spaces."
+        },
+        "errors": {
+          "unauthorized": "Your session expired. Please sign in again.",
+          "forbidden": "You do not have permission to change these settings.",
+          "notFound": "User not found.",
+          "notApproved": "Settings are available only for approved partners.",
+          "network": "Could not reach the server.",
+          "generic": "Could not load or save the settings."
+        }
+      },
       "dangerZone": {
         "title": "Danger Zone",
         "revokeButton": "Revoke Partner Status"

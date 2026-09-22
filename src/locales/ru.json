@@ -4403,6 +4403,50 @@
         "referrals": "Рефералы",
         "registrations": "Регистрации"
       },
+      "legacySettings": {
+        "title": "Персональные реферальные настройки",
+        "description": "Переопределения legacy-настроек только для этого одобренного партнёра.",
+        "futureOnly": "Настройки влияют только на будущие начисления; уже выданные награды не пересчитываются.",
+        "nullVsZero": "Пустое значение и сброс означают наследование global default, а 0 — явное отключение числового параметра.",
+        "effective": "Применяется",
+        "inherited": "Global default",
+        "inheritPlaceholder": "Наследовать global default",
+        "units": "Деньги вводятся в рублях; API получает копейки. Tiers: например, 0:100,1:50.",
+        "resetField": "Сбросить поле",
+        "resetAll": "Сбросить все",
+        "resetAllConfirm": "Сбросить все персональные настройки этого партнёра?",
+        "success": "Персональные настройки сохранены",
+        "resetAllSuccess": "Персональные настройки сброшены",
+        "fields": {
+          "minimum_topup_kopeks": "Минимальное пополнение, ₽",
+          "first_topup_bonus_kopeks": "Бонус за первое пополнение, ₽",
+          "inviter_bonus_kopeks": "Бонус пригласившему, ₽",
+          "commission_percent": "Комиссия, %",
+          "first_payment_commission_percent": "Комиссия за первый платёж, %",
+          "recurring_commission_tiers": "Ступени регулярной комиссии",
+          "max_commission_payments": "Максимум комиссионных платежей",
+          "max_commission_kopeks": "Максимальная комиссия, ₽"
+        },
+        "sources": {
+          "partner": "Partner override",
+          "partnerProfile": "Partner profile",
+          "global": "Global default"
+        },
+        "validation": {
+          "number": "Введите целое число не меньше 0.",
+          "percent": "Процент должен быть от 0 до 100.",
+          "tiersLength": "Ступени не должны быть длиннее 500 символов.",
+          "tiersFormat": "Используйте формат 0:100,1:50 без пробелов."
+        },
+        "errors": {
+          "unauthorized": "Сессия истекла. Войдите снова.",
+          "forbidden": "Недостаточно прав для изменения настроек.",
+          "notFound": "Пользователь не найден.",
+          "notApproved": "Настройки доступны только одобренным партнёрам.",
+          "network": "Не удалось связаться с сервером.",
+          "generic": "Не удалось загрузить или сохранить настройки."
+        }
+      },
       "dangerZone": {
         "title": "Опасная зона",
         "revokeButton": "Отозвать партнёрский статус"

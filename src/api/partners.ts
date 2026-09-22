@@ -173,6 +173,31 @@ export interface AdminPartnerDetailResponse {
   created_at: string;
 }
 
+export type LegacyReferralSettingField =
+  | 'minimum_topup_kopeks'
+  | 'first_topup_bonus_kopeks'
+  | 'inviter_bonus_kopeks'
+  | 'commission_percent'
+  | 'first_payment_commission_percent'
+  | 'recurring_commission_tiers'
+  | 'max_commission_payments'
+  | 'max_commission_kopeks';
+
+export type LegacyReferralSettingValue = number | string | null;
+
+export interface LegacyReferralSettingsResponse {
+  user_id: number;
+  is_partner: boolean;
+  partner_status: string;
+  overrides: Record<LegacyReferralSettingField, LegacyReferralSettingValue>;
+  effective: Record<LegacyReferralSettingField, number | string>;
+  sources: Record<LegacyReferralSettingField, 'global' | 'partner' | 'partner_profile' | string>;
+}
+
+export type LegacyReferralSettingsPatch = Partial<
+  Record<LegacyReferralSettingField, LegacyReferralSettingValue>
+>;
+
 export interface PartnerStats {
   total_partners: number;
   pending_applications: number;
@@ -264,6 +289,31 @@ export const partnerApi = {
   getPartnerDetail: async (userId: number): Promise<AdminPartnerDetailResponse> => {
     const response = await apiClient.get<AdminPartnerDetailResponse>(
       `/cabinet/admin/partners/${userId}`,
+    );
+    return response.data;
+  },
+
+  getLegacyReferralSettings: async (userId: number): Promise<LegacyReferralSettingsResponse> => {
+    const response = await apiClient.get<LegacyReferralSettingsResponse>(
+      `/cabinet/admin/partners/${userId}/legacy-referral-settings`,
+    );
+    return response.data;
+  },
+
+  updateLegacyReferralSettings: async (
+    userId: number,
+    patch: LegacyReferralSettingsPatch,
+  ): Promise<LegacyReferralSettingsResponse> => {
+    const response = await apiClient.patch<LegacyReferralSettingsResponse>(
+      `/cabinet/admin/partners/${userId}/legacy-referral-settings`,
+      patch,
+    );
+    return response.data;
+  },
+
+  deleteLegacyReferralSettings: async (userId: number): Promise<LegacyReferralSettingsResponse> => {
+    const response = await apiClient.delete<LegacyReferralSettingsResponse>(
+      `/cabinet/admin/partners/${userId}/legacy-referral-settings`,
     );
     return response.data;
   },
