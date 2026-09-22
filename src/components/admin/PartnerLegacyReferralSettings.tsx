@@ -284,9 +284,15 @@ export function PartnerLegacyReferralSettings({ userId }: { userId: number }) {
             <div key={field} className="rounded-lg bg-dark-700/40 p-3">
               <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <label htmlFor={`legacy-${field}`} className="text-sm font-medium text-dark-200">
-                    {t(`admin.partnerDetail.legacySettings.fields.${field}`)}
-                  </label>
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <label
+                      htmlFor={`legacy-${field}`}
+                      className="text-sm font-medium text-dark-200"
+                    >
+                      {t(`admin.partnerDetail.legacySettings.fields.${field}`)}
+                    </label>
+                    <code className="text-[11px] text-dark-500">{field}</code>
+                  </div>
                   <div className="mt-1 text-xs text-dark-500">
                     {t('admin.partnerDetail.legacySettings.effective')}: {effectiveLabel} ·{' '}
                     {sourceLabel(data.sources[field], t)}
