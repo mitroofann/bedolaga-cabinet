@@ -22,7 +22,7 @@ import { cn } from '../lib/utils';
 
 const MAX_POLL_MS = 10 * 60 * 1000; // 10 minutes
 
-function PendingState() {
+function PendingState({ isFreeTrial = false }: { isFreeTrial?: boolean }) {
   const { t } = useTranslation();
 
   return (
@@ -34,9 +34,15 @@ function PendingState() {
       <Spinner className="h-16 w-16 border-[3px]" />
       <div>
         <h1 className="text-xl font-bold text-dark-50">
-          {t('landing.awaitingPayment', 'Awaiting payment')}
+          {isFreeTrial
+            ? 'Активируем пробный доступ'
+            : t('landing.awaitingPayment', 'Awaiting payment')}
         </h1>
-        <p className="mt-2 text-sm text-dark-400">{t('landing.awaitingPaymentDesc')}</p>
+        <p className="mt-2 text-sm text-dark-400">
+          {isFreeTrial
+            ? 'Доступ готовится. Подключение появится автоматически через несколько секунд.'
+            : t('landing.awaitingPaymentDesc')}
+        </p>
       </div>
     </motion.div>
   );
@@ -925,6 +931,7 @@ export default function PurchaseSuccess() {
   const isBuyerGiftLink = purchaseStatus?.status === 'paid' && !!purchaseStatus?.is_gift;
 
   const isBulkaFlow = purchaseStatus?.landing_template === 'bulka_sales_flow';
+  const isFreeBulkaTrial = isBulkaFlow && purchaseStatus?.activation_kind === 'free_trial';
   const isBulkaPendingActivation = isBulkaFlow && isPendingActivation;
   const isGiftPendingActivation = isPendingActivation && purchaseStatus?.is_gift && !isActivateHint;
 
@@ -996,7 +1003,7 @@ export default function PurchaseSuccess() {
             contactType={purchaseStatus.contact_type}
           />
         ) : isBulkaPendingActivation ? (
-          <PendingState />
+          <PendingState isFreeTrial={isFreeBulkaTrial} />
         ) : isPendingActivation ? (
           <div className="space-y-4">
             <PendingActivationState

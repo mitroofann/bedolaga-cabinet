@@ -1,6 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { landingApi, type BulkaFlowPurchaseRequest } from '@/api/landings';
+import {
+  landingApi,
+  type BulkaFlowPurchaseRequest,
+  type BulkaFreeTrialRequest,
+} from '@/api/landings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { safeSession } from '@/utils/safeStorage';
@@ -79,7 +84,9 @@ function DevicesMetric({ deviceLimit }: { deviceLimit: number }) {
 }
 
 export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
+  const navigate = useNavigate();
   const { formatAmount, currencySymbol } = useCurrency();
+  const freeTrialRequest = useRef<{ key: string; data: BulkaFreeTrialRequest } | null>(null);
   const [intent, setIntent] = useState<'trial' | 'purchase'>(initialIntent);
   const [selectedTariffId, setSelectedTariffId] = useState<number | null>(null);
   const [selectedPeriodDays, setSelectedPeriodDays] = useState<number | null>(null);
@@ -166,7 +173,33 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
     },
   });
 
+  const freeTrialMutation = useMutation({
+    mutationFn: () => {
+      freeTrialRequest.current ??= {
+        key: idempotencyKey(),
+        data: {
+          language: 'ru',
+          referrer: safeSession.getItem('landing_referrer'),
+          subid: safeSession.getItem('landing_subid'),
+        },
+      };
+      return landingApi.activateBulkaFreeTrial(
+        slug,
+        freeTrialRequest.current.data,
+        freeTrialRequest.current.key,
+      );
+    },
+    onSuccess: (result) => {
+      navigate(`/buy/success/${encodeURIComponent(result.purchase_token)}`);
+    },
+    onError: (requestError) => {
+      setSubmitError(getApiErrorMessage(requestError, 'Не удалось активировать пробный доступ'));
+    },
+  });
+
   const selectIntent = (nextIntent: 'trial' | 'purchase') => {
+    if (freeTrialMutation.isPending) return;
+    if (nextIntent !== intent) freeTrialRequest.current = null;
     setIntent(nextIntent);
     setSelectedTariffId(null);
     setSelectedPeriodDays(null);
@@ -183,7 +216,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
   };
 
   const handlePayment = () => {
-    if (!flow || !selectedMethod) return;
+    if (!flow || !selectedMethod || purchaseMutation.isPending) return;
     if (intent === 'trial') {
       if (!flow.trial.available) return;
       purchaseMutation.mutate({
@@ -222,6 +255,8 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
   }
 
   const isTrial = intent === 'trial';
+  const isFreeTrial =
+    isTrial && !flow.trial.requires_external_payment && flow.trial.price_kopeks === 0;
   const priceKopeks = isTrial ? flow.trial.price_kopeks : (period?.price_kopeks ?? null);
   const canPay = Boolean(
     selectedMethod && priceKopeks !== null && (isTrial ? flow.trial.available : tariff && period),
@@ -266,8 +301,9 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           <div>
             <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Пробный период</h2>
             <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
-              После подтверждения оплаты доступ активируется автоматически, а затем вы получите
-              инструкцию для подключения VPN.
+              {isFreeTrial
+                ? 'Активируйте бесплатный пробный доступ — затем мы покажем инструкцию для подключения VPN.'
+                : 'После подтверждения оплаты доступ активируется автоматически, а затем вы получите инструкцию для подключения VPN.'}
             </p>
           </div>
           {flow.trial.available ? (
@@ -378,85 +414,111 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
         </div>
       )}
 
-      <div className="landing-surface-primary">
-        <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Способ оплаты</h2>
-        <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
-          Выберите удобный способ. Оплата пройдёт на защищённой странице провайдера.
-        </p>
-        <div className="mt-4 space-y-3" role="radiogroup" aria-label="Способ оплаты">
-          {flow.payment_methods.map((item) => (
-            <div key={item.method_id}>
-              {
-                <button
-                  type="button"
-                  role="radio"
-                  aria-checked={method?.method_id === item.method_id}
-                  onClick={() => selectMethod(item.method_id)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-xl border p-4 text-left transition-colors ${method?.method_id === item.method_id ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
-                >
-                  <span className="flex min-w-0 items-center gap-3">
-                    {item.icon_url && (
-                      <img
-                        src={item.icon_url}
-                        alt=""
-                        className="h-8 w-8 shrink-0 rounded-lg object-contain"
-                      />
-                    )}
-                    <span>
-                      <span className="block text-base font-medium text-dark-100">
-                        {item.display_name}
-                      </span>
-                      {item.description && (
-                        <span className="mt-1 block text-sm leading-relaxed text-dark-400">
-                          {item.description}
-                        </span>
-                      )}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-sm text-dark-400">{item.currency || ''}</span>
-                </button>
-              }
-              {method?.method_id === item.method_id &&
-                item.sub_options &&
-                item.sub_options.length > 1 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {item.sub_options.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => setSelectedSubOption(option.id)}
-                        className={`rounded-lg px-3 py-2 text-sm ${selectedSubOption === option.id ? 'bg-accent-500 text-on-accent' : 'landing-surface-inset text-dark-300'}`}
-                      >
-                        {option.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-            </div>
-          ))}
-        </div>
-        {submitError && (
-          <p className="mt-4 text-sm text-error-400" aria-live="polite">
-            {submitError}
+      {isFreeTrial ? (
+        <div className="landing-surface-primary">
+          <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Бесплатный пробный доступ</h2>
+          <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+            Оплата не требуется. После активации вы сразу перейдёте к подключению VPN.
           </p>
-        )}
-        <button
-          type="button"
-          disabled={!canPay || purchaseMutation.isPending}
-          onClick={handlePayment}
-          className="mt-6 flex w-full items-center justify-center rounded-xl bg-accent-500 px-5 py-4 text-base font-semibold text-on-accent transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {purchaseMutation.isPending
-            ? 'Создаём оплату…'
-            : priceKopeks === null
-              ? 'Выберите условия'
-              : `Перейти к оплате · ${formatAmount(priceKopeks / 100, 0)} ${currencySymbol}`}
-        </button>
-        <p className="landing-payment-reassurance">
-          После подтверждения оплаты доступ активируется автоматически. На следующем шаге покажем
-          простую инструкцию для подключения устройства.
-        </p>
-      </div>
+          {submitError && (
+            <p className="mt-4 text-sm text-error-400" aria-live="polite">
+              {submitError}
+            </p>
+          )}
+          <button
+            type="button"
+            disabled={!flow.trial.available || freeTrialMutation.isPending}
+            onClick={() => {
+              if (!flow.trial.available || freeTrialMutation.isPending) return;
+              setSubmitError(null);
+              freeTrialMutation.mutate();
+            }}
+            className="mt-6 flex w-full items-center justify-center rounded-xl bg-accent-500 px-5 py-4 text-base font-semibold text-on-accent transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {freeTrialMutation.isPending ? 'Активируем доступ…' : 'Активировать бесплатно'}
+          </button>
+        </div>
+      ) : (
+        <div className="landing-surface-primary">
+          <h2 className="text-xl font-bold text-dark-50 sm:text-2xl">Способ оплаты</h2>
+          <p className="mt-2 text-sm leading-relaxed text-dark-400 sm:text-base">
+            Выберите удобный способ. Оплата пройдёт на защищённой странице провайдера.
+          </p>
+          <div className="mt-4 space-y-3" role="radiogroup" aria-label="Способ оплаты">
+            {flow.payment_methods.map((item) => (
+              <div key={item.method_id}>
+                {
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={method?.method_id === item.method_id}
+                    onClick={() => selectMethod(item.method_id)}
+                    className={`flex w-full items-center justify-between gap-3 rounded-xl border p-4 text-left transition-colors ${method?.method_id === item.method_id ? 'border-accent-500 bg-accent-500/10' : 'border-dark-700 landing-surface-inset hover:border-dark-600'}`}
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      {item.icon_url && (
+                        <img
+                          src={item.icon_url}
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-lg object-contain"
+                        />
+                      )}
+                      <span>
+                        <span className="block text-base font-medium text-dark-100">
+                          {item.display_name}
+                        </span>
+                        {item.description && (
+                          <span className="mt-1 block text-sm leading-relaxed text-dark-400">
+                            {item.description}
+                          </span>
+                        )}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-sm text-dark-400">{item.currency || ''}</span>
+                  </button>
+                }
+                {method?.method_id === item.method_id &&
+                  item.sub_options &&
+                  item.sub_options.length > 1 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {item.sub_options.map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => setSelectedSubOption(option.id)}
+                          className={`rounded-lg px-3 py-2 text-sm ${selectedSubOption === option.id ? 'bg-accent-500 text-on-accent' : 'landing-surface-inset text-dark-300'}`}
+                        >
+                          {option.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+              </div>
+            ))}
+          </div>
+          {submitError && (
+            <p className="mt-4 text-sm text-error-400" aria-live="polite">
+              {submitError}
+            </p>
+          )}
+          <button
+            type="button"
+            disabled={!canPay || purchaseMutation.isPending}
+            onClick={handlePayment}
+            className="mt-6 flex w-full items-center justify-center rounded-xl bg-accent-500 px-5 py-4 text-base font-semibold text-on-accent transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {purchaseMutation.isPending
+              ? 'Создаём оплату…'
+              : priceKopeks === null
+                ? 'Выберите условия'
+                : `Перейти к оплате · ${formatAmount(priceKopeks / 100, 0)} ${currencySymbol}`}
+          </button>
+          <p className="landing-payment-reassurance">
+            После подтверждения оплаты доступ активируется автоматически. На следующем шаге покажем
+            простую инструкцию для подключения устройства.
+          </p>
+        </div>
+      )}
       <LandingLegalFooter />
     </div>
   );

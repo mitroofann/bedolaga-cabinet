@@ -65,6 +65,17 @@ export interface BulkaFlowPurchaseResponse {
   landing_template: 'bulka_sales_flow';
 }
 
+export interface BulkaFreeTrialRequest {
+  language?: string | null;
+  yandex_cid?: string | null;
+  referrer?: string | null;
+  subid?: string | null;
+}
+
+export interface BulkaFreeTrialResponse {
+  purchase_token: string;
+}
+
 export interface LandingFeature {
   icon: string;
   title: string;
@@ -268,6 +279,7 @@ export interface PurchaseStatus {
   landing_template?: LandingTemplate | null;
   flow_kind?: 'trial' | 'purchase' | null;
   flow_return_kind?: 'bulka_connect' | null;
+  activation_kind?: 'free_trial' | 'paid' | null;
   activated_at?: string | null;
   subscription_id?: number | null;
 }
@@ -442,6 +454,17 @@ export const landingApi = {
     idempotencyKey: string,
   ): Promise<BulkaFlowPurchaseResponse> => {
     const response = await apiClient.post(`/cabinet/landing/${slug}/bulka-flow/purchase`, data, {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    });
+    return response.data;
+  },
+
+  activateBulkaFreeTrial: async (
+    slug: string,
+    data: BulkaFreeTrialRequest,
+    idempotencyKey: string,
+  ): Promise<BulkaFreeTrialResponse> => {
+    const response = await apiClient.post(`/cabinet/landing/${slug}/bulka-flow/free-trial`, data, {
       headers: { 'Idempotency-Key': idempotencyKey },
     });
     return response.data;
