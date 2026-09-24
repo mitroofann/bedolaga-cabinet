@@ -321,7 +321,7 @@ function App() {
         <Route
           path="/buy/:slug/flow"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute withLayout={false}>
               <LazyPage>
                 <BulkaLandingFlow />
               </LazyPage>

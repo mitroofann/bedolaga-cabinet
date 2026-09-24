@@ -39,11 +39,13 @@ import {
 import { MobileBottomNav } from './MobileBottomNav';
 import { AppHeader } from './AppHeader';
 
-interface AppShellProps {
+export interface AppShellProps {
   children: React.ReactNode;
+  titleOverride?: string;
+  showLogo?: boolean;
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, titleOverride, showLogo = true }: AppShellProps) {
   const { t } = useTranslation();
   const location = useLocation();
   const isAdmin = useAuthStore((state) => state.isAdmin);
@@ -56,6 +58,7 @@ export function AppShell({ children }: AppShellProps) {
 
   // Extracted hooks
   const { appName, logoLetter, hasCustomLogo, logoUrl } = useBranding();
+  const displayTitle = titleOverride || appName;
   const { referralEnabled, wheelEnabled, hasContests, hasPolls, giftEnabled } = useFeatureFlags();
   useScrollRestoration();
   // Animated background is intentionally OFF inside the cabinet (it distracts
@@ -202,30 +205,32 @@ export function AppShell({ children }: AppShellProps) {
           {/* Logo */}
           <Link
             to="/"
-            className="flex shrink-0 items-center gap-2.5 justify-self-start"
+            className="flex min-w-0 shrink-0 items-center gap-2.5 justify-self-start"
             onClick={handleNavClick}
           >
-            <div className="relative flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-dark-800">
-              <span
-                className={cn(
-                  'absolute text-sm font-bold text-accent-400 transition-opacity duration-200',
-                  hasCustomLogo && isLogoPreloaded() ? 'opacity-0' : 'opacity-100',
-                )}
-              >
-                {logoLetter}
-              </span>
-              {hasCustomLogo && logoUrl && (
-                <img
-                  src={logoUrl}
-                  alt={appName || 'Logo'}
+            {showLogo && (
+              <div className="relative flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-dark-800">
+                <span
                   className={cn(
-                    'absolute h-full w-full object-contain transition-opacity duration-200',
-                    isLogoPreloaded() ? 'opacity-100' : 'opacity-0',
+                    'absolute text-sm font-bold text-accent-400 transition-opacity duration-200',
+                    hasCustomLogo && isLogoPreloaded() ? 'opacity-0' : 'opacity-100',
                   )}
-                />
-              )}
-            </div>
-            <span className="text-base font-semibold text-dark-100">{appName}</span>
+                >
+                  {logoLetter}
+                </span>
+                {hasCustomLogo && logoUrl && (
+                  <img
+                    src={logoUrl}
+                    alt={displayTitle || 'Logo'}
+                    className={cn(
+                      'absolute h-full w-full object-contain transition-opacity duration-200',
+                      isLogoPreloaded() ? 'opacity-100' : 'opacity-0',
+                    )}
+                  />
+                )}
+              </div>
+            )}
+            <span className="truncate text-base font-semibold text-dark-100">{displayTitle}</span>
           </Link>
 
           {/* Navigation — единая «капсула» (segmented control): все пункты видны
@@ -285,6 +290,8 @@ export function AppShell({ children }: AppShellProps) {
         safeAreaInset={safeAreaInset}
         contentSafeAreaInset={contentSafeAreaInset}
         telegramPlatform={platform}
+        titleOverride={titleOverride}
+        showLogo={showLogo}
         wheelEnabled={wheelEnabled}
         referralEnabled={referralEnabled}
         hasContests={hasContests}

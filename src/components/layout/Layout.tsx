@@ -1,6 +1,6 @@
-import { AppShell } from './AppShell';
+import { AppShell, type AppShellProps } from './AppShell';
 
-interface LayoutProps {
+interface LayoutProps extends Omit<AppShellProps, 'children'> {
   children: React.ReactNode;
 }
 
@@ -12,6 +12,6 @@ interface LayoutProps {
  * - Command palette (⌘K)
  * - Platform-aware features (Telegram integration)
  */
-export default function Layout({ children }: LayoutProps) {
-  return <AppShell>{children}</AppShell>;
+export default function Layout({ children, ...appShellProps }: LayoutProps) {
+  return <AppShell {...appShellProps}>{children}</AppShell>;
 }

@@ -58,6 +58,8 @@ interface AppHeaderProps {
   safeAreaInset: { top: number; bottom: number; left: number; right: number };
   contentSafeAreaInset: { top: number; bottom: number; left: number; right: number };
   telegramPlatform?: TelegramPlatform;
+  titleOverride?: string;
+  showLogo?: boolean;
   wheelEnabled?: boolean;
   referralEnabled?: boolean;
   hasContests?: boolean;
@@ -74,6 +76,8 @@ export function AppHeader({
   safeAreaInset,
   contentSafeAreaInset,
   telegramPlatform,
+  titleOverride,
+  showLogo = true,
   wheelEnabled,
   referralEnabled,
   hasContests,
@@ -107,6 +111,7 @@ export function AppHeader({
   });
 
   const appName = branding ? branding.name : FALLBACK_NAME;
+  const displayTitle = titleOverride || appName;
   const logoLetter = branding?.logo_letter || FALLBACK_LOGO;
   const hasCustomLogo = branding?.has_custom_logo || false;
   const logoUrl = branding ? brandingApi.getLogoUrl(branding) : null;
@@ -185,32 +190,37 @@ export function AppHeader({
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className={cn('flex flex-shrink-0 items-center gap-2.5', !appName && 'mr-4')}
+              className={cn(
+                'flex min-w-0 flex-shrink-0 items-center gap-2.5',
+                !displayTitle && 'mr-4',
+              )}
             >
-              <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-linear-lg border border-dark-700/50 bg-dark-800/80 shadow-md">
-                <span
-                  className={cn(
-                    'absolute text-lg font-bold text-accent-400 transition-opacity duration-200',
-                    hasCustomLogo && logoLoaded ? 'opacity-0' : 'opacity-100',
-                  )}
-                >
-                  {logoLetter}
-                </span>
-                {hasCustomLogo && logoUrl && (
-                  <img
-                    src={logoUrl}
-                    alt={appName || 'Logo'}
+              {showLogo && (
+                <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-linear-lg border border-dark-700/50 bg-dark-800/80 shadow-md">
+                  <span
                     className={cn(
-                      'absolute h-full w-full object-contain transition-opacity duration-200',
-                      logoLoaded ? 'opacity-100' : 'opacity-0',
+                      'absolute text-lg font-bold text-accent-400 transition-opacity duration-200',
+                      hasCustomLogo && logoLoaded ? 'opacity-0' : 'opacity-100',
                     )}
-                    onLoad={() => setLogoLoaded(true)}
-                  />
-                )}
-              </div>
-              {appName && (
-                <span className="whitespace-nowrap text-base font-semibold text-dark-100">
-                  {appName}
+                  >
+                    {logoLetter}
+                  </span>
+                  {hasCustomLogo && logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt={displayTitle || 'Logo'}
+                      className={cn(
+                        'absolute h-full w-full object-contain transition-opacity duration-200',
+                        logoLoaded ? 'opacity-100' : 'opacity-0',
+                      )}
+                      onLoad={() => setLogoLoaded(true)}
+                    />
+                  )}
+                </div>
+              )}
+              {displayTitle && (
+                <span className="max-w-[12rem] truncate whitespace-nowrap text-base font-semibold text-dark-100">
+                  {displayTitle}
                 </span>
               )}
             </Link>
