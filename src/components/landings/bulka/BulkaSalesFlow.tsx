@@ -36,7 +36,13 @@ export function BulkaSalesFlow({ slug, intent, config, branding }: BulkaSalesFlo
         <BackgroundRenderer />
       )}
       <div className="relative mx-auto flex min-h-dvh max-w-5xl flex-col px-4 sm:px-6 lg:px-8">
-        <LandingPublicHeader branding={branding} mode={authMode} onModeChange={setAuthMode} />
+        <LandingPublicHeader
+          branding={branding}
+          title={config.title}
+          showLogo={false}
+          mode={authMode}
+          onModeChange={setAuthMode}
+        />
         <main className="flex-1 py-8 sm:py-10">
           <LandingProgressSteps current={1} />
           <section className="mx-auto mt-6 max-w-xl landing-surface-primary sm:mt-8">

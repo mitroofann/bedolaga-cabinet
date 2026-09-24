@@ -4,11 +4,21 @@ import { brandingApi, getLogoBlobUrl, isLogoPreloaded, preloadLogo } from '@/api
 
 interface LandingPublicHeaderProps {
   branding?: BrandingInfo;
+  /** Optional landing-local title; defaults to the Bulka brand name. */
+  title?: string;
+  /** Keep the logo visible by default for other landing consumers. */
+  showLogo?: boolean;
   mode: 'login' | 'register';
   onModeChange: (mode: 'login' | 'register') => void;
 }
 
-export function LandingPublicHeader({ branding, mode, onModeChange }: LandingPublicHeaderProps) {
+export function LandingPublicHeader({
+  branding,
+  title = 'Bulka VPN',
+  showLogo = true,
+  mode,
+  onModeChange,
+}: LandingPublicHeaderProps) {
   const letter = branding?.logo_letter || 'B';
   const [logoLoaded, setLogoLoaded] = useState(() => isLogoPreloaded());
   const [logoUrl, setLogoUrl] = useState<string | null>(() => getLogoBlobUrl());
@@ -27,18 +37,20 @@ export function LandingPublicHeader({ branding, mode, onModeChange }: LandingPub
   return (
     <header className="flex items-center justify-between gap-4 border-b border-dark-700/40 py-4">
       <div className="flex min-w-0 items-center gap-3 text-dark-50">
-        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-accent-500 text-sm font-bold text-on-accent">
-          <span className={logoUrl && logoLoaded ? 'opacity-0' : 'opacity-100'}>{letter}</span>
-          {logoUrl && (
-            <img
-              src={logoUrl}
-              alt=""
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity ${logoLoaded ? 'opacity-100' : 'opacity-0'}`}
-              onLoad={() => setLogoLoaded(true)}
-            />
-          )}
-        </span>
-        <span className="truncate text-base font-semibold">Bulka VPN</span>
+        {showLogo && (
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-accent-500 text-sm font-bold text-on-accent">
+            <span className={logoUrl && logoLoaded ? 'opacity-0' : 'opacity-100'}>{letter}</span>
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt=""
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity ${logoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setLogoLoaded(true)}
+              />
+            )}
+          </span>
+        )}
+        <span className="truncate text-base font-semibold">{title || 'Bulka VPN'}</span>
       </div>
       <nav className="flex shrink-0 items-center gap-2" aria-label="Вход в кабинет">
         <button
