@@ -13,51 +13,55 @@ function valueOrDash(value: number | undefined, format: (value: number) => strin
 export function PartnerReferralTerms({ terms }: PartnerReferralTermsProps) {
   const { t } = useTranslation();
   const { formatWithCurrency } = useCurrency();
-  const formatMoney = (kopeks: number) => formatWithCurrency(kopeks / 100);
+  const formatMoney = (kopeks: number) => formatWithCurrency(kopeks / 100, 0);
   const formatLimit = (value: number | undefined) =>
-    value == null ? '—' : value === 0 ? t('referral.partnerTerms.unlimited') : String(value);
+    value == null
+      ? '—'
+      : value === 0
+        ? t('referral.partner.partnerTerms.unlimited')
+        : String(value);
 
   return (
     <section className="bento-card">
       <h2 className="mb-1 text-lg font-semibold text-dark-100">
-        {t('referral.partnerTerms.title')}
+        {t('referral.partner.partnerTerms.title')}
       </h2>
-      <p className="mb-4 text-sm text-dark-400">{t('referral.partnerTerms.description')}</p>
+      <p className="mb-4 text-sm text-dark-400">{t('referral.partner.partnerTerms.description')}</p>
 
       {terms.scheme === 'legacy' ? (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           <TermStat
-            label={t('referral.partnerTerms.minimumTopup')}
+            label={t('referral.partner.partnerTerms.minimumTopup')}
             value={valueOrDash(terms.minimum_topup_kopeks, formatMoney)}
           />
           <TermStat
-            label={t('referral.partnerTerms.firstTopupBonus')}
+            label={t('referral.partner.partnerTerms.firstTopupBonus')}
             value={valueOrDash(terms.first_topup_bonus_kopeks, formatMoney)}
           />
           <TermStat
-            label={t('referral.partnerTerms.inviterBonus')}
+            label={t('referral.partner.partnerTerms.inviterBonus')}
             value={valueOrDash(terms.inviter_bonus_kopeks, formatMoney)}
           />
           <TermStat
-            label={t('referral.partnerTerms.commission')}
+            label={t('referral.partner.partnerTerms.commission')}
             value={valueOrDash(terms.commission_percent, (value) => `${value}%`)}
           />
           <TermStat
-            label={t('referral.partnerTerms.firstPaymentCommission')}
+            label={t('referral.partner.partnerTerms.firstPaymentCommission')}
             value={valueOrDash(terms.first_payment_commission_percent, (value) => `${value}%`)}
           />
           <TermStat
-            label={t('referral.partnerTerms.maxPayments')}
+            label={t('referral.partner.partnerTerms.maxPayments')}
             value={formatLimit(terms.max_commission_payments)}
           />
           <TermStat
-            label={t('referral.partnerTerms.maxCommission')}
+            label={t('referral.partner.partnerTerms.maxCommission')}
             value={valueOrDash(terms.max_commission_kopeks, formatMoney)}
           />
           {terms.recurring_commission_tiers && terms.recurring_commission_tiers.length > 0 && (
             <div className="col-span-2 rounded-xl border border-dark-700/40 bg-dark-800/30 p-3 md:col-span-3">
               <div className="text-xs text-dark-500">
-                {t('referral.partnerTerms.recurringTiers')}
+                {t('referral.partner.partnerTerms.recurringTiers')}
               </div>
               <div className="mt-1 flex flex-wrap gap-2 text-sm text-dark-100">
                 {terms.recurring_commission_tiers.map((tier) => (
@@ -76,7 +80,7 @@ export function PartnerReferralTerms({ terms }: PartnerReferralTermsProps) {
         <div className="space-y-3">
           {terms.levels_mode && (
             <p className="text-sm text-dark-300">
-              {t('referral.partnerTerms.levelsMode')}:{' '}
+              {t('referral.partner.partnerTerms.levelsMode')}:{' '}
               {t(`referral.terms.mode${terms.levels_mode === 'chain' ? 'Chain' : 'Tiers'}`)}
             </p>
           )}
@@ -91,19 +95,19 @@ export function PartnerReferralTerms({ terms }: PartnerReferralTermsProps) {
                 </span>
                 <span className={level.is_active ? 'badge-success' : 'badge-neutral'}>
                   {level.is_active
-                    ? t('referral.partnerTerms.active')
-                    : t('referral.partnerTerms.inactive')}
+                    ? t('referral.partner.partnerTerms.active')
+                    : t('referral.partner.partnerTerms.inactive')}
                 </span>
               </div>
               <div className="mt-2 grid gap-1 text-sm text-dark-300 md:grid-cols-2">
                 <span>
-                  {t('referral.partnerTerms.rewardMode')}: {level.reward_mode}
+                  {t('referral.partner.partnerTerms.rewardMode')}: {level.reward_mode}
                 </span>
                 <span>
-                  {t('referral.partnerTerms.trigger')}: {level.trigger}
+                  {t('referral.partner.partnerTerms.trigger')}: {level.trigger}
                 </span>
                 <span>
-                  {t('referral.partnerTerms.referrerReward')}:{' '}
+                  {t('referral.partner.partnerTerms.referrerReward')}:{' '}
                   {formatReward(
                     level.referrer_percent,
                     level.referrer_fixed_kopeks,
@@ -112,7 +116,7 @@ export function PartnerReferralTerms({ terms }: PartnerReferralTermsProps) {
                   )}
                 </span>
                 <span>
-                  {t('referral.partnerTerms.refereeReward')}:{' '}
+                  {t('referral.partner.partnerTerms.refereeReward')}:{' '}
                   {formatReward(
                     undefined,
                     level.referee_fixed_kopeks,
@@ -121,13 +125,14 @@ export function PartnerReferralTerms({ terms }: PartnerReferralTermsProps) {
                   )}
                 </span>
                 <span>
-                  {t('referral.partnerTerms.maxPayments')}: {formatLimit(level.max_payments)}
+                  {t('referral.partner.partnerTerms.maxPayments')}:{' '}
+                  {formatLimit(level.max_payments)}
                 </span>
                 <span>
-                  {t('referral.partnerTerms.requiredReferrals')}: {level.required_referrals}
+                  {t('referral.partner.partnerTerms.requiredReferrals')}: {level.required_referrals}
                 </span>
                 <span>
-                  {t('referral.partnerTerms.activeOnly')}:{' '}
+                  {t('referral.partner.partnerTerms.activeOnly')}:{' '}
                   {level.required_referrals_active_only ? t('common.yes') : t('common.no')}
                 </span>
               </div>

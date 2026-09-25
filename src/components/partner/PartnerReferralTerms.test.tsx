@@ -8,26 +8,26 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
       const labels: Record<string, string> = {
-        'referral.partnerTerms.title': 'Your partner terms',
-        'referral.partnerTerms.description': 'Future rewards',
-        'referral.partnerTerms.minimumTopup': 'Minimum top-up',
-        'referral.partnerTerms.firstTopupBonus': 'First top-up bonus',
-        'referral.partnerTerms.inviterBonus': 'Inviter bonus',
-        'referral.partnerTerms.commission': 'Commission',
-        'referral.partnerTerms.firstPaymentCommission': 'First payment commission',
-        'referral.partnerTerms.recurringTiers': 'Recurring tiers',
-        'referral.partnerTerms.maxPayments': 'Maximum payments',
-        'referral.partnerTerms.maxCommission': 'Maximum commission',
-        'referral.partnerTerms.unlimited': 'Unlimited',
-        'referral.partnerTerms.levelsMode': 'Levels mode',
-        'referral.partnerTerms.rewardMode': 'Reward mode',
-        'referral.partnerTerms.trigger': 'Trigger',
-        'referral.partnerTerms.referrerReward': 'Referrer reward',
-        'referral.partnerTerms.refereeReward': 'Referee reward',
-        'referral.partnerTerms.requiredReferrals': 'Required referrals',
-        'referral.partnerTerms.activeOnly': 'Active only',
-        'referral.partnerTerms.active': 'Active',
-        'referral.partnerTerms.inactive': 'Inactive',
+        'referral.partner.partnerTerms.title': 'Your partner terms',
+        'referral.partner.partnerTerms.description': 'Future rewards',
+        'referral.partner.partnerTerms.minimumTopup': 'Minimum top-up',
+        'referral.partner.partnerTerms.firstTopupBonus': 'First top-up bonus',
+        'referral.partner.partnerTerms.inviterBonus': 'Inviter bonus',
+        'referral.partner.partnerTerms.commission': 'Commission',
+        'referral.partner.partnerTerms.firstPaymentCommission': 'First payment commission',
+        'referral.partner.partnerTerms.recurringTiers': 'Recurring tiers',
+        'referral.partner.partnerTerms.maxPayments': 'Maximum payments',
+        'referral.partner.partnerTerms.maxCommission': 'Maximum commission',
+        'referral.partner.partnerTerms.unlimited': 'Unlimited',
+        'referral.partner.partnerTerms.levelsMode': 'Levels mode',
+        'referral.partner.partnerTerms.rewardMode': 'Reward mode',
+        'referral.partner.partnerTerms.trigger': 'Trigger',
+        'referral.partner.partnerTerms.referrerReward': 'Referrer reward',
+        'referral.partner.partnerTerms.refereeReward': 'Referee reward',
+        'referral.partner.partnerTerms.requiredReferrals': 'Required referrals',
+        'referral.partner.partnerTerms.activeOnly': 'Active only',
+        'referral.partner.partnerTerms.active': 'Active',
+        'referral.partner.partnerTerms.inactive': 'Inactive',
         'referral.terms.levelLabel': `Level ${options?.level ?? ''}`,
         'referral.terms.modeChain': 'Chain',
         'referral.terms.modeTiers': 'Tiers',
@@ -40,7 +40,9 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('../../hooks/useCurrency', () => ({
-  useCurrency: () => ({ formatWithCurrency: (rubles: number) => `${rubles} ₽` }),
+  useCurrency: () => ({
+    formatWithCurrency: (rubles: number, decimals = 2) => `${rubles.toFixed(decimals)} ₽`,
+  }),
 }));
 
 afterEach(cleanup);
@@ -50,7 +52,7 @@ const legacyTerms: PartnerReferralTermsData = {
   levels_mode: null,
   minimum_topup_kopeks: 10000,
   first_topup_bonus_kopeks: 5000,
-  inviter_bonus_kopeks: 2500,
+  inviter_bonus_kopeks: 0,
   commission_percent: 25,
   first_payment_commission_percent: 30,
   recurring_commission_tiers: [{ payment_number: 10, percent: 15 }],
@@ -62,8 +64,12 @@ describe('PartnerReferralTerms', () => {
   it('shows legacy effective values in readable units', () => {
     render(<PartnerReferralTerms terms={legacyTerms} />);
 
+    expect(screen.getByText('Your partner terms')).toBeTruthy();
+    expect(screen.queryByText('referral.partnerTerms.title')).toBeNull();
     expect(screen.getByText('100 ₽')).toBeTruthy();
     expect(screen.getByText('50 ₽')).toBeTruthy();
+    expect(screen.getByText('0 ₽')).toBeTruthy();
+    expect(screen.queryByText('100.00 ₽')).toBeNull();
     expect(screen.getByText('25%')).toBeTruthy();
     expect(screen.getByText('30%')).toBeTruthy();
     expect(screen.getByText('10 → 15%')).toBeTruthy();
