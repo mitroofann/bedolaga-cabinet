@@ -1071,7 +1071,32 @@
       "yourCampaigns": "Your campaigns",
       "campaignLinks": {
         "bot": "Bot link",
-        "web": "Cabinet link"
+        "web": "Cabinet link",
+        "sale": "Sale link",
+        "trial": "Trial link",
+        "landing": "Landing link"
+      },
+      "partnerTerms": {
+        "title": "Your partner program terms",
+        "description": "Individual terms applied to future rewards.",
+        "minimumTopup": "Minimum top-up",
+        "firstTopupBonus": "First top-up bonus",
+        "inviterBonus": "Inviter bonus",
+        "commission": "Commission",
+        "firstPaymentCommission": "First payment commission",
+        "recurringTiers": "Commission by payment",
+        "maxPayments": "Maximum payments",
+        "maxCommission": "Maximum commission",
+        "levelsMode": "Levels mode",
+        "rewardMode": "Reward mode",
+        "trigger": "Trigger",
+        "referrerReward": "Referrer reward",
+        "refereeReward": "Referee reward",
+        "requiredReferrals": "Required referrals",
+        "activeOnly": "Active referrals only",
+        "active": "Active",
+        "inactive": "Inactive",
+        "unlimited": "Unlimited"
       },
       "campaignBonus": {
         "title": "Referral bonus",

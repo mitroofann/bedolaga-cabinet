@@ -946,7 +946,32 @@
       "yourCampaigns": "您的活动",
       "campaignLinks": {
         "bot": "机器人链接",
-        "web": "网页链接"
+        "web": "网页链接",
+        "sale": "销售链接",
+        "trial": "试用链接",
+        "landing": "落地页链接"
+      },
+      "partnerTerms": {
+        "title": "您的合作伙伴计划条件",
+        "description": "适用于未来奖励的个性化条件。",
+        "minimumTopup": "最低充值",
+        "firstTopupBonus": "首次充值奖励",
+        "inviterBonus": "邀请人奖励",
+        "commission": "佣金",
+        "firstPaymentCommission": "首次付款佣金",
+        "recurringTiers": "按付款次数计算的佣金",
+        "maxPayments": "最多付款次数",
+        "maxCommission": "最高佣金",
+        "levelsMode": "等级模式",
+        "rewardMode": "奖励类型",
+        "trigger": "触发条件",
+        "referrerReward": "邀请人奖励",
+        "refereeReward": "被邀请人奖励",
+        "requiredReferrals": "所需推荐人数",
+        "activeOnly": "仅活跃推荐",
+        "active": "启用",
+        "inactive": "停用",
+        "unlimited": "无限制"
       },
       "campaignBonus": {
         "title": "推荐奖励",

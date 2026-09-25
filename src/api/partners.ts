@@ -18,6 +18,42 @@ export interface PartnerApplicationInfo {
   processed_at: string | null;
 }
 
+export interface PartnerReferralTier {
+  payment_number: number;
+  percent: number;
+}
+
+export interface PartnerReferralLevel {
+  level: number;
+  is_active: boolean;
+  reward_mode: 'money' | 'days' | 'both';
+  trigger: 'registration' | 'first_topup' | 'every_topup';
+  referrer_percent: number;
+  referrer_fixed_kopeks: number;
+  referrer_days: number;
+  referrer_tariff_id: number | null;
+  referee_fixed_kopeks: number;
+  referee_days: number;
+  referee_tariff_id: number | null;
+  max_payments: number;
+  required_referrals: number;
+  required_referrals_active_only: boolean;
+}
+
+export interface PartnerReferralTerms {
+  scheme: 'legacy' | 'levels';
+  levels_mode: 'chain' | 'tiers' | null;
+  minimum_topup_kopeks?: number;
+  first_topup_bonus_kopeks?: number;
+  inviter_bonus_kopeks?: number;
+  commission_percent?: number;
+  first_payment_commission_percent?: number;
+  recurring_commission_tiers?: PartnerReferralTier[];
+  max_commission_payments?: number;
+  max_commission_kopeks?: number;
+  levels?: PartnerReferralLevel[];
+}
+
 export interface PartnerCampaignInfo {
   id: number;
   name: string;
@@ -28,6 +64,9 @@ export interface PartnerCampaignInfo {
   subscription_traffic_gb: number | null;
   deep_link: string | null;
   web_link: string | null;
+  sale_url?: string | null;
+  trial_url?: string | null;
+  landing_url?: string | null;
   // Per-campaign statistics
   registrations_count: number;
   referrals_count: number;
@@ -37,6 +76,7 @@ export interface PartnerCampaignInfo {
 export interface PartnerStatusResponse {
   partner_status: string;
   commission_percent: number | null;
+  partner_terms?: PartnerReferralTerms | null;
   latest_application: PartnerApplicationInfo | null;
   campaigns: PartnerCampaignInfo[];
 }

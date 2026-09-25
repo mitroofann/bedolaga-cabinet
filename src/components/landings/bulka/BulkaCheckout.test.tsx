@@ -5,6 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { BulkaFlowConfig } from '@/api/landings';
 import { BulkaCheckout } from './BulkaCheckout';
 
+vi.mock('@/utils/campaign', () => ({
+  getPendingCampaignSlug: () => 'summer_2026',
+}));
+
 const { getConfig, createPurchase, activateFreeTrial, navigate } = vi.hoisted(() => ({
   getConfig: vi.fn(),
   createPurchase: vi.fn(),
@@ -98,7 +102,7 @@ describe('Bulka free trial', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/buy/success/free-token'));
     expect(activateFreeTrial).toHaveBeenCalledWith(
       'bulka',
-      expect.objectContaining({ language: 'ru' }),
+      expect.objectContaining({ language: 'ru', campaign_slug: 'summer_2026' }),
       expect.any(String),
     );
     expect(createPurchase).not.toHaveBeenCalled();
@@ -134,7 +138,11 @@ describe('Bulka free trial', () => {
     await waitFor(() =>
       expect(createPurchase).toHaveBeenCalledWith(
         'bulka',
-        expect.objectContaining({ flow_kind: 'trial', payment_method: 'card' }),
+        expect.objectContaining({
+          flow_kind: 'trial',
+          payment_method: 'card',
+          campaign_slug: 'summer_2026',
+        }),
         expect.any(String),
       ),
     );
@@ -156,6 +164,7 @@ describe('Bulka free trial', () => {
           tariff_id: 2,
           period_days: 90,
           payment_method: 'card',
+          campaign_slug: 'summer_2026',
         }),
         expect.any(String),
       ),

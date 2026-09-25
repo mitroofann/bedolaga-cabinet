@@ -946,7 +946,32 @@
       "yourCampaigns": "کمپین‌های شما",
       "campaignLinks": {
         "bot": "لینک ربات",
-        "web": "لینک کابینت"
+        "web": "لینک کابینت",
+        "sale": "لینک فروش",
+        "trial": "لینک آزمایشی",
+        "landing": "لینک صفحه فرود"
+      },
+      "partnerTerms": {
+        "title": "شرایط برنامه همکاری شما",
+        "description": "شرایط اختصاصی برای پاداش‌های آینده.",
+        "minimumTopup": "حداقل شارژ",
+        "firstTopupBonus": "پاداش اولین شارژ",
+        "inviterBonus": "پاداش دعوت‌کننده",
+        "commission": "کمیسیون",
+        "firstPaymentCommission": "کمیسیون پرداخت اول",
+        "recurringTiers": "کمیسیون بر اساس پرداخت",
+        "maxPayments": "حداکثر پرداخت‌ها",
+        "maxCommission": "حداکثر کمیسیون",
+        "levelsMode": "حالت سطوح",
+        "rewardMode": "نوع پاداش",
+        "trigger": "محرک",
+        "referrerReward": "پاداش دعوت‌کننده",
+        "refereeReward": "پاداش دعوت‌شده",
+        "requiredReferrals": "معرفی‌های لازم",
+        "activeOnly": "فقط فعال‌ها",
+        "active": "فعال",
+        "inactive": "غیرفعال",
+        "unlimited": "نامحدود"
       },
       "campaignBonus": {
         "title": "جایزه معرفی",

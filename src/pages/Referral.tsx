@@ -10,6 +10,7 @@ import { brandingApi } from '../api/branding';
 import { partnerApi } from '../api/partners';
 import { withdrawalApi } from '../api/withdrawals';
 import { CampaignCard } from '../components/partner/CampaignCard';
+import { PartnerReferralTerms } from '../components/partner/PartnerReferralTerms';
 import { useWholeAmount } from '../components/referral/ReferralPromoBanner';
 import { useCurrency } from '../hooks/useCurrency';
 import { StatCard } from '@/components/stats';
@@ -825,7 +826,11 @@ export default function Referral() {
       </div>
 
       {/* Program Terms */}
-      {programTerms}
+      {isPartner && partnerStatus?.partner_terms ? (
+        <PartnerReferralTerms terms={partnerStatus.partner_terms} />
+      ) : (
+        programTerms
+      )}
 
       {/* Reward Settings */}
       {terms && (

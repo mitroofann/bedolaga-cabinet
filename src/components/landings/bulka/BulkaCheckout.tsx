@@ -9,6 +9,7 @@ import {
 import { useCurrency } from '@/hooks/useCurrency';
 import { getApiErrorMessage } from '@/utils/api-error';
 import { safeSession } from '@/utils/safeStorage';
+import { getPendingCampaignSlug } from '@/utils/campaign';
 import { SanitizedHtml } from '@/components/common/SanitizedHtml';
 import {
   ArrowDownIcon,
@@ -181,6 +182,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
           language: 'ru',
           referrer: safeSession.getItem('landing_referrer'),
           subid: safeSession.getItem('landing_subid'),
+          campaign_slug: getPendingCampaignSlug() ?? undefined,
         },
       };
       return landingApi.activateBulkaFreeTrial(
@@ -226,6 +228,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
         language: 'ru',
         referrer: safeSession.getItem('landing_referrer'),
         subid: safeSession.getItem('landing_subid'),
+        campaign_slug: getPendingCampaignSlug() ?? undefined,
       });
       return;
     }
@@ -239,6 +242,7 @@ export function BulkaCheckout({ slug, initialIntent }: BulkaCheckoutProps) {
       language: 'ru',
       referrer: safeSession.getItem('landing_referrer'),
       subid: safeSession.getItem('landing_subid'),
+      campaign_slug: getPendingCampaignSlug() ?? undefined,
     });
   };
 

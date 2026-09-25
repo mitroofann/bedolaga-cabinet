@@ -55,6 +55,7 @@ export interface BulkaFlowPurchaseRequest {
   yandex_cid?: string | null;
   referrer?: string | null;
   subid?: string | null;
+  campaign_slug?: string;
 }
 
 export interface BulkaFlowPurchaseResponse {
@@ -70,6 +71,7 @@ export interface BulkaFreeTrialRequest {
   yandex_cid?: string | null;
   referrer?: string | null;
   subid?: string | null;
+  campaign_slug?: string;
 }
 
 export interface BulkaFreeTrialResponse {
@@ -227,6 +229,7 @@ export interface TrialRequest {
   yclid?: string | null;
   referrer?: string | null;
   subid?: string | null;
+  campaign_slug?: string;
 }
 
 /** Free trial granted immediately (no payment). */

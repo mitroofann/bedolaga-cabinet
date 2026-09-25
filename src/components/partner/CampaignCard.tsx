@@ -54,6 +54,27 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
 
   const botKey = `${campaign.id}-bot`;
   const webKey = `${campaign.id}-web`;
+  const saleKey = `${campaign.id}-sale`;
+  const trialKey = `${campaign.id}-trial`;
+  const landingKey = `${campaign.id}-landing`;
+
+  const linkRow = (url: string, label: string, key: string) => (
+    <div>
+      <div className="mb-1 text-xs font-medium text-dark-500">{label}</div>
+      <div className="flex items-center gap-2">
+        <input type="text" readOnly value={url} className="input flex-1 text-xs" />
+        <button
+          type="button"
+          onClick={() => handleCopy(url, key)}
+          className={`btn-primary shrink-0 px-3 py-2.5 ${
+            copiedLink === key ? 'bg-success-500 hover:bg-success-500' : ''
+          }`}
+        >
+          {copiedLink === key ? <CheckIcon /> : <CopyIcon />}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="bento-card space-y-4">
@@ -119,55 +140,16 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         </div>
       )}
 
-      {/* Bot link */}
-      {campaign.deep_link && (
-        <div>
-          <div className="mb-1 text-xs font-medium text-dark-500">
-            {t('referral.partner.campaignLinks.bot')}
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              readOnly
-              value={campaign.deep_link}
-              className="input flex-1 text-xs"
-            />
-            <button
-              onClick={() => handleCopy(campaign.deep_link!, botKey)}
-              className={`btn-primary shrink-0 px-3 py-2.5 ${
-                copiedLink === botKey ? 'bg-success-500 hover:bg-success-500' : ''
-              }`}
-            >
-              {copiedLink === botKey ? <CheckIcon /> : <CopyIcon />}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Web link */}
-      {campaign.web_link && (
-        <div>
-          <div className="mb-1 text-xs font-medium text-dark-500">
-            {t('referral.partner.campaignLinks.web')}
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              readOnly
-              value={campaign.web_link}
-              className="input flex-1 text-xs"
-            />
-            <button
-              onClick={() => handleCopy(campaign.web_link!, webKey)}
-              className={`btn-primary shrink-0 px-3 py-2.5 ${
-                copiedLink === webKey ? 'bg-success-500 hover:bg-success-500' : ''
-              }`}
-            >
-              {copiedLink === webKey ? <CheckIcon /> : <CopyIcon />}
-            </button>
-          </div>
-        </div>
-      )}
+      {campaign.sale_url &&
+        linkRow(campaign.sale_url, t('referral.partner.campaignLinks.sale'), saleKey)}
+      {campaign.trial_url &&
+        linkRow(campaign.trial_url, t('referral.partner.campaignLinks.trial'), trialKey)}
+      {campaign.landing_url &&
+        linkRow(campaign.landing_url, t('referral.partner.campaignLinks.landing'), landingKey)}
+      {campaign.deep_link &&
+        linkRow(campaign.deep_link, t('referral.partner.campaignLinks.bot'), botKey)}
+      {campaign.web_link &&
+        linkRow(campaign.web_link, t('referral.partner.campaignLinks.web'), webKey)}
 
       {/* Expanded detail stats */}
       <div id={`campaign-detail-${campaign.id}`}>

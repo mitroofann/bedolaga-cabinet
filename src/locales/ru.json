@@ -1095,7 +1095,32 @@
       "yourCampaigns": "Ваши кампании",
       "campaignLinks": {
         "bot": "Ссылка в бот",
-        "web": "Ссылка в кабинет"
+        "web": "Ссылка в кабинет",
+        "sale": "Ссылка на продажу",
+        "trial": "Ссылка на триал",
+        "landing": "Ссылка на лендинг"
+      },
+      "partnerTerms": {
+        "title": "Ваши условия партнёрской программы",
+        "description": "Индивидуальные условия для будущих начислений.",
+        "minimumTopup": "Минимальное пополнение",
+        "firstTopupBonus": "Бонус за первое пополнение",
+        "inviterBonus": "Бонус пригласившему",
+        "commission": "Комиссия",
+        "firstPaymentCommission": "Комиссия за первый платёж",
+        "recurringTiers": "Комиссии по платежам",
+        "maxPayments": "Максимум платежей",
+        "maxCommission": "Максимум комиссии",
+        "levelsMode": "Режим уровней",
+        "rewardMode": "Тип награды",
+        "trigger": "Триггер",
+        "referrerReward": "Награда пригласившему",
+        "refereeReward": "Награда приглашённому",
+        "requiredReferrals": "Требуемые рефералы",
+        "activeOnly": "Только активные",
+        "active": "Активен",
+        "inactive": "Неактивен",
+        "unlimited": "Без ограничений"
       },
       "campaignBonus": {
         "title": "Бонус для реферала",

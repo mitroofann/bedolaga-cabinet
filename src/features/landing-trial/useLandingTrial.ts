@@ -12,6 +12,7 @@ import {
 import { getApiErrorMessage } from '../../utils/api-error';
 import { getYandexCid } from '../../utils/yandexCid';
 import { safeSession } from '../../utils/safeStorage';
+import { getPendingCampaignSlug } from '../../utils/campaign';
 import { detectContactType, isValidContact } from './contact';
 
 /** Read a tracking id from the current URL, falling back to sessionStorage. */
@@ -115,6 +116,7 @@ export function useLandingTrial(slug: string, trial: LandingTrialConfig): UseLan
       yclid: readTrackingParam('yclid', 'landing_yclid'),
       referrer: safeSession.getItem('landing_referrer') || undefined,
       subid: safeSession.getItem('landing_subid') || undefined,
+      campaign_slug: getPendingCampaignSlug() || undefined,
     };
 
     mutation.mutate(data);
