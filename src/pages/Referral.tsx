@@ -571,7 +571,7 @@ export default function Referral() {
             </p>
             <p className="mt-1 text-sm leading-snug text-dark-400 whitespace-pre-line">
               {t('referral.promo.description', {
-                percent: terms.commission_percent,
+                percent: terms.first_payment_commission_percent ?? terms.commission_percent,
                 minTopup: `${formatWhole(terms.minimum_topup_rubles)} ${currencySymbol}`,
                 maxCommission: `${formatWhole(maxCommissionKopeks / 100)} ${currencySymbol}`,
               })}
@@ -580,8 +580,8 @@ export default function Referral() {
         )}
         <div className={`grid grid-cols-2 gap-4 ${gridCols}`}>
           <StatCard
-            label={t('referral.terms.commission')}
-            value={`${terms.commission_percent}%`}
+            label={t('referral.terms.firstPaymentCommission')}
+            value={`${terms.first_payment_commission_percent ?? terms.commission_percent}%`}
             icon={<PercentIcon className="h-5 w-5" />}
             tone="neutral"
           />

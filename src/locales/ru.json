@@ -1031,6 +1031,7 @@
     "terms": {
       "title": "Условия программы",
       "commission": "Комиссия",
+      "firstPaymentCommission": "Комиссия за первое пополнение",
       "minTopup": "Мин. пополнение",
       "newUserBonus": "Бонус новому пользователю",
       "inviterBonus": "Бонус пригласившему",

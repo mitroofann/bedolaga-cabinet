@@ -465,6 +465,8 @@ export interface ReferralInfo {
 export interface ReferralTerms {
   is_enabled: boolean;
   commission_percent: number;
+  /** Effective commission rate for the referral's first top-up, when exposed by the backend. */
+  first_payment_commission_percent?: number | null;
   minimum_topup_kopeks: number;
   minimum_topup_rubles: number;
   first_topup_bonus_kopeks: number;

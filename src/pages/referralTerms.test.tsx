@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import ruLocale from '@/locales/ru.json';
+import { ReferralPromoBanner } from '../components/referral/ReferralPromoBanner';
 import type { ReferralProgramLevel, ReferralTerms } from '../types';
 
 /**
@@ -28,6 +30,13 @@ vi.mock('react-i18next', () => ({
   }),
   Trans: ({ children }: { children?: unknown }) => children ?? null,
   initReactI18next: { type: '3rdParty', init: () => {} },
+}));
+
+vi.mock('../hooks/useCurrency', () => ({
+  useCurrency: () => ({
+    currencySymbol: '₽',
+    formatAmount: (amount: number) => `${amount} ₽`,
+  }),
 }));
 
 const level = (over: Partial<ReferralProgramLevel> = {}): ReferralProgramLevel => ({
@@ -65,6 +74,14 @@ afterEach(cleanup);
 async function renderTerms(value: ReferralTerms) {
   const { ProgrammeTerms } = await import('./Referral');
   render(<ProgrammeTerms terms={value} />);
+}
+
+function renderPromo(value: ReferralTerms) {
+  render(
+    <MemoryRouter>
+      <ReferralPromoBanner terms={value} />
+    </MemoryRouter>,
+  );
 }
 
 describe('карточка условий программы', () => {
@@ -127,6 +144,30 @@ describe('карточка условий программы', () => {
     // Старый бэкенд не знает поля levels; экран обязан остаться читаемым.
     await renderTerms(terms({ levels: [], level_descriptions: ['Уровень 1: 25% от суммы'] }));
     expect(screen.getByText('Уровень 1: 25% от суммы')).toBeTruthy();
+  });
+
+  it('показывает ставку первого пополнения вместо обычной комиссии', () => {
+    renderPromo(
+      terms({
+        commission_percent: 0,
+        first_payment_commission_percent: 100,
+        minimum_topup_kopeks: 25000,
+        max_commission_kopeks: 100000,
+      }),
+    );
+    expect(screen.getByText(/100% комиссии/)).toBeTruthy();
+    expect(screen.queryByText(/^0% комиссии/)).toBeNull();
+  });
+
+  it('сохраняет fallback на обычную комиссию для старого backend', () => {
+    renderPromo(
+      terms({
+        commission_percent: 25,
+        first_payment_commission_percent: null,
+        max_commission_kopeks: 100000,
+      }),
+    );
+    expect(screen.getByText(/25% комиссии/)).toBeTruthy();
   });
 
   it('сообщает, когда уровни не настроены вовсе', async () => {

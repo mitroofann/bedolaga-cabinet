@@ -50,7 +50,9 @@ export function ReferralPromoBanner({
   if (maxCommissionKopeks <= 0) return null;
 
   const maxRubles = maxCommissionKopeks / 100;
-  const percent = terms?.commission_percent ?? 0;
+  // The recurring rate may be 0 while the first top-up has its own rate.
+  // Older backends do not return the new field, so retain the old fallback.
+  const percent = terms?.first_payment_commission_percent ?? terms?.commission_percent ?? 0;
   const minTopupRubles = (terms?.minimum_topup_kopeks ?? 0) / 100;
 
   const description = t('referral.promo.description', {

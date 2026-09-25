@@ -882,6 +882,7 @@
     "terms": {
       "title": "شرایط برنامه",
       "commission": "کمیسیون",
+      "firstPaymentCommission": "کمیسیون اولین شارژ",
       "minTopup": "حداقل شارژ",
       "newUserBonus": "جایزه کاربر جدید",
       "inviterBonus": "جایزه معرف",

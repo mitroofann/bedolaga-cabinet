@@ -1007,6 +1007,7 @@
     "terms": {
       "title": "Program Terms",
       "commission": "Commission",
+      "firstPaymentCommission": "First top-up commission",
       "minTopup": "Min. Top-up",
       "newUserBonus": "New User Bonus",
       "inviterBonus": "Inviter Bonus",

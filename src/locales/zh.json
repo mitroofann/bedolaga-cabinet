@@ -882,6 +882,7 @@
     "terms": {
       "title": "计划条款",
       "commission": "佣金",
+      "firstPaymentCommission": "首次充值佣金",
       "minTopup": "最低充值",
       "newUserBonus": "新用户奖励",
       "inviterBonus": "邀请人奖励",
